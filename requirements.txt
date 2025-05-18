@@ -1,6 +1,6 @@
-flask
+flask==2.3.3
 flask-mysqldb
-flask-babel
+flask-babel==3.1.0
 python-dotenv
 requests
 gunicorn
