@@ -20,15 +20,28 @@ def login():
             session['role'] = user['role']
             session['lang'] = user.get('preferred_lang', 'cz')
             flash("Login successful.", "success")
-            return redirect(url_for('driver.dashboard') if user['role'] == 'driver' else url_for('employee.dashboard'))
+
+            # Redirect based on role
+            if user['role'] == 'driver':
+                return redirect(url_for('driver.dashboard'))
+            elif user['role'] == 'employee':
+                return redirect(url_for('employee.dashboard'))
+            elif user['role'] == 'manager':
+                return redirect(url_for('manager.dashboard'))
+
+            # fallback if role is weird
+            return redirect(url_for('auth.login'))
         else:
             flash("Invalid email or password.", "danger")
 
     return render_template('auth/login.html')
-
 
 @auth_bp.route('/logout')
 def logout():
     session.clear()
     flash("Logged out.", "info")
     return redirect(url_for('auth.login'))
+
+@auth_bp.route('/')
+def index():
+    return render_template('index.html')
