@@ -18,7 +18,7 @@ def login():
         if user and check_password_hash(user['password_hash'], password):
             session['user_id'] = user['id']
             session['role'] = user['role']
-            session['lang'] = user.get('preferred_lang', 'cz')
+            session['lang'] = user.get('preferred_lang', 'cs')
             flash("Login successful.", "success")
 
             # Redirect based on role

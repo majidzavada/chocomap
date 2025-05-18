@@ -11,5 +11,5 @@ class Config:
     MYSQL_CURSORCLASS = 'DictCursor'
 
     # Localization
-    BABEL_DEFAULT_LOCALE = 'cz'
+    BABEL_DEFAULT_LOCALE = 'cs'
     BABEL_TRANSLATION_DIRECTORIES = 'app/translations'

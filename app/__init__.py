@@ -20,7 +20,7 @@ def create_app():
 
     # Define locale selector function for Babel
     def get_locale():
-        return session.get('lang', 'cz')
+        return session.get('lang', 'cs')
 
     # Initialize Babel with selector
     babel.init_app(app, locale_selector=get_locale)
