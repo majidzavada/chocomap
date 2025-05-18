@@ -17,7 +17,7 @@ def create_app():
     mysql.init_app(app)
     babel.init_app(app)
 
-    @babel.localeselector_func
+    @babel.locale_selector
     def get_locale():
         return session.get('lang', 'cz')
 
