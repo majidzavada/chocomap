@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from werkzeug.security import check_password_hash
 from app import mysql
 
-auth_bp = Blueprint('auth', __name__)
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -29,12 +29,13 @@ def login():
             elif user['role'] == 'manager':
                 return redirect(url_for('manager.dashboard'))
 
-            # fallback if role is weird
+            # fallback
             return redirect(url_for('auth.login'))
         else:
             flash("Invalid email or password.", "danger")
 
     return render_template('auth/login.html')
+
 
 @auth_bp.route('/logout')
 def logout():
@@ -42,6 +43,15 @@ def logout():
     flash("Logged out.", "info")
     return redirect(url_for('auth.login'))
 
+
 @auth_bp.route('/')
 def index():
     return render_template('index.html')
+
+
+# ← New language‐switch endpoint
+@auth_bp.route('/lang/<lang_code>')
+def set_language(lang_code):
+    session['lang'] = lang_code
+    # send the user back where they came from, or home
+    return redirect(request.referrer or url_for('auth.index'))
