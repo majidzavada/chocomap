@@ -15,17 +15,22 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Initialize MySQL as before
+    # Initialize MySQL
     mysql.init_app(app)
 
-    # Define your locale selector function
+    # Define locale selector function for Babel
     def get_locale():
         return session.get('lang', 'cz')
 
-    # Initialize Babel with your selector (no decorator)
-    babel.init_app(app, locale_selector=get_locale)  # ← new API
+    # Initialize Babel with selector
+    babel.init_app(app, locale_selector=get_locale)
 
-    # Register your blueprints
+    # Inject get_locale into templates
+    @app.context_processor
+    def inject_get_locale():
+        return dict(get_locale=get_locale)
+
+    # Register blueprints
     from .routes.auth import auth_bp
     from .routes.driver import driver_bp
     from .routes.employee import employee_bp
