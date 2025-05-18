@@ -27,5 +27,5 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 
 ### 1. Clone the project
 ```bash
-git clone <repo-url>
+git clone https://github.com/majidzavada/chocomap
 cd chocomap
