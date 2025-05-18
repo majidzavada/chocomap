@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Driver Dashboard') }}{% endblock %}
+{% block content %}
+<h2>{{ _('Today\'s Deliveries') }}</h2>
+
+{% if deliveries %}
+  {% for d in deliveries %}
+    <div style="margin-bottom: 2rem; padding: 10px; border-left: 5px solid
+      {% if d['status'] == 'pending' %}orange
+      {% elif d['status'] == 'accepted' %}green
+      {% elif d['status'] == 'rejected' %}red
+      {% elif d['status'] == 'completed' %}blue
+      {% else %}gray{% endif %}; background: #fff;">
+
+      <strong>{{ d['delivery_date'] }} {{ d['start_time'] }}:</strong>
+      {{ d['label'] }} – {{ d['street_address'] }}<br>
+      <small>{{ _('Status') }}: {{ d['status'] }}</small><br>
+
+      {% if d['status'] == 'pending' %}
+        <a href="{{ url_for('driver.accept_delivery', delivery_id=d['id']) }}">{{ _('Accept') }}</a> |
+        <a href="{{ url_for('driver.reject_delivery', delivery_id=d['id']) }}">{{ _('Reject') }}</a>
+      {% elif d['status'] == 'accepted' %}
+        <a href="{{ url_for('driver.complete_delivery', delivery_id=d['id']) }}">{{ _('Mark as Completed') }}</a>
+      {% endif %}
+
+      <!-- Map -->
+      <div id="map-{{ d['id'] }}" style="height: 200px; margin-top: 10px;"></div>
+      <script>
+        function initMap{{ d['id'] }}() {
+          const origin = { lat: {{ config['WAREHOUSE_LAT'] | float }}, lng: {{ config['WAREHOUSE_LNG'] | float }} };
+          const destination = { lat: {{ d['latitude'] | float }}, lng: {{ d['longitude'] | float }} };
+
+          const map = new google.maps.Map(document.getElementById("map-{{ d['id'] }}"), {
+            zoom: 11,
+            center: origin,
+          });
+
+          const directionsService = new google.maps.DirectionsService();
+          const directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
+
+          directionsService.route({
+            origin: origin,
+            destination: destination,
+            travelMode: google.maps.TravelMode.DRIVING,
+          }, (response, status) => {
+            if (status === "OK") {
+              directionsRenderer.setDirections(response);
+            }
+          });
+        }
+        window.addEventListener('load', initMap{{ d['id'] }});
+      </script>
+    </div>
+  {% endfor %}
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ config['GOOGLE_MAPS_API_KEY'] }}&callback=initMap" async defer></script>
+{% else %}
+  <p>{{ _('No deliveries assigned.') }}</p>
+{% endif %}
+{% endblock %}

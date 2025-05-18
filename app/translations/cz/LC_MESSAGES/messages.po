@@ -1,0 +1,40 @@
+msgid ""
+msgstr ""
+"Language: cs\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Login to ChocoMap"
+msgstr "Přihlášení do ChocoMap"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Password"
+msgstr "Heslo"
+
+msgid "Accept"
+msgstr "Přijmout"
+
+msgid "Reject"
+msgstr "Odmítnout"
+
+msgid "Mark as Completed"
+msgstr "Označit jako dokončené"
+
+msgid "Today's Deliveries"
+msgstr "Dnešní rozvozy"
+
+msgid "Driver Dashboard"
+msgstr "Řídicí panel řidiče"
+
+msgid "Employee Dashboard"
+msgstr "Řídicí panel zaměstnance"
+
+msgid "Delivery Calendar"
+msgstr "Kalendář rozvozů"
+
+msgid "Schedule a Delivery"
+msgstr "Naplánovat rozvoz"
+
+msgid "Update"
+msgstr "Aktualizovat"

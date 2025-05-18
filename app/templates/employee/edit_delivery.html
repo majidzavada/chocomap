@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Edit Delivery') }}{% endblock %}
+{% block content %}
+<h2>{{ _('Edit Delivery') }}</h2>
+
+<form method="POST">
+  <select name="driver_id" required>
+    {% for d in drivers %}
+      <option value="{{ d.id }}" {% if d.id == delivery.driver_id %}selected{% endif %}>{{ d.name }}</option>
+    {% endfor %}
+  </select><br>
+
+  <select name="address_id" required>
+    {% for a in addresses %}
+      <option value="{{ a.id }}" {% if a.id == delivery.address_id %}selected{% endif %}>{{ a.label }}</option>
+    {% endfor %}
+  </select><br>
+
+  <input type="date" name="delivery_date" value="{{ delivery.delivery_date }}"><br>
+  <input type="time" name="start_time" value="{{ delivery.start_time }}"><br>
+  <input type="time" name="end_time" value="{{ delivery.end_time }}"><br>
+  <textarea name="notes">{{ delivery.notes }}</textarea><br>
+
+  <button type="submit">{{ _('Update') }}</button>
+</form>
+{% endblock %}

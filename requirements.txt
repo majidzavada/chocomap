@@ -1,0 +1,6 @@
+flask
+flask-mysqldb
+flask-babel
+python-dotenv
+requests
+gunicorn

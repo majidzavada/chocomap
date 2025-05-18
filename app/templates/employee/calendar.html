@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Weekly Delivery Calendar') }}{% endblock %}
+{% block content %}
+<h2>{{ _('Delivery Calendar') }}</h2>
+
+<form method="GET">
+  <input type="text" name="driver" placeholder="{{ _('Filter by driver') }}">
+  <input type="date" name="date" placeholder="{{ _('Filter by date') }}">
+  <button type="submit">{{ _('Apply Filters') }}</button>
+</form>
+
+{% for (date, driver), entries in schedule.items() %}
+  <h3>{{ date }} – {{ driver }}</h3>
+  <ul>
+    {% for d in entries %}
+      <li>
+        {{ d['start_time'] }} → {{ d['end_time'] }}:
+        {{ d['label'] }} – {{ d['street_address'] }}
+        [{{ d['status'] }}]
+        <a href="{{ url_for('employee.delete_delivery_route', delivery_id=d['id']) }}">🗑️</a>
+        <a href="{{ url_for('employee.edit_delivery', delivery_id=d['id']) }}">✏️</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Employee Dashboard') }}{% endblock %}
+{% block content %}
+<div class="dashboard-box">
+  <h2>{{ _('Employee Dashboard') }}</h2>
+
+  <div class="stats">
+    <div class="stat-item">
+      <strong>{{ _('Today\'s Deliveries') }}</strong><br>
+      {{ today_count }}
+    </div>
+    <div class="stat-item">
+      <strong>{{ _('This Week') }}</strong><br>
+      {{ week_count }}
+    </div>
+    <div class="stat-item">
+      <strong>{{ _('Upcoming Delivery') }}</strong><br>
+      {% if next_delivery %}
+        {{ next_delivery.delivery_date }} — {{ next_delivery.label }}
+      {% else %}
+        {{ _('None') }}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="dashboard-links">
+    <a href="{{ url_for('employee.schedule') }}">{{ _('📅 Schedule a Delivery') }}</a>
+    <a href="{{ url_for('employee.addresses') }}">{{ _('🏠 Manage Addresses') }}</a>
+    <a href="{{ url_for('employee.calendar') }}">{{ _('📆 View Calendar') }}</a>
+  </div>
+</div>
+
+<style>
+  .dashboard-box {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    background: #eee;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 30%;
+    margin: 0.5rem;
+  }
+
+  .dashboard-links a {
+    display: inline-block;
+    margin: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background-color: #6a1b9a;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+
+  .dashboard-links a:hover {
+    background-color: #4a0e6b;
+  }
+
+  @media (max-width: 600px) {
+    .stats {
+      flex-direction: column;
+    }
+    .stat-item {
+      width: 100%;
+    }
+  }
+</style>
+{% endblock %}

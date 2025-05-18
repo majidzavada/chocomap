@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="{{ get_locale() }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}ChocoMap{% endblock %}</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      background-color: #f2f2f2;
+    }
+
+    header {
+      background-color: #6a1b9a;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    nav {
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    nav a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #6a1b9a;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 1rem;
+    }
+
+    .flash {
+      text-align: center;
+      color: red;
+      margin: 1rem 0;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ChocoMap</h1>
+  </header>
+
+  <nav>
+    <a href="{{ url_for('auth.logout') }}">{{ _('Logout') }}</a> |
+    <a href="{{ url_for('set_language', lang_code='en') }}">EN</a> |
+    <a href="{{ url_for('set_language', lang_code='cz') }}">CZ</a>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
