@@ -1,7 +1,7 @@
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, session, request, render_template
+from flask import Flask, session, request, render_template, redirect, url_for
 from flask_talisman import Talisman
 from flask_compress import Compress
 from dotenv import load_dotenv
@@ -86,6 +86,11 @@ def create_app(config_class=Config):
     @app.errorhandler(429)
     def ratelimit_error(error):
         return render_template('errors/429.html'), 429
+    
+    # Add root route
+    @app.route('/')
+    def root():
+        return redirect(url_for('auth.index'))
     
     # Register before_request handlers
     @app.before_request
