@@ -95,7 +95,7 @@ def index():
     return render_template('index.html')
 
 @auth_bp.route('/lang/<lang_code>')
-def set_language(lang_code):
+def lang(lang_code):
     allowed_languages = {'cs', 'en'}  # Add more as needed
     if lang_code not in allowed_languages:
         abort(400)
