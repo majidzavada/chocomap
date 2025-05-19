@@ -94,6 +94,11 @@ def logout():
 def index():
     return render_template('index.html')
 
+@auth_bp.route('/home')
+@cache_control(max_age=60, private=False)  # Cache for 1 minute
+def home():
+    return redirect(url_for('auth.index'))
+
 @auth_bp.route('/lang/<lang_code>')
 def lang(lang_code):
     allowed_languages = {'cs', 'en'}  # Add more as needed

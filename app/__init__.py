@@ -32,7 +32,7 @@ def create_app(config_class=Config):
             return session['lang']
         # Otherwise try to guess the language from the user accept
         # header the browser transmits
-        return request.accept_languages.best_match(['en', 'cs'])
+        return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
     
     babel.localeselector = get_locale
     

@@ -79,6 +79,15 @@ class Config:
     TIMEZONE = os.environ.get('TIMEZONE', 'UTC')
     DEFAULT_LANGUAGE = os.environ.get('DEFAULT_LANGUAGE', 'en')
     
+    # Babel configuration
+    BABEL_DEFAULT_LOCALE = DEFAULT_LANGUAGE
+    BABEL_DEFAULT_TIMEZONE = TIMEZONE
+    BABEL_TRANSLATION_DIRECTORIES = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'translations')
+    LANGUAGES = {
+        'en': 'English',
+        'cs': 'Čeština'
+    }
+    
     # Feature flags
     ENABLE_ANALYTICS = os.environ.get('ENABLE_ANALYTICS', 'True').lower() == 'true'
     ENABLE_NOTIFICATIONS = os.environ.get('ENABLE_NOTIFICATIONS', 'True').lower() == 'true'
