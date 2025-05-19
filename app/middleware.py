@@ -195,6 +195,19 @@ def cache_control(max_age=0, private=True):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             response = f(*args, **kwargs)
+            
+            # Convert string response to Response object
+            if isinstance(response, str):
+                from flask import make_response
+                response = make_response(response)
+            
+            # Handle tuple responses (response, status_code)
+            if isinstance(response, tuple):
+                response, status_code = response
+                if isinstance(response, str):
+                    from flask import make_response
+                    response = make_response(response, status_code)
+            
             if private:
                 response.headers['Cache-Control'] = f'private, max-age={max_age}'
             else:
