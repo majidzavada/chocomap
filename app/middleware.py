@@ -20,12 +20,12 @@ def login_required(f: Callable) -> Callable:
         return f(*args, **kwargs)
     return decorated_function
 
-def role_required(role: str) -> Callable:
-    """Decorator to require specific user role."""
+def role_required(*roles: str) -> Callable:
+    """Decorator to require specific user role(s)."""
     def decorator(f: Callable) -> Callable:
         @wraps(f)
         def decorated_function(*args: Any, **kwargs: Any) -> Any:
-            if session.get('role') != role:
+            if session.get('role') not in roles:
                 if request.is_json:
                     return jsonify({'error': 'Permission denied'}), 403
                 return redirect(url_for('auth.login'))
