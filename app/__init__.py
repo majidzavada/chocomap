@@ -25,6 +25,16 @@ def create_app(config_class=Config):
     mail.init_app(app)
     babel.init_app(app)
     
+    # Set up Babel locale selector
+    @babel.localeselector
+    def get_locale():
+        # Try to get the language from the session
+        if 'lang' in session:
+            return session['lang']
+        # Otherwise try to guess the language from the user accept
+        # header the browser transmits
+        return request.accept_languages.best_match(['en', 'cs'])
+    
     # Set up logging
     if not app.debug and not app.testing:
         if not os.path.exists('logs'):

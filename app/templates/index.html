@@ -1,59 +1,29 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block title %}{{ _('Welcome to ChocoMap') }}{% endblock %}
 
 {% block content %}
-<div class="welcome-section">
-  <h2>{{ _('Welcome to ChocoMap') }}</h2>
-  <p>{{ _('Plan, assign, and track chocolate deliveries with ease.') }}</p>
-
-  {% if not session.get('user_id') %}
-    <div class="cta-buttons">
-      <a href="{{ url_for('auth.login') }}">{{ _('Login') }}</a>
+<div class="container text-center py-5">
+    <h1 class="display-4 mb-4">{{ _('Welcome to ChocoMap') }}</h1>
+    <p class="lead mb-5">{{ _('Your efficient delivery management system') }}</p>
+    
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="d-grid gap-3">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('auth.dashboard') }}" class="btn btn-primary btn-lg">
+                        {{ _('Go to Dashboard') }}
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                        {{ _('Login') }}
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary btn-lg">
+                        {{ _('Register') }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
-  {% else %}
-    <div class="cta-buttons">
-      {% if session.get('role') == 'employee' %}
-        <a href="{{ url_for('employee.dashboard') }}">{{ _('Go to Employee Dashboard') }}</a>
-      {% elif session.get('role') == 'driver' %}
-        <a href="{{ url_for('driver.dashboard') }}">{{ _('Go to Driver Dashboard') }}</a>
-      {% elif session.get('role') == 'manager' %}
-        <a href="{{ url_for('manager.dashboard') }}">{{ _('Go to Manager Dashboard') }}</a>
-      {% endif %}
-    </div>
-  {% endif %}
 </div>
-
-<style>
-  .welcome-section {
-    max-width: 600px;
-    margin: 2rem auto;
-    text-align: center;
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  }
-
-  .cta-buttons a {
-    display: inline-block;
-    margin: 1rem 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background-color: #6a1b9a;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-  }
-
-  .cta-buttons a:hover {
-    background-color: #4a0e6b;
-  }
-
-  @media (max-width: 600px) {
-    .welcome-section {
-      margin: 1rem;
-      padding: 1rem;
-    }
-  }
-</style>
 {% endblock %}

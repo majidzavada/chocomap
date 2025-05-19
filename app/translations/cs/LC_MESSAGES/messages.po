@@ -1,10 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Chocomap 1.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-01 12:00+0000\n"
-"PO-Revision-Date: 2024-01-01 12:00+0000\n"
-"Last-Translator: \n"
+"Project-Id-Version: ChocoMap\n"
+"POT-Creation-Date: 2024-05-19 21:40+0000\n"
+"PO-Revision-Date: 2024-05-19 21:40+0000\n"
+"Last-Translator: Majid Zavada\n"
 "Language-Team: Czech\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -12,24 +11,56 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-# Auth messages
-msgid "Login"
-msgstr "Přihlášení"
+msgid "Welcome to ChocoMap"
+msgstr "Vítejte v ChocoMap"
 
-msgid "Logout"
-msgstr "Odhlášení"
+msgid "Your efficient delivery management system"
+msgstr "Váš efektivní systém pro správu doručení"
+
+msgid "Go to Dashboard"
+msgstr "Přejít na Ovládací panel"
+
+msgid "Login"
+msgstr "Přihlásit se"
 
 msgid "Register"
-msgstr "Registrace"
+msgstr "Registrovat se"
+
+msgid "Login to ChocoMap"
+msgstr "Přihlášení do ChocoMap"
 
 msgid "Email"
-msgstr "Email"
+msgstr "E-mail"
 
 msgid "Password"
 msgstr "Heslo"
 
-msgid "Confirm Password"
-msgstr "Potvrzení hesla"
+msgid "Internal Server Error"
+msgstr "Interní chyba serveru"
+
+msgid "Something went wrong on our end. Please try again later or contact support if the problem persists."
+msgstr "Něco se pokazilo na naší straně. Prosím, zkuste to později nebo kontaktujte podporu, pokud problém přetrvává."
+
+msgid "Go to Homepage"
+msgstr "Přejít na úvodní stránku"
+
+msgid "Not Found"
+msgstr "Nenalezeno"
+
+msgid "The requested page could not be found."
+msgstr "Požadovaná stránka nebyla nalezena."
+
+msgid "Forbidden"
+msgstr "Zakázáno"
+
+msgid "You don't have permission to access this resource."
+msgstr "Nemáte oprávnění přistupovat k tomuto zdroji."
+
+msgid "Too Many Requests"
+msgstr "Příliš mnoho požadavků"
+
+msgid "You have made too many requests. Please try again later."
+msgstr "Vytvořili jste příliš mnoho požadavků. Prosím, zkuste to později."
 
 # Dashboard messages
 msgid "Dashboard"
@@ -128,9 +159,6 @@ msgstr "Tento týden"
 
 msgid "This Month"
 msgstr "Tento měsíc"
-
-msgid "Login to ChocoMap"
-msgstr "Přihlášení do ChocoMap"
 
 msgid "Accept"
 msgstr "Přijmout"

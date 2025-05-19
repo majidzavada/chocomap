@@ -3,14 +3,12 @@
 {% block title %}{{ _('Internal Server Error') }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 text-center">
-            <h1 class="display-1">500</h1>
-            <h2 class="mb-4">{{ _('Internal Server Error') }}</h2>
-            <p class="lead mb-4">{{ _('Something went wrong on our end. Please try again later or contact support if the problem persists.') }}</p>
-            <a href="{{ url_for('auth.index') }}" class="btn btn-primary">{{ _('Go to Homepage') }}</a>
-        </div>
-    </div>
+<div class="container text-center py-5">
+    <h1 class="display-1 text-muted mb-4">500</h1>
+    <h2 class="mb-4">{{ _('Internal Server Error') }}</h2>
+    <p class="lead mb-5">{{ _('Something went wrong on our end. Please try again later.') }}</p>
+    <a href="{{ url_for('auth.index') }}" class="btn btn-primary btn-lg">
+        {{ _('Return to Homepage') }}
+    </a>
 </div>
 {% endblock %} 

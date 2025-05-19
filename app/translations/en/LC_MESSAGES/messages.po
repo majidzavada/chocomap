@@ -1,10 +1,9 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Chocomap 1.0\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-01 12:00+0000\n"
-"PO-Revision-Date: 2024-01-01 12:00+0000\n"
-"Last-Translator: \n"
+"Project-Id-Version: ChocoMap\n"
+"POT-Creation-Date: 2024-05-19 21:40+0000\n"
+"PO-Revision-Date: 2024-05-19 21:40+0000\n"
+"Last-Translator: Majid Zavada\n"
 "Language-Team: English\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -12,15 +11,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-# Auth messages
+msgid "Welcome to ChocoMap"
+msgstr "Welcome to ChocoMap"
+
+msgid "Your efficient delivery management system"
+msgstr "Your efficient delivery management system"
+
+msgid "Go to Dashboard"
+msgstr "Go to Dashboard"
+
 msgid "Login"
 msgstr "Login"
 
-msgid "Logout"
-msgstr "Logout"
-
 msgid "Register"
 msgstr "Register"
+
+msgid "Login to ChocoMap"
+msgstr "Login to ChocoMap"
 
 msgid "Email"
 msgstr "Email"
@@ -28,8 +35,32 @@ msgstr "Email"
 msgid "Password"
 msgstr "Password"
 
-msgid "Confirm Password"
-msgstr "Confirm Password"
+msgid "Internal Server Error"
+msgstr "Internal Server Error"
+
+msgid "Something went wrong on our end. Please try again later or contact support if the problem persists."
+msgstr "Something went wrong on our end. Please try again later or contact support if the problem persists."
+
+msgid "Go to Homepage"
+msgstr "Go to Homepage"
+
+msgid "Not Found"
+msgstr "Not Found"
+
+msgid "The requested page could not be found."
+msgstr "The requested page could not be found."
+
+msgid "Forbidden"
+msgstr "Forbidden"
+
+msgid "You don't have permission to access this resource."
+msgstr "You don't have permission to access this resource."
+
+msgid "Too Many Requests"
+msgstr "Too Many Requests"
+
+msgid "You have made too many requests. Please try again later."
+msgstr "You have made too many requests. Please try again later."
 
 # Dashboard messages
 msgid "Dashboard"

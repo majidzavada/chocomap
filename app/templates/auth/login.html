@@ -1,148 +1,55 @@
-{% extends 'base.html' %}
-{% block title %}{{ _('Login to ChocoMap') }}{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}{{ _('Login') }}{% endblock %}
+
 {% block content %}
-<div class="login-container">
-  <h2>{{ _('Login to ChocoMap') }}</h2>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="flash-message">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-
-  <form method="POST">
-    <input type="email" name="email" placeholder="{{ _('Email') }}" required>
-    <input type="password" name="password" placeholder="{{ _('Password') }}" required>
-    <button type="submit">{{ _('Login') }}</button>
-  </form>
-
-  <div class="lang-switch">
-    <a href="{{ url_for('auth.set_language', lang_code='en') }}">English</a> |
-    <a href="{{ url_for('auth.set_language', lang_code='cs') }}">Česky</a>
-  </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-4">{{ _('Login') }}</h2>
+                    
+                    <form method="POST" action="{{ url_for('auth.login') }}">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">{{ _('Email') }}</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">{{ _('Password') }}</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">{{ _('Remember me') }}</label>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">{{ _('Login') }}</button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('auth.reset_password_request') }}" class="text-decoration-none">
+                            {{ _('Forgot password?') }}
+                        </a>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p class="mb-0">{{ _("Don't have an account?") }}</p>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary mt-2">
+                            {{ _('Register') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
-<style>
-  .login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-
-  input[type="email"],
-  input[type="password"] {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #6a1b9a;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-  }
-
-  .lang-switch {
-    text-align: center;
-    margin-top: 1rem;
-  }
-
-  .flash-message {
-    margin-bottom: 1rem;
-    color: red;
-    text-align: center;
-  }
-
-  @media (max-width: 480px) {
-    .login-container {
-      margin: 20px;
-      padding: 1rem;
-    }
-  }
-</style>
-{% endblock %}
-{% extends 'base.html' %}
-{% block title %}{{ _('Login to ChocoMap') }}{% endblock %}
-{% block content %}
-<div class="login-container">
-  <h2>{{ _('Login to ChocoMap') }}</h2>
-
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="flash-message">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-
-  <form method="POST">
-    <input type="email" name="email" placeholder="{{ _('Email') }}" required>
-    <input type="password" name="password" placeholder="{{ _('Password') }}" required>
-    <button type="submit">{{ _('Login') }}</button>
-  </form>
-
-  <div class="lang-switch">
-    <a href="{{ url_for('auth.set_language', lang_code='en') }}">English</a> |
-    <a href="{{ url_for('auth.set_language', lang_code='cs') }}">Česky</a>
-  </div>
-</div>
-
-<style>
-  .login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-
-  input[type="email"],
-  input[type="password"] {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #6a1b9a;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: bold;
-  }
-
-  .lang-switch {
-    text-align: center;
-    margin-top: 1rem;
-  }
-
-  .flash-message {
-    margin-bottom: 1rem;
-    color: red;
-    text-align: center;
-  }
-
-  @media (max-width: 480px) {
-    .login-container {
-      margin: 20px;
-      padding: 1rem;
-    }
-  }
-</style>
 {% endblock %}
