@@ -35,6 +35,9 @@ def create_app(config_class=Config):
         # header the browser transmits
         return request.accept_languages.best_match(['en', 'cs'])
     
+    # Make get_locale available in templates
+    app.jinja_env.globals.update(get_locale=get_locale)
+    
     # Set up logging
     if not app.debug and not app.testing:
         if not os.path.exists('logs'):
