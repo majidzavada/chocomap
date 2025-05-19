@@ -26,7 +26,7 @@ def create_app(config_class=Config):
     babel.init_app(app)
     
     # Set up Babel locale selector
-    @babel.localeselector
+    @babel.select_locale
     def get_locale():
         # Try to get the language from the session
         if 'lang' in session:
