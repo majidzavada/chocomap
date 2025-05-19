@@ -7,26 +7,26 @@ backlog = 2048
 
 # Worker processes
 workers = multiprocessing.cpu_count() * 2 + 1
-worker_class = 'sync'
+worker_class = "gevent"
 worker_connections = 1000
 timeout = 30
 keepalive = 2
 
 # Logging
-accesslog = 'logs/gunicorn-access.log'
-errorlog = 'logs/gunicorn-error.log'
-loglevel = 'info'
+accesslog = "logs/access.log"
+errorlog = "logs/error.log"
+loglevel = "info"
 
 # Process naming
-proc_name = 'chocomap'
+proc_name = "chocomap"
 
-# SSL
-# keyfile = 'path/to/keyfile'
-# certfile = 'path/to/certfile'
+# SSL (uncomment and configure if using HTTPS)
+# keyfile = "path/to/keyfile"
+# certfile = "path/to/certfile"
 
 # Server mechanics
 daemon = False
-pidfile = 'gunicorn.pid'
+pidfile = "gunicorn.pid"
 umask = 0
 user = None
 group = None
@@ -35,11 +35,11 @@ tmp_upload_dir = None
 # Server hooks
 def on_starting(server):
     """Log when server starts."""
-    server.log.info("Starting Chocomap server")
+    server.log.info("Starting ChocoMap server")
 
 def on_exit(server):
     """Log when server exits."""
-    server.log.info("Stopping Chocomap server")
+    server.log.info("Stopping ChocoMap server")
 
 def worker_int(worker):
     """Log when worker receives SIGINT or SIGQUIT."""

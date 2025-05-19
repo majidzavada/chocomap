@@ -1,0 +1,14 @@
+[Unit]
+Description=ChocoMap Delivery Management System
+After=network.target
+
+[Service]
+User=thor
+Group=thor
+WorkingDirectory=/home/thor/Documents/app_for_warehouse/chocomap
+Environment="PATH=/home/thor/Documents/app_for_warehouse/chocomap/venv/bin"
+ExecStart=/home/thor/Documents/app_for_warehouse/chocomap/venv/bin/gunicorn --config gunicorn.conf.py wsgi:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target 
