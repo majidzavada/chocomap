@@ -1,16 +1,136 @@
 msgid ""
 msgstr ""
+"Project-Id-Version: Chocomap 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"PO-Revision-Date: 2024-01-01 12:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Czech\n"
 "Language: cs\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
-msgid "Login to ChocoMap"
-msgstr "Přihlášení do ChocoMap"
+# Auth messages
+msgid "Login"
+msgstr "Přihlášení"
+
+msgid "Logout"
+msgstr "Odhlášení"
+
+msgid "Register"
+msgstr "Registrace"
 
 msgid "Email"
-msgstr "E-mail"
+msgstr "Email"
 
 msgid "Password"
 msgstr "Heslo"
+
+msgid "Confirm Password"
+msgstr "Potvrzení hesla"
+
+# Dashboard messages
+msgid "Dashboard"
+msgstr "Přehled"
+
+msgid "Deliveries"
+msgstr "Doručení"
+
+msgid "Addresses"
+msgstr "Adresy"
+
+msgid "Profile"
+msgstr "Profil"
+
+# Delivery messages
+msgid "New Delivery"
+msgstr "Nové doručení"
+
+msgid "Edit Delivery"
+msgstr "Upravit doručení"
+
+msgid "Delete Delivery"
+msgstr "Smazat doručení"
+
+msgid "Delivery Status"
+msgstr "Stav doručení"
+
+# Address messages
+msgid "New Address"
+msgstr "Nová adresa"
+
+msgid "Edit Address"
+msgstr "Upravit adresu"
+
+msgid "Delete Address"
+msgstr "Smazat adresu"
+
+# Error messages
+msgid "Error"
+msgstr "Chyba"
+
+msgid "Success"
+msgstr "Úspěch"
+
+msgid "Warning"
+msgstr "Varování"
+
+msgid "Info"
+msgstr "Informace"
+
+# Form messages
+msgid "Submit"
+msgstr "Odeslat"
+
+msgid "Cancel"
+msgstr "Zrušit"
+
+msgid "Save"
+msgstr "Uložit"
+
+msgid "Delete"
+msgstr "Smazat"
+
+# Navigation
+msgid "Home"
+msgstr "Domů"
+
+msgid "Settings"
+msgstr "Nastavení"
+
+msgid "Help"
+msgstr "Nápověda"
+
+# Status messages
+msgid "Active"
+msgstr "Aktivní"
+
+msgid "Inactive"
+msgstr "Neaktivní"
+
+msgid "Pending"
+msgstr "Čekající"
+
+msgid "Completed"
+msgstr "Dokončené"
+
+# Time messages
+msgid "Today"
+msgstr "Dnes"
+
+msgid "Yesterday"
+msgstr "Včera"
+
+msgid "This Week"
+msgstr "Tento týden"
+
+msgid "This Month"
+msgstr "Tento měsíc"
+
+msgid "Login to ChocoMap"
+msgstr "Přihlášení do ChocoMap"
 
 msgid "Accept"
 msgstr "Přijmout"

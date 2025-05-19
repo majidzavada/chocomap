@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Too Many Requests') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">429</h1>
+            <h2 class="mb-4">{{ _('Too Many Requests') }}</h2>
+            <p class="lead mb-4">{{ _('You have made too many requests. Please wait a moment before trying again.') }}</p>
+            <a href="{{ url_for('auth.index') }}" class="btn btn-primary">{{ _('Go to Homepage') }}</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Page Not Found') }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h1 class="display-1">404</h1>
+            <h2 class="mb-4">{{ _('Page Not Found') }}</h2>
+            <p class="lead mb-4">{{ _('The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.') }}</p>
+            <a href="{{ url_for('auth.index') }}" class="btn btn-primary">{{ _('Go to Homepage') }}</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 
