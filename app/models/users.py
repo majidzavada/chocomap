@@ -1,5 +1,5 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import mysql
+from app.extensions import mysql
 import functools
 from flask import current_app
 import time

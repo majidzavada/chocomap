@@ -1,29 +1,14 @@
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, session, request
-from flask_mysqldb import MySQL
-from flask_babel import Babel
+from flask import Flask, session, request, render_template
 from flask_talisman import Talisman
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 from flask_compress import Compress
 from dotenv import load_dotenv
 from app.config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_cors import CORS
-from flask_caching import Cache
-from flask_mail import Mail
-
-# Initialize extensions
-db = SQLAlchemy()
-migrate = Migrate()
-cors = CORS()
-limiter = Limiter(key_func=get_remote_address)
-cache = Cache()
-mail = Mail()
-babel = Babel()
+from app.extensions import (
+    db, migrate, cors, limiter, cache, mail, babel, mysql
+)
 
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
@@ -31,6 +16,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     
     # Initialize extensions
+    mysql.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
     cors.init_app(app)
@@ -120,6 +106,9 @@ def create_app(config_class=Config):
     # Register shell context
     @app.shell_context_processor
     def make_shell_context():
+        from app.models.users import User
+        from app.models.deliveries import Delivery
+        from app.models.addresses import Address
         return {
             'db': db,
             'User': User,
@@ -159,8 +148,3 @@ def create_app(config_class=Config):
             print('Error creating admin user.')
     
     return app
-
-# Import models
-from app.models.users import User
-from app.models.deliveries import Delivery
-from app.models.addresses import Address
