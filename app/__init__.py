@@ -26,7 +26,6 @@ def create_app(config_class=Config):
     babel.init_app(app)
     
     # Set up Babel locale selector
-    @babel.locale_selector
     def get_locale():
         # Try to get the language from the session
         if 'lang' in session:
@@ -34,6 +33,8 @@ def create_app(config_class=Config):
         # Otherwise try to guess the language from the user accept
         # header the browser transmits
         return request.accept_languages.best_match(['en', 'cs'])
+    
+    babel.localeselector = get_locale
     
     # Make get_locale available in templates
     app.jinja_env.globals.update(get_locale=get_locale)
