@@ -15,6 +15,15 @@ class Config:
     MYSQL_DB = os.environ.get('MYSQL_DB', 'chocomap')
     MYSQL_PORT = int(os.environ.get('MYSQL_PORT', 3306))
     
+    # SQLAlchemy configuration
+    SQLALCHEMY_DATABASE_URI = f"mysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_size': 10,
+        'pool_recycle': 3600,
+        'pool_pre_ping': True
+    }
+    
     # Session configuration
     SESSION_TYPE = 'filesystem'
     PERMANENT_SESSION_LIFETIME = timedelta(days=1)
