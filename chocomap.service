@@ -3,12 +3,18 @@ Description=ChocoMap Delivery Management System
 After=network.target
 
 [Service]
-User=thor
-Group=thor
-WorkingDirectory=/home/thor/Documents/app_for_warehouse/chocomap
-Environment="PATH=/home/thor/Documents/app_for_warehouse/chocomap/venv/bin"
-ExecStart=/home/thor/Documents/app_for_warehouse/chocomap/venv/bin/gunicorn --config gunicorn.conf.py wsgi:app
+User=choco
+Group=choco
+WorkingDirectory=/home/choco/chocomap
+Environment="PATH=/home/choco/chocomap/venv/bin"
+Environment="PYTHONPATH=/home/choco/chocomap"
+Environment="FLASK_APP=wsgi.py"
+Environment="FLASK_ENV=production"
+ExecStart=/home/choco/chocomap/venv/bin/gunicorn --config gunicorn.conf.py wsgi:app
 Restart=always
+RestartSec=5
+StandardOutput=append:/home/choco/chocomap/logs/gunicorn.log
+StandardError=append:/home/choco/chocomap/logs/gunicorn-error.log
 
 [Install]
 WantedBy=multi-user.target 
