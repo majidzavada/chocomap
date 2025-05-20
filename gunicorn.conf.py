@@ -7,7 +7,7 @@ backlog = 2048
 
 # Worker processes
 workers = multiprocessing.cpu_count() * 2 + 1
-worker_class = "gevent"
+worker_class = 'gevent'
 worker_connections = 1000
 timeout = 30
 keepalive = 2
@@ -15,14 +15,14 @@ keepalive = 2
 # Logging
 accesslog = "logs/access.log"
 errorlog = "logs/error.log"
-loglevel = "info"
+loglevel = "debug"
 
 # Process naming
-proc_name = "chocomap"
+proc_name = 'chocomap'
 
-# SSL (uncomment and configure if using HTTPS)
-# keyfile = "path/to/keyfile"
-# certfile = "path/to/certfile"
+# SSL
+keyfile = None
+certfile = None
 
 # Server mechanics
 daemon = False
