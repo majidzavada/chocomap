@@ -1,7 +1,7 @@
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, session, request, render_template, redirect, url_for
+from flask import Flask, session, request, render_template, redirect, url_for, current_app
 from flask_talisman import Talisman
 from flask_compress import Compress
 from dotenv import load_dotenv
@@ -29,7 +29,6 @@ def create_app(config_class=Config):
     babel.init_app(app)
     
     # Set up Babel locale selector
-    @babel.localeselector
     def get_locale():
         """Get the locale for the current request"""
         # First try to get language from session
@@ -50,6 +49,9 @@ def create_app(config_class=Config):
         
         # Finally, try to get from browser settings
         return request.accept_languages.best_match(['en', 'cs'])
+    
+    # Register the locale selector function
+    babel.localeselector(get_locale)
     
     # Make get_locale available in templates
     app.jinja_env.globals.update(get_locale=get_locale)
