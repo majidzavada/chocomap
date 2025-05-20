@@ -21,13 +21,8 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     cors.init_app(app)
     
-    # Initialize rate limiter with Redis storage
-    limiter.init_app(
-        app,
-        storage_url=app.config['RATELIMIT_STORAGE_URL'],
-        strategy=app.config['RATELIMIT_STRATEGY'],
-        default_limits=app.config['RATELIMIT_DEFAULT']
-    )
+    # Initialize rate limiter
+    limiter.init_app(app)
     
     cache.init_app(app)
     mail.init_app(app)

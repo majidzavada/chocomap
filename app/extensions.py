@@ -13,7 +13,12 @@ mysql = MySQL()
 db = SQLAlchemy()
 migrate = Migrate()
 cors = CORS()
-limiter = Limiter(key_func=get_remote_address)
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour", "10 per minute"],
+    storage_uri="redis://localhost:6379/0",
+    strategy="fixed-window"
+)
 cache = Cache()
 mail = Mail()
 babel = Babel() 
