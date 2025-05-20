@@ -24,7 +24,7 @@ def create_app(config_class=Config):
     # Initialize rate limiter with Redis storage
     limiter.init_app(
         app,
-        storage_uri=app.config['RATELIMIT_STORAGE_URL'],
+        storage_url=app.config['RATELIMIT_STORAGE_URL'],
         strategy=app.config['RATELIMIT_STRATEGY'],
         default_limits=app.config['RATELIMIT_DEFAULT']
     )
