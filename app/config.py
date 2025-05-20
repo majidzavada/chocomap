@@ -39,7 +39,7 @@ class Config:
     
     # Rate limiting
     RATELIMIT_DEFAULT = "200 per day"
-    RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL', 'memory://')
+    RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
     RATELIMIT_STRATEGY = 'fixed-window'
     
     # Caching
