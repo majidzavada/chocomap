@@ -5,9 +5,16 @@ import os
 bind = "0.0.0.0:8000"
 
 # Worker processes
-workers = 4
+workers = 2  # Reduced from 4 to 2 for better memory management
 worker_class = 'gevent'
 timeout = 30
+keepalive = 5
+worker_connections = 1000
+
+# Memory management
+max_requests = 1000
+max_requests_jitter = 50
+worker_tmp_dir = "/dev/shm"  # Use RAM for temporary files
 
 # Logging
 loglevel = "debug"
