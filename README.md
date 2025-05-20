@@ -6,8 +6,10 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 
 - **Authentication & Authorization**
   - Secure user authentication
-  - Role-based access control (Manager, Employee, Driver)
+  - Role-based access control (Admin, Manager, Employee, Driver)
   - Password reset and change functionality
+  - User registration approval system
+  - Admin dashboard for user management
 
 - **Driver Features**
   - Real-time delivery tracking
@@ -23,6 +25,13 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
   - Delivery statistics
   - Task assignment
 
+- **Admin Features**
+  - User approval system
+  - User management (create, edit, delete)
+  - Role management
+  - System configuration
+  - Access control
+
 - **Manager Features**
   - Driver management
   - Performance analytics
@@ -32,6 +41,7 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 
 - **General Features**
   - Multi-language support (English and Czech)
+  - Language switching with persistence
   - Responsive design
   - Real-time updates
   - Data validation
@@ -45,6 +55,7 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
   - SQLAlchemy ORM
   - MariaDB
   - Redis for caching
+  - Gunicorn for deployment
 
 - **Frontend**
   - Bootstrap 5
@@ -56,6 +67,7 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 - **Internationalization**
   - Flask-Babel
   - Translation files (EN, CS)
+  - Persistent language preferences
 
 - **Testing**
   - pytest
@@ -69,7 +81,7 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 - Redis (optional, for caching)
 - Google Maps API key
 
-### Installation
+### Development Installation
 
 1. Clone the repository
 ```bash
@@ -101,16 +113,50 @@ cp .env.example .env
 flask db upgrade
 ```
 
-6. Run the application
+6. Run the development server
 ```bash
 flask run
+```
+
+### Production Deployment
+
+1. Clone and setup as above (steps 1-5)
+
+2. Create database and user
+```sql
+CREATE DATABASE chocomap;
+CREATE USER 'choco'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON chocomap.* TO 'choco'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+3. Initialize database schema
+```bash
+mysql -u choco -p chocomap < migrations/create_users_table.sql
+```
+
+4. Run with Gunicorn
+```bash
+# Stop any existing Gunicorn processes
+sudo pkill gunicorn
+sudo rm -f gunicorn.pid
+
+# Start Gunicorn
+gunicorn --bind 0.0.0.0:8000 wsgi:app --pid gunicorn.pid --daemon
+```
+
+5. Default admin credentials
+```
+Email: admin@chocomap.com
+Password: Admin123!
 ```
 
 ### Development
 
 - Run tests: `pytest`
-- Generate translations: `flask babel compile`
+- Generate translations: `pybabel compile -d app/translations`
 - Check code style: `flake8`
+- Update translations: `pybabel update -i messages.pot -d app/translations`
 
 ## 📝 API Documentation
 
@@ -124,6 +170,19 @@ The API documentation is available at `/api/docs` when running the application.
 - Input validation
 - SQL injection prevention
 - XSS protection
+- User registration approval system
+- Role-based access control
+
+## 🌐 Internationalization
+
+The application supports multiple languages:
+- English (default)
+- Czech
+
+Language preferences are:
+1. Stored in user profile if logged in
+2. Stored in session if not logged in
+3. Detected from browser settings as fallback
 
 ## 🤝 Contributing
 
