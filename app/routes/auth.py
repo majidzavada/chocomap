@@ -101,14 +101,26 @@ def home():
 
 @auth_bp.route('/lang/<lang_code>')
 def lang(lang_code):
-    allowed_languages = {'cs', 'en'}  # Add more as needed
-    if lang_code not in allowed_languages:
-        abort(400)
-        
+    """Switch language"""
+    if lang_code not in ['en', 'cs']:
+        lang_code = 'en'
+    
+    # Set language in session
     session['lang'] = lang_code
+    
+    # If user is logged in, update their preferred language
     if 'user_id' in session:
-        update_user(session['user_id'], preferred_lang=lang_code)
-        
+        try:
+            with mysql.cursor() as cursor:
+                cursor.execute(
+                    'UPDATE users SET preferred_lang = %s WHERE id = %s',
+                    (lang_code, session['user_id'])
+                )
+                mysql.commit()
+        except Exception as e:
+            logger.error(f"Error updating user language: {str(e)}")
+    
+    # Redirect back to the previous page or home
     return redirect(request.referrer or url_for('auth.index'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
