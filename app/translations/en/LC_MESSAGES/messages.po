@@ -159,3 +159,30 @@ msgstr "This Week"
 
 msgid "This Month"
 msgstr "This Month"
+
+msgid "Accept"
+msgstr "Accept"
+
+msgid "Reject"
+msgstr "Reject"
+
+msgid "Mark as Completed"
+msgstr "Mark as Completed"
+
+msgid "Today's Deliveries"
+msgstr "Today's Deliveries"
+
+msgid "Driver Dashboard"
+msgstr "Driver Dashboard"
+
+msgid "Employee Dashboard"
+msgstr "Employee Dashboard"
+
+msgid "Delivery Calendar"
+msgstr "Delivery Calendar"
+
+msgid "Schedule a Delivery"
+msgstr "Schedule a Delivery"
+
+msgid "Update"
+msgstr "Update"
