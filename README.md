@@ -54,7 +54,7 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
   - Flask 2.0+
   - SQLAlchemy ORM
   - MariaDB
-  - Redis for caching
+  - Redis for caching and rate limiting
   - Gunicorn for deployment
 
 - **Frontend**
@@ -78,8 +78,35 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 ### Prerequisites
 - Python 3.8 or higher
 - MariaDB
-- Redis (optional, for caching)
+- Redis (required for rate limiting and caching)
 - Google Maps API key
+
+### System Requirements
+
+1. **Python Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **MariaDB**
+   ```bash
+   sudo apt-get update
+   sudo apt-get install mariadb-server
+   ```
+
+3. **Redis**
+   ```bash
+   sudo apt-get update
+   sudo apt-get install redis-server
+   sudo systemctl start redis-server
+   sudo systemctl enable redis-server
+   ```
+
+4. **Verify Redis Installation**
+   ```bash
+   redis-cli ping
+   # Should return PONG
+   ```
 
 ### Development Installation
 
@@ -165,7 +192,7 @@ The API documentation is available at `/api/docs` when running the application.
 ## 🔒 Security
 
 - CSRF protection
-- Rate limiting
+- Rate limiting (using Redis)
 - Password hashing
 - Input validation
 - SQL injection prevention
@@ -200,7 +227,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Majid - Initial work
 
-## 🙏 Acknowledgments
+## �� Acknowledgments
 
 - Google Maps API
 - Bootstrap team
