@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Dict, Any, List
 from app import mysql
-from app.utils import generate_hash, is_valid_password
+from app.utils import generate_hash, is_valid_password, check_password_hash
 import logging
 
 logger = logging.getLogger(__name__)
@@ -155,5 +155,37 @@ class UserService:
             mysql.connection.rollback()
             logger.error(f"Error tracking user activity: {str(e)}")
             return False
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def authenticate_user(email: str, password: str) -> Optional[Dict[str, Any]]:
+        """Authenticate a user with email and password"""
+        cursor = mysql.connection.cursor()
+        try:
+            cursor.execute("""
+                SELECT id, name, email, password_hash, role, active, status
+                FROM users 
+                WHERE email = %s
+            """, (email,))
+            user = cursor.fetchone()
+            
+            if user and user['active'] and user['status'] == 'active':
+                if check_password_hash(user['password_hash'], password):
+                    # Update last login
+                    cursor.execute("""
+                        UPDATE users 
+                        SET last_login = NOW() 
+                        WHERE id = %s
+                    """, (user['id'],))
+                    mysql.connection.commit()
+                    
+                    # Remove password_hash from user dict
+                    user.pop('password_hash', None)
+                    return user
+            return None
+        except Exception as e:
+            logger.error(f"Error authenticating user: {str(e)}")
+            return None
         finally:
             cursor.close() 
