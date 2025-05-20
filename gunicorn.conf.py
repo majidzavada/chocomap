@@ -1,5 +1,4 @@
 import multiprocessing
-import os
 
 # Server socket
 bind = "0.0.0.0:8000"
@@ -20,17 +19,12 @@ loglevel = "debug"
 # Process naming
 proc_name = 'chocomap'
 
-# SSL
-keyfile = None
-certfile = None
-
 # Server mechanics
 daemon = False
 pidfile = "gunicorn.pid"
 umask = 0
 user = None
 group = None
-tmp_upload_dir = None
 
 # Server hooks
 def on_starting(server):
