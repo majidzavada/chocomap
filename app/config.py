@@ -38,7 +38,7 @@ class Config:
     JWT_ALGORITHM = 'HS256'
     
     # Rate limiting
-    RATELIMIT_DEFAULT = "200 per day"
+    RATELIMIT_DEFAULT = ["200 per day", "50 per hour", "10 per minute"]
     RATELIMIT_STORAGE_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
     RATELIMIT_STRATEGY = 'fixed-window'
     

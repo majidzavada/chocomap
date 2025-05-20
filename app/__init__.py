@@ -26,7 +26,7 @@ def create_app(config_class=Config):
         app,
         storage_uri=app.config['RATELIMIT_STORAGE_URL'],
         strategy=app.config['RATELIMIT_STRATEGY'],
-        default_limits=[app.config['RATELIMIT_DEFAULT']]
+        default_limits=app.config['RATELIMIT_DEFAULT']
     )
     
     cache.init_app(app)
