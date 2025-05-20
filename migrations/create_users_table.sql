@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Create admin user
+-- Password is: Admin123!
 INSERT INTO users (name, email, password_hash, role, approval_status)
-SELECT 'Admin', 'admin@chocomap.com', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewYpR1IOBYVxGzHy', 'admin', 'approved'
-WHERE NOT EXISTS (SELECT 1 FROM users WHERE email = 'admin@chocomap.com'); 
+VALUES ('Admin', 'admin@chocomap.com', '$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW', 'admin', 'approved')
+ON DUPLICATE KEY UPDATE id=id; 
