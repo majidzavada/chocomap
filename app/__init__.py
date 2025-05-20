@@ -26,9 +26,8 @@ def create_app(config_class=Config):
     
     cache.init_app(app)
     mail.init_app(app)
-    babel.init_app(app)
     
-    # Set up Babel locale selector
+    # Define locale selector function
     def get_locale():
         """Get the locale for the current request"""
         # First try to get language from session
@@ -50,8 +49,8 @@ def create_app(config_class=Config):
         # Finally, try to get from browser settings
         return request.accept_languages.best_match(['en', 'cs'])
     
-    # Register the locale selector function
-    babel.localeselector(get_locale)
+    # Initialize Babel with the locale selector
+    babel.init_app(app, locale_selector=get_locale)
     
     # Make get_locale available in templates
     app.jinja_env.globals.update(get_locale=get_locale)

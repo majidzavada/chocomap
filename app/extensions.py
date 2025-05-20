@@ -21,4 +21,4 @@ limiter = Limiter(
 )
 cache = Cache()
 mail = Mail()
-babel = Babel() 
+babel = Babel()  # Initialize without app parameter 
