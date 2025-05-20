@@ -1,6 +1,6 @@
 [Unit]
 Description=ChocoMap Delivery Management System
-After=network.target
+After=network.target mysql.service redis.service
 
 [Service]
 User=choco
@@ -15,6 +15,8 @@ Restart=always
 RestartSec=5
 StandardOutput=append:/home/choco/chocomap/logs/gunicorn.log
 StandardError=append:/home/choco/chocomap/logs/gunicorn-error.log
+Type=simple
+PIDFile=/home/choco/chocomap/gunicorn.pid
 
 [Install]
 WantedBy=multi-user.target 

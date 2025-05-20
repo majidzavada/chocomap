@@ -1,4 +1,5 @@
 import multiprocessing
+import os
 
 # Server socket
 bind = "0.0.0.0:8000"
@@ -21,6 +22,13 @@ daemon = False
 pidfile = "gunicorn.pid"
 
 # Server hooks
+def pre_exec(server):
+    """Remove stale PID file on restart."""
+    try:
+        os.remove(server.pidfile)
+    except OSError:
+        pass
+
 def on_starting(server):
     """Log when server starts."""
     server.log.info("Starting ChocoMap server")
