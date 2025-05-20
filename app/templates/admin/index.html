@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+
+{% block admin_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Admin Dashboard</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Pending Users</h5>
+                <p class="card-text display-4">{{ pending_users|length }}</p>
+                <a href="{{ url_for('admin.pending_users') }}" class="btn btn-primary">View Pending Users</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Users</h5>
+                <p class="card-text display-4">{{ total_users|length }}</p>
+                <a href="{{ url_for('admin.users') }}" class="btn btn-primary">View All Users</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Active Users</h5>
+                <p class="card-text display-4">{{ active_users|length }}</p>
+                <a href="{{ url_for('admin.users') }}" class="btn btn-primary">View Active Users</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

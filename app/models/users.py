@@ -3,6 +3,7 @@ from app.extensions import mysql
 import functools
 from flask import current_app
 import time
+from datetime import datetime
 
 def cache_with_timeout(timeout=300):  # 5 minutes default
     def decorator(f):
@@ -126,3 +127,73 @@ def get_user_stats(user_id):
         return cursor.fetchone()
     finally:
         cursor.close()
+
+class User:
+    def __init__(self, id, name, email, role, preferred_lang='en', approval_status='pending', created_at=None):
+        self.id = id
+        self.name = name
+        self.email = email
+        self.role = role
+        self.preferred_lang = preferred_lang
+        self.approval_status = approval_status  # pending, approved, rejected
+        self.created_at = created_at or datetime.utcnow()
+
+    @staticmethod
+    def get_by_id(user_id):
+        cursor = mysql.connection.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM users WHERE id = %s', (user_id,))
+        user = cursor.fetchone()
+        cursor.close()
+        return User(**user) if user else None
+
+    @staticmethod
+    def get_by_email(email):
+        cursor = mysql.connection.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
+        user = cursor.fetchone()
+        cursor.close()
+        return User(**user) if user else None
+
+    @staticmethod
+    def get_all_pending():
+        cursor = mysql.connection.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM users WHERE approval_status = %s', ('pending',))
+        users = cursor.fetchall()
+        cursor.close()
+        return [User(**user) for user in users]
+
+    @staticmethod
+    def get_all():
+        cursor = mysql.connection.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM users')
+        users = cursor.fetchall()
+        cursor.close()
+        return [User(**user) for user in users]
+
+    def update(self, **kwargs):
+        allowed_fields = {'name', 'email', 'role', 'preferred_lang', 'approval_status'}
+        updates = {k: v for k, v in kwargs.items() if k in allowed_fields}
+        
+        if not updates:
+            return False
+            
+        set_clause = ', '.join(f'{k} = %s' for k in updates.keys())
+        values = list(updates.values())
+        values.append(self.id)
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute(f'UPDATE users SET {set_clause} WHERE id = %s', values)
+        mysql.connection.commit()
+        cursor.close()
+        
+        for k, v in updates.items():
+            setattr(self, k, v)
+            
+        return True
+
+    def delete(self):
+        cursor = mysql.connection.cursor()
+        cursor.execute('DELETE FROM users WHERE id = %s', (self.id,))
+        mysql.connection.commit()
+        cursor.close()
+        return True

@@ -1,6 +1,6 @@
 from functools import wraps
-from flask import session, redirect, url_for, request, abort, jsonify
-from app.models.users import get_user_by_id
+from flask import session, redirect, url_for, request, abort, jsonify, flash
+from app.models.users import get_user_by_id, User
 from app.utils import verify_token, log_activity
 import logging
 from typing import Callable, Any
@@ -13,10 +13,14 @@ def login_required(f: Callable) -> Callable:
     """Decorator to require user login."""
     @wraps(f)
     def decorated_function(*args: Any, **kwargs: Any) -> Any:
-        if not session.get('user_id'):
-            if request.is_json:
-                return jsonify({'error': 'Authentication required'}), 401
+        if 'user_id' not in session:
             return redirect(url_for('auth.login'))
+            
+        user = User.get_by_id(session['user_id'])
+        if not user or user.approval_status != 'approved':
+            flash('Your account is pending approval or has been rejected.', 'warning')
+            return redirect(url_for('auth.login'))
+            
         return f(*args, **kwargs)
     return decorated_function
 
@@ -214,4 +218,18 @@ def cache_control(max_age=0, private=True):
                 response.headers['Cache-Control'] = f'public, max-age={max_age}'
             return response
         return decorated_function
-    return decorator 
+    return decorator
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('auth.login'))
+            
+        user = User.get_by_id(session['user_id'])
+        if not user or user.role != 'admin':
+            flash('Access denied. Admin privileges required.', 'danger')
+            return redirect(url_for('auth.index'))
+            
+        return f(*args, **kwargs)
+    return decorated_function 
