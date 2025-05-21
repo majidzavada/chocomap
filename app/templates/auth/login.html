@@ -10,17 +10,31 @@
                 <div class="card-body p-4">
                     <h2 class="text-center mb-4">{{ _('Login') }}</h2>
                     
-                    <form method="POST" action="{{ url_for('auth.login') }}">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST" action="{{ url_for('auth.login') }}" id="loginForm">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
                         
                         <div class="mb-3">
                             <label for="email" class="form-label">{{ _('Email or Username') }}</label>
-                            <input type="text" class="form-control" id="email" name="email" required>
+                            <input type="text" class="form-control" id="email" name="email" required
+                                   placeholder="{{ _('Enter your email or username') }}">
+                            <div class="form-text">{{ _('You can use either your email or username to login') }}</div>
                         </div>
                         
                         <div class="mb-3">
                             <label for="password" class="form-label">{{ _('Password') }}</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <input type="password" class="form-control" id="password" name="password" required
+                                   placeholder="{{ _('Enter your password') }}">
                         </div>
                         
                         <div class="mb-3 form-check">
@@ -29,7 +43,9 @@
                         </div>
                         
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary">{{ _('Login') }}</button>
+                            <button type="submit" class="btn btn-primary" id="loginButton">
+                                {{ _('Login') }}
+                            </button>
                         </div>
                     </form>
                     
@@ -39,17 +55,30 @@
                         </a>
                     </div>
                     
-                    <hr class="my-4">
-                    
-                    <div class="text-center">
-                        <p class="mb-0">{{ _("Don't have an account?") }}</p>
-                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary mt-2">
-                            {{ _('Register') }}
-                        </a>
+                    {% if config.DEBUG %}
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6 class="text-muted">Debug Information</h6>
+                        <small class="text-muted">
+                            <p>Rate Limit: 5 attempts per minute</p>
+                            <p>Session Cookie: {{ session.get('_csrf_token', 'Not set') }}</p>
+                            <p>Debug Endpoint: <a href="{{ url_for('auth.debug_login_status') }}" target="_blank">/debug/login-status</a></p>
+                        </small>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{% block scripts %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const button = document.getElementById('loginButton');
+    button.disabled = true;
+    button.innerHTML = '{{ _("Logging in...") }}';
+});
+</script>
+{% endblock %}
+
 {% endblock %}

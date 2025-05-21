@@ -1,9 +1,13 @@
-from werkzeug.security import generate_password_hash, check_password_hash
+# from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import mysql
 import functools
 from flask import current_app
 import time
 from datetime import datetime
+import bcrypt
+import logging
+
+logger = logging.getLogger(__name__)
 
 def cache_with_timeout(timeout=300):  # 5 minutes default
     def decorator(f):
@@ -52,7 +56,7 @@ def get_all_drivers():
 def create_user(name, email, password, role='employee', preferred_lang='cs'):
     cursor = mysql.connection.cursor()
     try:
-        password_hash = generate_password_hash(password)
+        password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         cursor.execute("""
             INSERT INTO users (name, email, password_hash, role, preferred_lang, active)
             VALUES (%s, %s, %s, %s, %s, TRUE)
@@ -84,7 +88,7 @@ def update_user(user_id, **kwargs):
 def change_password(user_id, new_password):
     cursor = mysql.connection.cursor()
     try:
-        password_hash = generate_password_hash(new_password)
+        password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
         cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s",
                       (password_hash, user_id))
         mysql.connection.commit()
@@ -98,7 +102,10 @@ def verify_password(user_id, password):
         cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
         result = cursor.fetchone()
         if result:
-            return check_password_hash(result['password_hash'], password)
+            return bcrypt.checkpw(password.encode(), result['password_hash'].encode())
+        return False
+    except Exception as e:
+        logger.error(f"Error verifying password: {str(e)}")
         return False
     finally:
         cursor.close()

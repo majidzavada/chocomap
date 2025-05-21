@@ -6,6 +6,7 @@ After=network.target mysql.service redis.service
 User=choco
 Group=choco
 WorkingDirectory=/home/choco/chocomap
+EnvironmentFile=/home/choco/chocomap/.env
 Environment="PATH=/home/choco/chocomap/venv/bin"
 Environment="PYTHONPATH=/home/choco/chocomap"
 Environment="FLASK_APP=wsgi.py"

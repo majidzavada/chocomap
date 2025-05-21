@@ -1,13 +1,14 @@
 import secrets
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort
-from werkzeug.security import check_password_hash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort, jsonify
+# from werkzeug.security import check_password_hash
 from app import mysql
-from app.models.users import get_user_by_email, verify_password, update_user
+# from app.models.users import get_user_by_email, verify_password, update_user
 from app.middleware import rate_limit_by_ip, cache_control
 from datetime import datetime
 from app.services.user_service import UserService
 from app.utils import validate_email, sanitize_input, is_valid_password
 import logging
+from flask import current_app
 
 logger = logging.getLogger(__name__)
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -40,13 +41,17 @@ def login():
             login_input = request.form.get('email', '').strip()
             password = request.form.get('password', '')
             
+            logger.info(f"Login attempt for: {login_input} from IP: {request.remote_addr}")
+            
             if not login_input or not password:
                 flash("Email/Username and password are required", "danger")
                 return redirect(url_for('auth.login'))
             
             # Attempt login
             user = UserService.authenticate_user(login_input, password)
+            
             if user:
+                logger.info(f"Successful login for user: {user['id']} ({user['email']})")
                 session['user_id'] = user['id']
                 session['role'] = user['role']
                 session['name'] = user['name']
@@ -61,12 +66,13 @@ def login():
                 flash("Login successful", "success")
                 return redirect(url_for('dashboard'))
             else:
-                flash("Invalid email or password", "danger")
+                logger.warning(f"Failed login attempt for: {login_input}")
+                flash("Invalid email/username or password", "danger")
                 return redirect(url_for('auth.login'))
                 
         except Exception as e:
-            logger.error(f"Login error: {str(e)}")
-            flash("An error occurred during login", "danger")
+            logger.error(f"Login error: {str(e)}", exc_info=True)
+            flash("An error occurred during login. Please try again.", "danger")
             return redirect(url_for('auth.login'))
 
     return render_template('auth/login.html')
@@ -88,6 +94,8 @@ def logout():
 @auth_bp.route('/')
 @cache_control(max_age=60, private=False)  # Cache for 1 minute
 def index():
+    if 'user_id' not in session:
+        return redirect(url_for('auth.login'))
     return render_template('index.html')
 
 @auth_bp.route('/home')
@@ -249,3 +257,23 @@ def forbidden_error(error):
 def ratelimit_error(error):
     flash("Too many attempts. Please try again later.", "danger")
     return render_template('auth/login.html'), 429
+
+@auth_bp.route('/debug/login-status')
+def debug_login_status():
+    """Debug endpoint to check login status and session info"""
+    if not current_app.debug:
+        abort(404)
+        
+    debug_info = {
+        'session': dict(session),
+        'cookies': dict(request.cookies),
+        'headers': dict(request.headers),
+        'remote_addr': request.remote_addr,
+        'rate_limit_info': {
+            'login_limit': '5 per minute',
+            'register_limit': '3 per hour',
+            'reset_limit': '3 per hour'
+        }
+    }
+    
+    return jsonify(debug_info)

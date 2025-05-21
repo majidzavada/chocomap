@@ -3,7 +3,6 @@ from typing import Optional, Dict, Any, List, Tuple
 from app import mysql
 from app.utils import hash_password, is_valid_password, verify_password
 import logging
-from mysql.connector.cursor import MySQLCursorDict
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +16,7 @@ class UserService:
         phone: Optional[str] = None
     ) -> Optional[int]:
         """Create a new user with validation"""
-        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor()
         try:
             # Validate password
             is_valid, message = is_valid_password(password)
@@ -55,7 +54,7 @@ class UserService:
         active: Optional[bool] = None
     ) -> bool:
         """Update user information"""
-        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor()
         try:
             updates = []
             params = []
@@ -109,7 +108,7 @@ class UserService:
     @staticmethod
     def get_user_stats() -> Dict[str, Any]:
         """Get user statistics"""
-        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor()
         try:
             cursor.execute("""
                 SELECT 
@@ -120,14 +119,29 @@ class UserService:
                     COUNT(CASE WHEN last_login >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as active_last_week
                 FROM users
             """)
-            return cursor.fetchone()
+            result = cursor.fetchone()
+            if result:
+                return {
+                    'total_users': result[0],
+                    'total_drivers': result[1],
+                    'total_managers': result[2],
+                    'active_users': result[3],
+                    'active_last_week': result[4]
+                }
+            return {
+                'total_users': 0,
+                'total_drivers': 0,
+                'total_managers': 0,
+                'active_users': 0,
+                'active_last_week': 0
+            }
         finally:
             cursor.close()
 
     @staticmethod
     def get_user_activity(user_id: int, days: int = 30) -> List[Dict[str, Any]]:
         """Get user activity for the last N days"""
-        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor()
         try:
             cursor.execute("""
                 SELECT 
@@ -140,14 +154,22 @@ class UserService:
                 GROUP BY DATE(created_at)
                 ORDER BY date DESC
             """, (user_id, days))
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            return [
+                {
+                    'date': row[0],
+                    'activity_count': row[1],
+                    'roles': row[2]
+                }
+                for row in result
+            ]
         finally:
             cursor.close()
 
     @staticmethod
     def track_user_activity(user_id: int, action: str, details: Optional[Dict] = None) -> bool:
         """Track user activity"""
-        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor()
         try:
             cursor.execute("""
                 INSERT INTO user_activity (
@@ -166,31 +188,54 @@ class UserService:
     @staticmethod
     def authenticate_user(login_input: str, password: str) -> Optional[Dict[str, Any]]:
         """Authenticate a user with email or username and password"""
-        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor()
         try:
+            logger.info(f"Attempting to authenticate user: {login_input}")
+            
             cursor.execute("""
-                SELECT id, name, email, username, password_hash, role, active, status
+                SELECT id, name, email, username, password_hash, role, active, approval_status
                 FROM users 
                 WHERE email = %s OR username = %s
             """, (login_input, login_input))
-            user = cursor.fetchone()
+            user_tuple = cursor.fetchone()
             
-            if user and user['active'] and user['status'] == 'active':
-                if verify_password(password, user['password_hash']):
-                    # Update last login
-                    cursor.execute("""
-                        UPDATE users 
-                        SET last_login = NOW() 
-                        WHERE id = %s
-                    """, (user['id'],))
-                    mysql.connection.commit()
-                    
-                    # Remove password_hash from user dict
-                    user.pop('password_hash', None)
-                    return user
-            return None
+            if not user_tuple:
+                logger.warning(f"No user found with email/username: {login_input}")
+                return None
+            
+            # Convert tuple to dictionary
+            user = {
+                'id': user_tuple[0],
+                'name': user_tuple[1],
+                'email': user_tuple[2],
+                'username': user_tuple[3],
+                'password_hash': user_tuple[4],
+                'role': user_tuple[5],
+                'active': user_tuple[6],
+                'approval_status': user_tuple[7]
+            }
+                
+            if not user['active']:
+                logger.warning(f"Inactive user attempted login: {login_input}")
+                return None
+                
+            if user['approval_status'] != 'approved':
+                logger.warning(f"Unapproved user attempted login: {login_input} (approval_status: {user['approval_status']})")
+                return None
+            
+            if verify_password(password, user['password_hash']):
+                logger.info(f"Password verified for user: {user['id']}")
+                # Update last login - removed since there's no last_login column
+                
+                # Remove password_hash from user dict
+                user.pop('password_hash', None)
+                return user
+            else:
+                logger.warning(f"Invalid password for user: {login_input}")
+                return None
+                
         except Exception as e:
-            logger.error(f"Error authenticating user: {str(e)}")
+            logger.error(f"Error authenticating user: {str(e)}", exc_info=True)
             return None
         finally:
             cursor.close()
@@ -198,12 +243,17 @@ class UserService:
     @staticmethod
     def change_password(user_id: int, current_password: str, new_password: str) -> bool:
         """Change user's password after verifying current password"""
-        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor()
         try:
             cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
             result = cursor.fetchone()
-            if not result or not verify_password(current_password, result['password_hash']):
+            if not result:
                 return False
+                
+            password_hash = result[0]  # Access by index instead of key
+            if not verify_password(current_password, password_hash):
+                return False
+                
             new_hash = hash_password(new_password)
             cursor.execute("UPDATE users SET password_hash = %s, updated_at = NOW() WHERE id = %s", (new_hash, user_id))
             mysql.connection.commit()

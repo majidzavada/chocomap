@@ -1,19 +1,31 @@
 import os
 import logging
 from logging.handlers import RotatingFileHandler
-from flask import Flask, session, request, render_template, redirect, url_for, current_app
+
+# Load environment variables first, before any other imports
+from dotenv import load_dotenv
+load_dotenv()
+
+from flask import Flask, session, request, render_template, redirect, url_for, current_app, jsonify
 from flask_talisman import Talisman
 from flask_compress import Compress
-from dotenv import load_dotenv
 from app.config import Config
 from app.extensions import (
     db, migrate, cors, limiter, cache, mail, babel, mysql
 )
+from datetime import datetime
 
 def create_app(config_class=Config):
     """Create and configure the Flask application."""
     app = Flask(__name__)
     app.config.from_object(config_class)
+    
+    # Explicitly set MySQL config from environment variables
+    app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST', 'localhost')
+    app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER', 'root')
+    app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD', '')
+    app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'chocomap')
+    app.config['MYSQL_PORT'] = int(os.environ.get('MYSQL_PORT', 3306))
     
     # Initialize extensions
     mysql.init_app(app)
@@ -106,7 +118,19 @@ def create_app(config_class=Config):
     # Add root route
     @app.route('/')
     def root():
-        return redirect(url_for('auth.index'))
+        """Root endpoint that shows basic app info"""
+        if request.headers.get('Accept') == 'application/json':
+            return jsonify({
+                'status': 'ok',
+                'message': 'Chocomap API is running',
+                'version': '1.0.0',
+                'endpoints': {
+                    'health': url_for('health_check', _external=True),
+                    'login': url_for('auth.login', _external=True),
+                    'register': url_for('auth.register', _external=True)
+                }
+            })
+        return redirect(url_for('auth.login'))
     
     # Register before_request handlers
     @app.before_request
@@ -181,5 +205,33 @@ def create_app(config_class=Config):
             print('Admin user created successfully.')
         else:
             print('Error creating admin user.')
+    
+    # Add health check route
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        """Health check endpoint"""
+        try:
+            # Check database connection
+            mysql.connection.ping(reconnect=True)
+            db_status = 'healthy'
+        except Exception as e:
+            logger.error(f"Database health check failed: {str(e)}")
+            db_status = 'unhealthy'
+            
+        health_info = {
+            'status': 'ok',
+            'timestamp': datetime.utcnow().isoformat(),
+            'database': db_status,
+            'debug': app.debug,
+            'environment': app.config.get('ENV', 'production'),
+            'version': '1.0.0',
+            'endpoints': {
+                'login': url_for('auth.login', _external=True),
+                'register': url_for('auth.register', _external=True),
+                'health': url_for('health_check', _external=True)
+            }
+        }
+        
+        return jsonify(health_info), 200
     
     return app
