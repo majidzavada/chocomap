@@ -1,188 +1,704 @@
+
 msgid ""
 msgstr ""
-"Project-Id-Version: ChocoMap\n"
-"POT-Creation-Date: 2024-05-19 21:40+0000\n"
+"Project-Id-Version:  ChocoMap\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-21 23:50+0200\n"
 "PO-Revision-Date: 2024-05-19 21:40+0000\n"
 "Last-Translator: Majid Zavada\n"
-"Language-Team: Czech\n"
 "Language: cs\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: Czech\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
 
+#: app/templates/base.html:102
+msgid "Logout"
+msgstr ""
+
+#: app/templates/base.html:129
+msgid "All rights reserved."
+msgstr ""
+
+#: app/templates/index.html:3 app/templates/index.html:7
 msgid "Welcome to ChocoMap"
 msgstr "Vítejte v ChocoMap"
 
+#: app/templates/index.html:8
 msgid "Your efficient delivery management system"
 msgstr "Váš efektivní systém pro správu doručení"
 
+#: app/templates/index.html:15
 msgid "Go to Dashboard"
 msgstr "Přejít na Ovládací panel"
 
+#: app/templates/auth/login.html:3 app/templates/auth/login.html:11
+#: app/templates/auth/login.html:32 app/templates/auth/register.html:50
+#: app/templates/index.html:19
 msgid "Login"
 msgstr "Přihlásit se"
 
+#: app/templates/auth/login.html:47 app/templates/auth/register.html:3
+#: app/templates/auth/register.html:11 app/templates/auth/register.html:41
+#: app/templates/index.html:22
 msgid "Register"
 msgstr "Registrovat se"
 
-msgid "Login to ChocoMap"
-msgstr "Přihlášení do ChocoMap"
+#: app/templates/auth/change_password.html:3
+#: app/templates/auth/change_password.html:11
+#: app/templates/auth/change_password.html:32
+#, fuzzy
+msgid "Change Password"
+msgstr "Heslo"
 
-msgid "Email"
-msgstr "E-mail"
+#: app/templates/auth/change_password.html:17
+msgid "Current Password"
+msgstr ""
 
+#: app/templates/auth/change_password.html:22
+#: app/templates/auth/reset_password.html:17
+#, fuzzy
+msgid "New Password"
+msgstr "Heslo"
+
+#: app/templates/auth/change_password.html:27
+#: app/templates/auth/reset_password.html:22
+msgid "Confirm New Password"
+msgstr ""
+
+#: app/templates/auth/change_password.html:38
+#, fuzzy
+msgid "Back to Dashboard"
+msgstr "Přejít na Ovládací panel"
+
+#: app/templates/auth/change_password.html:58
+msgid "New passwords do not match"
+msgstr ""
+
+#: app/templates/auth/login.html:17
+msgid "Email or Username"
+msgstr ""
+
+#: app/templates/auth/login.html:22 app/templates/auth/register.html:22
 msgid "Password"
 msgstr "Heslo"
 
-msgid "Internal Server Error"
-msgstr "Interní chyba serveru"
+#: app/templates/auth/login.html:28
+msgid "Remember me"
+msgstr ""
 
-msgid "Something went wrong on our end. Please try again later or contact support if the problem persists."
-msgstr "Něco se pokazilo na naší straně. Prosím, zkuste to později nebo kontaktujte podporu, pokud problém přetrvává."
+#: app/templates/auth/login.html:38
+msgid "Forgot password?"
+msgstr ""
 
-msgid "Go to Homepage"
-msgstr "Přejít na úvodní stránku"
+#: app/templates/auth/login.html:45
+msgid "Don't have an account?"
+msgstr ""
 
-msgid "Not Found"
-msgstr "Nenalezeno"
+#: app/templates/auth/register.html:17
+msgid "Email"
+msgstr "E-mail"
 
-msgid "The requested page could not be found."
-msgstr "Požadovaná stránka nebyla nalezena."
+#: app/templates/auth/register.html:27
+msgid "Confirm Password"
+msgstr ""
 
-msgid "Forbidden"
-msgstr "Zakázáno"
-
-msgid "You don't have permission to access this resource."
-msgstr "Nemáte oprávnění přistupovat k tomuto zdroji."
-
-msgid "Too Many Requests"
-msgstr "Příliš mnoho požadavků"
-
-msgid "You have made too many requests. Please try again later."
-msgstr "Vytvořili jste příliš mnoho požadavků. Prosím, zkuste to později."
-
-# Dashboard messages
-msgid "Dashboard"
-msgstr "Přehled"
-
-msgid "Deliveries"
-msgstr "Doručení"
-
-msgid "Addresses"
-msgstr "Adresy"
-
-msgid "Profile"
+#: app/templates/auth/register.html:32
+#, fuzzy
+msgid "Role"
 msgstr "Profil"
 
-# Delivery messages
-msgid "New Delivery"
-msgstr "Nové doručení"
+#: app/templates/auth/register.html:34
+msgid "Employee"
+msgstr ""
 
-msgid "Edit Delivery"
-msgstr "Upravit doručení"
+#: app/templates/auth/register.html:35
+msgid "Manager"
+msgstr ""
 
-msgid "Delete Delivery"
-msgstr "Smazat doručení"
+#: app/templates/auth/register.html:36
+msgid "Driver"
+msgstr ""
 
-msgid "Delivery Status"
-msgstr "Stav doručení"
+#: app/templates/auth/register.html:48
+msgid "Already have an account?"
+msgstr ""
 
-# Address messages
-msgid "New Address"
-msgstr "Nová adresa"
+#: app/templates/auth/register.html:70
+msgid "Passwords do not match"
+msgstr ""
 
-msgid "Edit Address"
-msgstr "Upravit adresu"
+#: app/templates/auth/reset_password.html:3
+#: app/templates/auth/reset_password.html:11
+#: app/templates/auth/reset_password.html:27
+#, fuzzy
+msgid "Reset Password"
+msgstr "Heslo"
 
-msgid "Delete Address"
-msgstr "Smazat adresu"
+#: app/templates/auth/reset_password.html:33
+msgid "Back to Login"
+msgstr ""
 
-# Error messages
-msgid "Error"
-msgstr "Chyba"
-
-msgid "Success"
-msgstr "Úspěch"
-
-msgid "Warning"
-msgstr "Varování"
-
-msgid "Info"
-msgstr "Informace"
-
-# Form messages
-msgid "Submit"
-msgstr "Odeslat"
-
-msgid "Cancel"
-msgstr "Zrušit"
-
-msgid "Save"
-msgstr "Uložit"
-
-msgid "Delete"
-msgstr "Smazat"
-
-# Navigation
-msgid "Home"
-msgstr "Domů"
-
-msgid "Settings"
-msgstr "Nastavení"
-
-msgid "Help"
-msgstr "Nápověda"
-
-# Status messages
-msgid "Active"
-msgstr "Aktivní"
-
-msgid "Inactive"
-msgstr "Neaktivní"
-
-msgid "Pending"
-msgstr "Čekající"
-
-msgid "Completed"
-msgstr "Dokončené"
-
-# Time messages
-msgid "Today"
-msgstr "Dnes"
-
-msgid "Yesterday"
-msgstr "Včera"
-
-msgid "This Week"
-msgstr "Tento týden"
-
-msgid "This Month"
-msgstr "Tento měsíc"
-
-msgid "Accept"
-msgstr "Přijmout"
-
-msgid "Reject"
-msgstr "Odmítnout"
-
-msgid "Mark as Completed"
-msgstr "Označit jako dokončené"
-
-msgid "Today's Deliveries"
-msgstr "Dnešní rozvozy"
-
+#: app/templates/driver/dashboard.html:2
 msgid "Driver Dashboard"
 msgstr "Řídicí panel řidiče"
 
-msgid "Employee Dashboard"
-msgstr "Řídicí panel zaměstnance"
+#: app/templates/driver/dashboard.html:4
+#: app/templates/employee/dashboard.html:9
+msgid "Today's Deliveries"
+msgstr "Dnešní rozvozy"
 
+#: app/templates/driver/dashboard.html:17
+msgid "Status"
+msgstr ""
+
+#: app/templates/driver/dashboard.html:20
+msgid "Accept"
+msgstr "Přijmout"
+
+#: app/templates/driver/dashboard.html:21
+msgid "Reject"
+msgstr "Odmítnout"
+
+#: app/templates/driver/dashboard.html:23
+msgid "Mark as Completed"
+msgstr "Označit jako dokončené"
+
+#: app/templates/driver/dashboard.html:57
+msgid "No deliveries assigned."
+msgstr ""
+
+#: app/templates/employee/addresses.html:2
+#: app/templates/employee/addresses.html:4
+msgid "Address Book"
+msgstr ""
+
+#: app/templates/employee/addresses.html:7
+msgid "Label"
+msgstr ""
+
+#: app/templates/employee/addresses.html:8
+#, fuzzy
+msgid "Street Address"
+msgstr "Smazat adresu"
+
+#: app/templates/employee/addresses.html:9
+msgid "City"
+msgstr ""
+
+#: app/templates/employee/addresses.html:10
+msgid "ZIP Code"
+msgstr ""
+
+#: app/templates/employee/addresses.html:11
+msgid "Latitude"
+msgstr ""
+
+#: app/templates/employee/addresses.html:12
+msgid "Longitude"
+msgstr ""
+
+#: app/templates/employee/addresses.html:13
+#, fuzzy
+msgid "Add Address"
+msgstr "Upravit adresu"
+
+#: app/templates/employee/addresses.html:16
+#, fuzzy
+msgid "Saved Addresses"
+msgstr "Adresy"
+
+#: app/templates/employee/calendar.html:2
+#, fuzzy
+msgid "Weekly Delivery Calendar"
+msgstr "Kalendář rozvozů"
+
+#: app/templates/employee/calendar.html:4
 msgid "Delivery Calendar"
 msgstr "Kalendář rozvozů"
 
-msgid "Schedule a Delivery"
+#: app/templates/employee/calendar.html:7
+msgid "Filter by driver"
+msgstr ""
+
+#: app/templates/employee/calendar.html:8
+msgid "Filter by date"
+msgstr ""
+
+#: app/templates/employee/calendar.html:9
+msgid "Apply Filters"
+msgstr ""
+
+#: app/templates/employee/dashboard.html:2
+#: app/templates/employee/dashboard.html:5
+msgid "Employee Dashboard"
+msgstr "Řídicí panel zaměstnance"
+
+#: app/templates/employee/dashboard.html:13
+msgid "This Week"
+msgstr "Tento týden"
+
+#: app/templates/employee/dashboard.html:17
+msgid "Upcoming Delivery"
+msgstr ""
+
+#: app/templates/employee/dashboard.html:21
+msgid "None"
+msgstr ""
+
+#: app/templates/employee/dashboard.html:27
+#, fuzzy
+msgid "📅 Schedule a Delivery"
 msgstr "Naplánovat rozvoz"
 
+#: app/templates/employee/dashboard.html:28
+msgid "🏠 Manage Addresses"
+msgstr ""
+
+#: app/templates/employee/dashboard.html:29
+msgid "📆 View Calendar"
+msgstr ""
+
+#: app/templates/employee/edit_delivery.html:2
+#: app/templates/employee/edit_delivery.html:4
+msgid "Edit Delivery"
+msgstr "Upravit doručení"
+
+#: app/templates/employee/edit_delivery.html:24
 msgid "Update"
 msgstr "Aktualizovat"
+
+#: app/templates/errors/403.html:3 app/templates/errors/403.html:8
+msgid "Access Denied"
+msgstr ""
+
+#: app/templates/errors/403.html:9
+#, fuzzy
+msgid "You do not have permission to access this page."
+msgstr "Nemáte oprávnění přistupovat k tomuto zdroji."
+
+#: app/templates/errors/403.html:11 app/templates/errors/404.html:11
+#: app/templates/errors/429.html:11 app/templates/errors/500.html:11
+#, fuzzy
+msgid "Return to Homepage"
+msgstr "Přejít na úvodní stránku"
+
+#: app/templates/errors/404.html:3 app/templates/errors/404.html:8
+#, fuzzy
+msgid "Page Not Found"
+msgstr "Nenalezeno"
+
+#: app/templates/errors/404.html:9
+msgid "The page you are looking for does not exist."
+msgstr ""
+
+#: app/templates/errors/429.html:3 app/templates/errors/429.html:8
+msgid "Too Many Requests"
+msgstr "Příliš mnoho požadavků"
+
+#: app/templates/errors/429.html:9
+msgid "You have made too many requests. Please try again later."
+msgstr "Vytvořili jste příliš mnoho požadavků. Prosím, zkuste to později."
+
+#: app/templates/errors/500.html:3 app/templates/errors/500.html:8
+msgid "Internal Server Error"
+msgstr "Interní chyba serveru"
+
+#: app/templates/errors/500.html:9
+#, fuzzy
+msgid "Something went wrong on our end. Please try again later."
+msgstr ""
+"Něco se pokazilo na naší straně. Prosím, zkuste to později nebo "
+"kontaktujte podporu, pokud problém přetrvává."
+
+#: app/templates/manager/dashboard.html:2
+#, fuzzy
+msgid "Manager Dashboard"
+msgstr "Řídicí panel řidiče"
+
+#: app/templates/manager/dashboard.html:4
+msgid "Welcome, Manager"
+msgstr ""
+
+#: app/templates/manager/dashboard.html:5
+msgid "You can oversee schedules, addresses, and staff operations."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/_termui_impl.py:600
+msgid "{editor}: Editing failed"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/_termui_impl.py:604
+msgid "{editor}: Editing failed: {e}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1084
+#: venv/lib/python3.12/site-packages/click/core.py:1121
+msgid "{text} {deprecated_message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1140
+msgid "Options"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1204
+msgid "Got unexpected extra argument ({args})"
+msgid_plural "Got unexpected extra arguments ({args})"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1220
+msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1405
+msgid "Aborted!"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1779
+msgid "Commands"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1810
+msgid "Missing command."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:1888
+msgid "No such command {name!r}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2303
+msgid "Value must be an iterable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2326
+msgid "Takes {nargs} values but 1 was given."
+msgid_plural "Takes {nargs} values but {len} were given."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2403
+msgid ""
+"DeprecationWarning: The {param_type} {name!r} is "
+"deprecated.{extra_message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2806
+msgid "env var: {var}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2809
+msgid "default: {default}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2813
+msgid "required"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/core.py:2869
+msgid "(dynamic)"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/decorators.py:465
+#, python-format
+msgid "%(prog)s, version %(version)s"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/decorators.py:522
+msgid "Show the version and exit."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/decorators.py:548
+msgid "Show this message and exit."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:50
+#: venv/lib/python3.12/site-packages/click/exceptions.py:89
+msgid "Error: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:81
+msgid "Try '{command} {option}' for help."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:130
+msgid "Invalid value: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:132
+msgid "Invalid value for {param_hint}: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:190
+msgid "Missing argument"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:192
+msgid "Missing option"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:194
+msgid "Missing parameter"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:196
+msgid "Missing {param_type}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:203
+msgid "Missing parameter: {param_name}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:223
+msgid "No such option: {name}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:237
+msgid "Did you mean {possibility}?"
+msgid_plural "(Possible options: {possibilities})"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:282
+msgid "unknown error"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/exceptions.py:289
+msgid "Could not open file {filename!r}: {message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/formatting.py:156
+msgid "Usage:"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/parser.py:200
+msgid "Argument {name!r} takes {nargs} values."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/parser.py:383
+msgid "Option {name!r} does not take a value."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/parser.py:443
+msgid "Option {name!r} requires an argument."
+msgid_plural "Option {name!r} requires {nargs} arguments."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: venv/lib/python3.12/site-packages/click/shell_completion.py:325
+msgid "Shell completion is not supported for Bash versions older than 4.4."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/shell_completion.py:333
+msgid "Couldn't detect Bash version, shell completion is not supported."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:162
+msgid "Repeat for confirmation"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:178
+msgid "Error: The value you entered was invalid."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:180
+msgid "Error: {e.message}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:191
+msgid "Error: The two entered values do not match."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:247
+msgid "Error: invalid input"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/termui.py:866
+msgid "Press any key to continue..."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:332
+msgid ""
+"Choose from:\n"
+"\t{choices}"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:371
+msgid "{value!r} is not {choice}."
+msgid_plural "{value!r} is not one of {choices}."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:462
+msgid "{value!r} does not match the format {format}."
+msgid_plural "{value!r} does not match the formats {formats}."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:482
+msgid "{value!r} is not a valid {number_type}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:538
+msgid "{value} is not in the range {range}."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:679
+msgid "{value!r} is not a valid boolean."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:703
+msgid "{value!r} is not a valid UUID."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:893
+#, fuzzy
+msgid "file"
+msgstr "Profil"
+
+#: venv/lib/python3.12/site-packages/click/types.py:895
+msgid "directory"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:897
+#, fuzzy
+msgid "path"
+msgstr "Aktualizovat"
+
+#: venv/lib/python3.12/site-packages/click/types.py:944
+msgid "{name} {filename!r} does not exist."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:953
+msgid "{name} {filename!r} is a file."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:961
+msgid "{name} {filename!r} is a directory."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:970
+msgid "{name} {filename!r} is not readable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:979
+msgid "{name} {filename!r} is not writable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:988
+msgid "{name} {filename!r} is not executable."
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/click/types.py:1054
+msgid "{len_type} values are required, but {len_value} was given."
+msgid_plural "{len_type} values are required, but {len_value} were given."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: venv/lib/python3.12/site-packages/isort/main.py:158
+msgid "show this help message and exit"
+msgstr ""
+
+#: venv/lib/python3.12/site-packages/mypy/main.py:392
+#, python-format
+msgid "%(prog)s: error: %(message)s\n"
+msgstr ""
+
+#~ msgid "Login to ChocoMap"
+#~ msgstr "Přihlášení do ChocoMap"
+
+#~ msgid "The requested page could not be found."
+#~ msgstr "Požadovaná stránka nebyla nalezena."
+
+#~ msgid "Forbidden"
+#~ msgstr "Zakázáno"
+
+# Dashboard messages
+#~ msgid "Dashboard"
+#~ msgstr "Přehled"
+
+#~ msgid "Deliveries"
+#~ msgstr "Doručení"
+
+# Delivery messages
+#~ msgid "New Delivery"
+#~ msgstr "Nové doručení"
+
+#~ msgid "Delete Delivery"
+#~ msgstr "Smazat doručení"
+
+#~ msgid "Delivery Status"
+#~ msgstr "Stav doručení"
+
+# Address messages
+#~ msgid "New Address"
+#~ msgstr "Nová adresa"
+
+# Error messages
+#~ msgid "Error"
+#~ msgstr "Chyba"
+
+#~ msgid "Success"
+#~ msgstr "Úspěch"
+
+#~ msgid "Warning"
+#~ msgstr "Varování"
+
+#~ msgid "Info"
+#~ msgstr "Informace"
+
+# Form messages
+#~ msgid "Submit"
+#~ msgstr "Odeslat"
+
+#~ msgid "Cancel"
+#~ msgstr "Zrušit"
+
+#~ msgid "Save"
+#~ msgstr "Uložit"
+
+#~ msgid "Delete"
+#~ msgstr "Smazat"
+
+# Navigation
+#~ msgid "Home"
+#~ msgstr "Domů"
+
+#~ msgid "Settings"
+#~ msgstr "Nastavení"
+
+#~ msgid "Help"
+#~ msgstr "Nápověda"
+
+# Status messages
+#~ msgid "Active"
+#~ msgstr "Aktivní"
+
+#~ msgid "Inactive"
+#~ msgstr "Neaktivní"
+
+#~ msgid "Pending"
+#~ msgstr "Čekající"
+
+#~ msgid "Completed"
+#~ msgstr "Dokončené"
+
+# Time messages
+#~ msgid "Today"
+#~ msgstr "Dnes"
+
+#~ msgid "Yesterday"
+#~ msgstr "Včera"
+
+#~ msgid "This Month"
+#~ msgstr "Tento měsíc"
+
