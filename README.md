@@ -5,7 +5,7 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 ## 📦 Features
 
 - **Authentication & Authorization**
-  - Secure user authentication
+  - Secure user authentication (login with email or username)
   - Role-based access control (Admin, Manager, Employee, Driver)
   - Password reset and change functionality
   - User registration approval system
@@ -174,7 +174,8 @@ gunicorn --bind 0.0.0.0:8000 wsgi:app --pid gunicorn.pid --daemon
 
 5. Default admin credentials
 ```
-Email: admin@chocomap.com
+Username: Admin
+Email: majid@steinerkovarik.com
 Password: Admin123!
 ```
 
@@ -227,7 +228,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - Majid - Initial work
 
-## �� Acknowledgments
+##  Acknowledgments
 
 - Google Maps API
 - Bootstrap team
@@ -250,3 +251,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ```bash
 git clone https://github.com/majidzavada/chocomap
 cd chocomap
+
+```
+
+### Database Schema Changes
+- The `users` table now includes a `username` column (unique). You can log in with either your username or email address.
+
+### Login
+- You can now log in using either your email or your username.
+
+### Default admin credentials
+```
+Username: Admin
+Email: majid@steinerkovarik.com
+Password: Admin123!
+```

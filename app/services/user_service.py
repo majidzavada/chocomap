@@ -164,15 +164,15 @@ class UserService:
             cursor.close()
 
     @staticmethod
-    def authenticate_user(email: str, password: str) -> Optional[Dict[str, Any]]:
-        """Authenticate a user with email and password"""
+    def authenticate_user(login_input: str, password: str) -> Optional[Dict[str, Any]]:
+        """Authenticate a user with email or username and password"""
         cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
         try:
             cursor.execute("""
-                SELECT id, name, email, password_hash, role, active, status
+                SELECT id, name, email, username, password_hash, role, active, status
                 FROM users 
-                WHERE email = %s
-            """, (email,))
+                WHERE email = %s OR username = %s
+            """, (login_input, login_input))
             user = cursor.fetchone()
             
             if user and user['active'] and user['status'] == 'active':

@@ -37,19 +37,19 @@ def login():
 
     if request.method == 'POST':
         try:
-            email = request.form.get('email', '').strip()
+            login_input = request.form.get('email', '').strip()
             password = request.form.get('password', '')
             
-            if not email or not password:
-                flash("Email and password are required", "danger")
+            if not login_input or not password:
+                flash("Email/Username and password are required", "danger")
                 return redirect(url_for('auth.login'))
             
-            if not validate_email(email):
+            if not validate_email(login_input):
                 flash("Invalid email format", "danger")
                 return redirect(url_for('auth.login'))
             
             # Attempt login
-            user = UserService.authenticate_user(email, password)
+            user = UserService.authenticate_user(login_input, password)
             if user:
                 session['user_id'] = user['id']
                 session['role'] = user['role']
