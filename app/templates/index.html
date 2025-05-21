@@ -11,9 +11,23 @@
         <div class="col-md-6">
             <div class="d-grid gap-3">
                 {% if session.get('user_id') %}
-                    <a href="{{ url_for('auth.dashboard') }}" class="btn btn-primary btn-lg">
-                        {{ _('Go to Dashboard') }}
-                    </a>
+                    {% if session.get('user_role') == 'admin' %}
+                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-lg">
+                            {{ _('Go to Admin Dashboard') }}
+                        </a>
+                    {% elif session.get('user_role') == 'manager' %}
+                        <a href="{{ url_for('manager.dashboard') }}" class="btn btn-primary btn-lg">
+                            {{ _('Go to Manager Dashboard') }}
+                        </a>
+                    {% elif session.get('user_role') == 'driver' %}
+                        <a href="{{ url_for('driver.dashboard') }}" class="btn btn-primary btn-lg">
+                            {{ _('Go to Driver Dashboard') }}
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('employee.dashboard') }}" class="btn btn-primary btn-lg">
+                            {{ _('Go to Employee Dashboard') }}
+                        </a>
+                    {% endif %}
                 {% else %}
                     <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
                         {{ _('Login') }}

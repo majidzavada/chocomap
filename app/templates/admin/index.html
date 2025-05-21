@@ -1,37 +1,34 @@
-{% extends "admin/base.html" %}
+{% extends 'base.html' %}
+{% block title %}{{ _('Admin Area') }}{% endblock %}
 
-{% block admin_content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Admin Dashboard</h1>
-</div>
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ _('Admin Area') }}</h1>
+    </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Pending Users</h5>
-                <p class="card-text display-4">{{ pending_users|length }}</p>
-                <a href="{{ url_for('admin.pending_users') }}" class="btn btn-primary">View Pending Users</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Total Users</h5>
-                <p class="card-text display-4">{{ total_users|length }}</p>
-                <a href="{{ url_for('admin.users') }}" class="btn btn-primary">View All Users</a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Active Users</h5>
-                <p class="card-text display-4">{{ active_users|length }}</p>
-                <a href="{{ url_for('admin.users') }}" class="btn btn-primary">View Active Users</a>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <p class="lead">{{ _('Welcome to the Admin Area. Choose an option below:') }}</p>
+                    
+                    <div class="list-group mt-4">
+                        <a href="{{ url_for('admin.dashboard') }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ _('Dashboard') }}</h5>
+                            </div>
+                            <p class="mb-1">{{ _('View system statistics and pending approvals') }}</p>
+                        </a>
+                        
+                        <a href="{{ url_for('admin.users') }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ _('User Management') }}</h5>
+                            </div>
+                            <p class="mb-1">{{ _('Manage user accounts, roles, and permissions') }}</p>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

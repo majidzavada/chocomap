@@ -53,7 +53,7 @@ def login():
             if user:
                 logger.info(f"Successful login for user: {user['id']} ({user['email']})")
                 session['user_id'] = user['id']
-                session['role'] = user['role']
+                session['user_role'] = user['role']
                 session['name'] = user['name']
                 
                 # Track login activity
@@ -64,7 +64,15 @@ def login():
                 )
                 
                 flash("Login successful", "success")
-                return redirect(url_for('dashboard'))
+                # Redirect to the appropriate dashboard based on user role
+                if user['role'] == 'admin':
+                    return redirect(url_for('admin.dashboard'))
+                elif user['role'] == 'manager':
+                    return redirect(url_for('manager.dashboard'))
+                elif user['role'] == 'driver':
+                    return redirect(url_for('driver.dashboard'))
+                else:
+                    return redirect(url_for('employee.dashboard'))
             else:
                 logger.warning(f"Failed login attempt for: {login_input}")
                 flash("Invalid email/username or password", "danger")

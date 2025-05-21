@@ -1,48 +1,69 @@
-{% extends "admin/base.html" %}
+{% extends 'base.html' %}
+{% block title %}{{ _('Edit User') }}{% endblock %}
 
-{% block admin_content %}
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">Edit User</h1>
-</div>
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ _('Edit User') }}</h1>
+        <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> {{ _('Back to Users') }}
+        </a>
+    </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <form method="POST">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            
-            <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
-            </div>
-            
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-            </div>
-            
-            <div class="mb-3">
-                <label for="role" class="form-label">Role</label>
-                <select class="form-select" id="role" name="role" required>
-                    <option value="driver" {% if user.role == 'driver' %}selected{% endif %}>Driver</option>
-                    <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>Manager</option>
-                    <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
-                </select>
-            </div>
-            
-            <div class="mb-3">
-                <label for="approval_status" class="form-label">Status</label>
-                <select class="form-select" id="approval_status" name="approval_status" required>
-                    <option value="pending" {% if user.approval_status == 'pending' %}selected{% endif %}>Pending</option>
-                    <option value="approved" {% if user.approval_status == 'approved' %}selected{% endif %}>Approved</option>
-                    <option value="rejected" {% if user.approval_status == 'rejected' %}selected{% endif %}>Rejected</option>
-                </select>
-            </div>
-            
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a href="{{ url_for('admin.users') }}" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">{{ _('Edit User') }}: {{ user.name }}</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{{ url_for('admin.edit_user', user_id=user.id) }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                
+                <div class="mb-3">
+                    <label for="name" class="form-label">{{ _('Name') }}</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{ user.name }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">{{ _('Email') }}</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="username" class="form-label">{{ _('Username') }}</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
+                    <div class="form-text">{{ _('Username cannot be changed') }}</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="role" class="form-label">{{ _('Role') }}</label>
+                    <select class="form-select" id="role" name="role" required>
+                        <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>{{ _('Admin') }}</option>
+                        <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>{{ _('Manager') }}</option>
+                        <option value="driver" {% if user.role == 'driver' %}selected{% endif %}>{{ _('Driver') }}</option>
+                        <option value="employee" {% if user.role == 'employee' %}selected{% endif %}>{{ _('Employee') }}</option>
+                    </select>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="active" name="active" {% if user.active %}checked{% endif %}>
+                    <label class="form-check-label" for="active">{{ _('Active') }}</label>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="approval_status" class="form-label">{{ _('Approval Status') }}</label>
+                    <select class="form-select" id="approval_status" name="approval_status" required>
+                        <option value="approved" {% if user.approval_status == 'approved' %}selected{% endif %}>{{ _('Approved') }}</option>
+                        <option value="pending" {% if user.approval_status == 'pending' %}selected{% endif %}>{{ _('Pending') }}</option>
+                        <option value="rejected" {% if user.approval_status == 'rejected' %}selected{% endif %}>{{ _('Rejected') }}</option>
+                    </select>
+                </div>
+                
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('admin.users') }}" class="btn btn-secondary me-md-2">{{ _('Cancel') }}</a>
+                    <button type="submit" class="btn btn-primary">{{ _('Save Changes') }}</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %} 

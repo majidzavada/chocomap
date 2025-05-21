@@ -67,6 +67,21 @@ def create_app(config_class=Config):
     # Make get_locale available in templates
     app.jinja_env.globals.update(get_locale=get_locale)
     
+    # Add custom Jinja filters
+    @app.template_filter('date')
+    def date_filter(value, format='%Y-%m-%d'):
+        if isinstance(value, str):
+            try:
+                value = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                try:
+                    value = datetime.strptime(value, '%Y-%m-%d')
+                except ValueError:
+                    return value
+        if isinstance(value, datetime):
+            return value.strftime(format)
+        return value
+    
     # Set up logging
     if not app.debug and not app.testing:
         if not os.path.exists('logs'):
@@ -91,11 +106,13 @@ def create_app(config_class=Config):
     from app.routes.employee import employee_bp
     from app.routes.driver import driver_bp
     from app.routes.manager import manager_bp
+    from app.routes.admin import admin_bp
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(employee_bp)
     app.register_blueprint(driver_bp)
     app.register_blueprint(manager_bp)
+    app.register_blueprint(admin_bp)
     
     # Register error handlers
     @app.errorhandler(404)
