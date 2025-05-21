@@ -44,10 +44,6 @@ def login():
                 flash("Email/Username and password are required", "danger")
                 return redirect(url_for('auth.login'))
             
-            if not validate_email(login_input):
-                flash("Invalid email format", "danger")
-                return redirect(url_for('auth.login'))
-            
             # Attempt login
             user = UserService.authenticate_user(login_input, password)
             if user:

@@ -9,6 +9,7 @@ import logging
 from flask import request, jsonify
 import jwt
 from app.config import Config
+import bcrypt
 
 logger = logging.getLogger(__name__)
 
@@ -37,17 +38,13 @@ def validate_password(password: str) -> bool:
     return True
 
 def hash_password(password: str) -> str:
-    """Hash password using SHA-256."""
-    salt = secrets.token_hex(16)
-    hashed = hashlib.sha256((password + salt).encode()).hexdigest()
-    return f"{salt}${hashed}"
+    """Hash password using bcrypt."""
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 def verify_password(password: str, hashed: str) -> bool:
-    """Verify password against hashed value."""
+    """Verify password against bcrypt hash."""
     try:
-        salt, stored_hash = hashed.split('$')
-        computed_hash = hashlib.sha256((password + salt).encode()).hexdigest()
-        return secrets.compare_digest(computed_hash, stored_hash)
+        return bcrypt.checkpw(password.encode(), hashed.encode())
     except Exception as e:
         logger.error(f"Error verifying password: {str(e)}")
         return False

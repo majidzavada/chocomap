@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Tuple
 from app import mysql
-from app.utils import generate_hash, is_valid_password, verify_password
+from app.utils import hash_password, is_valid_password, verify_password
 import logging
 from mysql.connector.cursor import MySQLCursorDict
 
@@ -26,7 +26,7 @@ class UserService:
                 return None
 
             # Hash password
-            password_hash = generate_hash(password)
+            password_hash = hash_password(password)
             
             cursor.execute("""
                 INSERT INTO users (
@@ -192,5 +192,25 @@ class UserService:
         except Exception as e:
             logger.error(f"Error authenticating user: {str(e)}")
             return None
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def change_password(user_id: int, current_password: str, new_password: str) -> bool:
+        """Change user's password after verifying current password"""
+        cursor: MySQLCursorDict = mysql.connection.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
+            result = cursor.fetchone()
+            if not result or not verify_password(current_password, result['password_hash']):
+                return False
+            new_hash = hash_password(new_password)
+            cursor.execute("UPDATE users SET password_hash = %s, updated_at = NOW() WHERE id = %s", (new_hash, user_id))
+            mysql.connection.commit()
+            return True
+        except Exception as e:
+            mysql.connection.rollback()
+            logger.error(f"Error changing password: {str(e)}")
+            return False
         finally:
             cursor.close() 
