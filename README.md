@@ -194,12 +194,27 @@ The API documentation is available at `/api/docs` when running the application.
 
 - CSRF protection
 - Rate limiting (using Redis)
-- Password hashing
+- Password hashing using bcrypt
 - Input validation
 - SQL injection prevention
 - XSS protection
 - User registration approval system
 - Role-based access control
+
+### Password Security
+
+The application uses bcrypt for password hashing, which provides:
+- Secure password storage with salt
+- Protection against rainbow table attacks
+- Configurable work factor for future-proofing
+- Industry-standard password hashing algorithm
+
+Password requirements:
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one number
+- At least one special character
 
 ## 🌐 Internationalization
 
