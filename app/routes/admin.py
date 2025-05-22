@@ -303,15 +303,28 @@ def create_user_route():
                 flash(_("All fields are required"), "danger")
                 return redirect(url_for('admin.create_user_route'))
 
+            # Check for duplicate email
+            from app.models.users import get_user_by_email
+            if get_user_by_email(email):
+                flash(_("A user with this email already exists."), "danger")
+                return redirect(url_for('admin.create_user_route'))
+
+            # Validate password strength
+            from app.utils import is_valid_password
+            is_valid, message = is_valid_password(password)
+            if not is_valid:
+                flash(_(message), "danger")
+                return redirect(url_for('admin.create_user_route'))
+
             new_id = UserService.create_user(name=name, email=email, password=password, role=role)
             if new_id:
                 UserService.update_user(new_id, approval_status='approved', active=True)
                 flash(_("User created successfully"), "success")
                 return redirect(url_for('admin.users'))
             else:
-                flash(_("Error creating user"), "danger")
+                flash(_("Error creating user. Please check the form and try again."), "danger")
         except Exception as e:
             logger.error(f'Error creating user: {str(e)}', exc_info=True)
-            flash(_("Error creating user"), "danger")
+            flash(_("Error creating user: %(error)s", error=str(e)), "danger")
 
     return render_template('admin/create_user.html')
