@@ -188,4 +188,10 @@ class AddressService:
             """)
             return cursor.fetchone()
         finally:
-            cursor.close() 
+            cursor.close()
+
+    @staticmethod
+    def get_all_addresses() -> list:
+        """Get all addresses with their details."""
+        from app.models.addresses import get_all_addresses as model_get_all_addresses
+        return model_get_all_addresses()

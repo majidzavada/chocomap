@@ -11,6 +11,7 @@ class UserService:
     def create_user(
         name: str,
         email: str,
+        username: str,
         password: str,
         role: str
     ) -> Optional[int]:
@@ -28,10 +29,10 @@ class UserService:
             
             cursor.execute("""
                 INSERT INTO users (
-                    name, email, password_hash, role,
+                    name, email, username, password_hash, role,
                     active, created_at, updated_at
-                ) VALUES (%s, %s, %s, %s, TRUE, NOW(), NOW())
-            """, (name, email, password_hash, role))
+                ) VALUES (%s, %s, %s, %s, %s, TRUE, NOW(), NOW())
+            """, (name, email, username, password_hash, role))
             
             mysql.connection.commit()
             return cursor.lastrowid
@@ -47,6 +48,7 @@ class UserService:
         user_id: int,
         name: Optional[str] = None,
         email: Optional[str] = None,
+        username: Optional[str] = None,
         phone: Optional[str] = None,
         role: Optional[str] = None,
         status: Optional[str] = None,
@@ -58,13 +60,15 @@ class UserService:
         try:
             updates = []
             params = []
-            
             if name is not None:
                 updates.append("name = %s")
                 params.append(name)
             if email is not None:
                 updates.append("email = %s")
                 params.append(email)
+            if username is not None:
+                updates.append("username = %s")
+                params.append(username)
             if phone is not None:
                 updates.append("phone = %s")
                 params.append(phone)
@@ -80,19 +84,15 @@ class UserService:
             if approval_status is not None:
                 updates.append("approval_status = %s")
                 params.append(approval_status)
-            
             if not updates:
                 return False
-                
             updates.append("updated_at = NOW()")
             params.append(user_id)
-            
             query = f"""
                 UPDATE users 
                 SET {', '.join(updates)}
                 WHERE id = %s
             """
-            
             cursor.execute(query, tuple(params))
             mysql.connection.commit()
             return cursor.rowcount > 0

@@ -30,8 +30,7 @@
                 
                 <div class="mb-3">
                     <label for="username" class="form-label">{{ _('Username') }}</label>
-                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly>
-                    <div class="form-text">{{ _('Username cannot be changed') }}</div>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
                 </div>
                 
                 <div class="mb-3">
@@ -66,4 +65,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}

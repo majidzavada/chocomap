@@ -176,18 +176,23 @@ def edit_user(user_id):
         if request.method == 'POST':
             name = sanitize_input(request.form.get('name', ''))
             email = request.form.get('email', '').strip()
+            username = sanitize_input(request.form.get('username', '')).strip()
             role = request.form.get('role', '')
             active = 'active' in request.form  # Checkbox
             approval_status = request.form.get('approval_status', '')
             
-            if not all([name, email, role, approval_status]):
+            if not all([name, email, username, role, approval_status]):
                 flash(_("All fields are required"), "danger")
                 return redirect(url_for('admin.edit_user', user_id=user_id))
             if not validate_email(email):
                 flash(_("Invalid email format"), "danger")
                 return redirect(url_for('admin.edit_user', user_id=user_id))
-            if UserService.update_user(user_id, name=name, email=email, role=role, 
-                                      active=active, approval_status=approval_status):
+            # Check for duplicate username (if changed)
+            cursor.execute("SELECT id FROM users WHERE username = %s AND id != %s", (username, user_id))
+            if cursor.fetchone():
+                flash(_("A user with this username already exists."), "danger")
+                return redirect(url_for('admin.edit_user', user_id=user_id))
+            if UserService.update_user(user_id, name=name, email=email, username=username, role=role, active=active, approval_status=approval_status):
                 flash(_("User updated successfully"), "success")
                 return redirect(url_for('admin.users'))
             else:
@@ -296,18 +301,26 @@ def create_user_route():
         try:
             name = sanitize_input(request.form.get('name', ''))
             email = request.form.get('email', '').strip()
+            username = sanitize_input(request.form.get('username', '')).strip()
             role = request.form.get('role', 'employee')
             password = request.form.get('password', '').strip()
 
-            if not all([name, email, password, role]):
+            if not all([name, email, username, password, role]):
                 flash(_("All fields are required"), "danger")
                 return redirect(url_for('admin.create_user_route'))
 
-            # Check for duplicate email
-            from app.models.users import get_user_by_email
+            # Check for duplicate email or username
+            from app.models.users import get_user_by_email, get_user_by_id
             if get_user_by_email(email):
                 flash(_("A user with this email already exists."), "danger")
                 return redirect(url_for('admin.create_user_route'))
+            cursor = mysql.connection.cursor()
+            cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+            if cursor.fetchone():
+                cursor.close()
+                flash(_("A user with this username already exists."), "danger")
+                return redirect(url_for('admin.create_user_route'))
+            cursor.close()
 
             # Validate password strength
             from app.utils import is_valid_password
@@ -316,7 +329,7 @@ def create_user_route():
                 flash(_(message), "danger")
                 return redirect(url_for('admin.create_user_route'))
 
-            new_id = UserService.create_user(name=name, email=email, password=password, role=role)
+            new_id = UserService.create_user(name=name, email=email, username=username, password=password, role=role)
             if new_id:
                 UserService.update_user(new_id, approval_status='approved', active=True)
                 flash(_("User created successfully"), "success")

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Addresses') }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1>{{ _('Addresses') }}</h1>
+    {% if addresses %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{{ _('Label') }}</th>
+                    <th>{{ _('Street Address') }}</th>
+                    <th>{{ _('City') }}</th>
+                    <th>{{ _('ZIP Code') }}</th>
+                    <th>{{ _('Created By') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for address in addresses %}
+                <tr>
+                    <td>{{ address.label }}</td>
+                    <td>{{ address.street_address }}</td>
+                    <td>{{ address.city }}</td>
+                    <td>{{ address.zip_code }}</td>
+                    <td>{{ address.created_by_name or '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>{{ _('No addresses found.') }}</p>
+    {% endif %}
+</div>
+{% endblock %}
