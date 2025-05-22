@@ -12,8 +12,7 @@ class UserService:
         name: str,
         email: str,
         password: str,
-        role: str,
-        phone: Optional[str] = None
+        role: str
     ) -> Optional[int]:
         """Create a new user with validation"""
         cursor = mysql.connection.cursor()
@@ -29,10 +28,10 @@ class UserService:
             
             cursor.execute("""
                 INSERT INTO users (
-                    name, email, password_hash, role, phone,
+                    name, email, password_hash, role,
                     active, status, created_at, updated_at
-                ) VALUES (%s, %s, %s, %s, %s, TRUE, 'active', NOW(), NOW())
-            """, (name, email, password_hash, role, phone))
+                ) VALUES (%s, %s, %s, %s, TRUE, 'active', NOW(), NOW())
+            """, (name, email, password_hash, role))
             
             mysql.connection.commit()
             return cursor.lastrowid
@@ -266,4 +265,4 @@ class UserService:
             logger.error(f"Error changing password: {str(e)}")
             return False
         finally:
-            cursor.close() 
+            cursor.close()
