@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  ChocoMap\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-22 12:19+0200\n"
+"POT-Creation-Date: 2025-05-22 12:27+0200\n"
 "PO-Revision-Date: 2024-05-19 21:40+0000\n"
 "Last-Translator: Majid Zavada\n"
 "Language: en\n"
@@ -48,7 +48,7 @@ msgstr ""
 msgid "User not found"
 msgstr "Not Found"
 
-#: app/routes/admin.py:184 app/routes/admin.py:303 app/routes/auth.py:185
+#: app/routes/admin.py:184 app/routes/admin.py:303 app/routes/auth.py:182
 #: app/routes/employee.py:81 app/routes/employee.py:122
 #: app/routes/employee.py:208
 msgid "All fields are required"
@@ -92,74 +92,83 @@ msgid "Returned to admin account"
 msgstr ""
 
 #: app/routes/admin.py:309
+msgid "A user with this email already exists."
+msgstr ""
+
+#: app/routes/admin.py:322
 msgid "User created successfully"
 msgstr ""
 
-#: app/routes/admin.py:312 app/routes/admin.py:315
-msgid "Error creating user"
+#: app/routes/admin.py:325
+msgid "Error creating user. Please check the form and try again."
 msgstr ""
 
-#: app/routes/auth.py:48
+#: app/routes/admin.py:328
+#, python-format
+msgid "Error creating user: %(error)s"
+msgstr ""
+
+#: app/routes/auth.py:47
 msgid "Email/Username and password are required"
 msgstr ""
 
-#: app/routes/auth.py:68
+#: app/routes/auth.py:63
 msgid "Login successful"
 msgstr ""
 
-#: app/routes/auth.py:80
+#: app/routes/auth.py:75
 msgid "Invalid email/username or password"
 msgstr ""
 
-#: app/routes/auth.py:85
+#: app/routes/auth.py:79
 msgid "An error occurred during login. Please try again."
 msgstr ""
 
-#: app/routes/auth.py:101
+#: app/routes/auth.py:94
 msgid "You have been logged out"
 msgstr ""
 
-#: app/routes/auth.py:144
+#: app/routes/auth.py:137
 msgid "Registration is currently disabled. Please contact the administrator."
 msgstr ""
 
-#: app/routes/auth.py:155
+#: app/routes/auth.py:148
 msgid "Please enter a valid email address"
 msgstr ""
 
-#: app/routes/auth.py:160
-msgid "Password reset instructions have been sent to your email"
-msgstr ""
-
-#: app/routes/auth.py:162
+#: app/routes/auth.py:155 app/routes/auth.py:162
 msgid "Error sending password reset email"
 msgstr ""
 
-#: app/routes/auth.py:168
+#: app/routes/auth.py:159
+msgid "Password reset instructions have been sent to your email"
+msgstr ""
+
+#: app/routes/auth.py:166
 msgid "An error occurred while processing your request"
 msgstr ""
 
-#: app/routes/auth.py:188 app/templates/auth/change_password.html:58
+#: app/routes/auth.py:185 app/templates/auth/change_password.html:58
 msgid "New passwords do not match"
 msgstr ""
 
-#: app/routes/auth.py:203
+#: app/routes/auth.py:200
 msgid "Password changed successfully"
 msgstr ""
 
-#: app/routes/auth.py:214
+#: app/routes/auth.py:211
 msgid "Current password is incorrect"
 msgstr ""
 
-#: app/routes/auth.py:219
+#: app/routes/auth.py:216
 msgid "An error occurred while changing your password"
 msgstr ""
 
-#: app/routes/auth.py:226
+#: app/routes/auth.py:223
 msgid "Access forbidden. Please try again."
 msgstr ""
 
-#: app/routes/auth.py:231
+#: app/routes/auth.py:228
 #, fuzzy
 msgid "Too many attempts. Please try again later."
 msgstr "You have made too many requests. Please try again later."
@@ -373,6 +382,64 @@ msgstr "Driver Dashboard"
 msgid "Go to Employee Dashboard"
 msgstr "Employee Dashboard"
 
+#: app/templates/admin/create_user.html:3
+#: app/templates/admin/create_user.html:30 app/templates/admin/users.html:17
+msgid "Create User"
+msgstr ""
+
+#: app/templates/admin/create_user.html:7
+msgid "Create New User"
+msgstr ""
+
+#: app/templates/admin/create_user.html:10
+#: app/templates/admin/dashboard.html:64 app/templates/admin/edit_user.html:22
+#: app/templates/admin/users.html:27
+msgid "Name"
+msgstr ""
+
+#: app/templates/admin/create_user.html:14
+#: app/templates/admin/dashboard.html:65 app/templates/admin/edit_user.html:27
+#: app/templates/admin/users.html:28 app/templates/auth/register.html:17
+msgid "Email"
+msgstr "Email"
+
+#: app/templates/admin/create_user.html:18
+#, fuzzy
+msgid "Temporary Password"
+msgstr "Password"
+
+#: app/templates/admin/create_user.html:22
+#: app/templates/admin/dashboard.html:67 app/templates/admin/edit_user.html:38
+#: app/templates/admin/users.html:30 app/templates/auth/register.html:32
+#, fuzzy
+msgid "Role"
+msgstr "Profile"
+
+#: app/templates/admin/create_user.html:24
+#: app/templates/admin/edit_user.html:43 app/templates/auth/register.html:34
+msgid "Employee"
+msgstr ""
+
+#: app/templates/admin/create_user.html:25
+#: app/templates/admin/edit_user.html:41 app/templates/auth/register.html:35
+msgid "Manager"
+msgstr ""
+
+#: app/templates/admin/create_user.html:26
+#: app/templates/admin/edit_user.html:42 app/templates/auth/register.html:36
+msgid "Driver"
+msgstr ""
+
+#: app/templates/admin/create_user.html:27
+#: app/templates/admin/edit_user.html:40
+msgid "Admin"
+msgstr ""
+
+#: app/templates/admin/create_user.html:31
+#: app/templates/admin/edit_user.html:62 app/templates/admin/users.html:88
+msgid "Cancel"
+msgstr ""
+
 #: app/templates/admin/dashboard.html:2 app/templates/admin/dashboard.html:7
 #, fuzzy
 msgid "Admin Dashboard"
@@ -413,26 +480,10 @@ msgstr ""
 msgid "ID"
 msgstr ""
 
-#: app/templates/admin/dashboard.html:64 app/templates/admin/edit_user.html:22
-#: app/templates/admin/users.html:27
-msgid "Name"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:65 app/templates/admin/edit_user.html:27
-#: app/templates/admin/users.html:28 app/templates/auth/register.html:17
-msgid "Email"
-msgstr "Email"
-
 #: app/templates/admin/dashboard.html:66 app/templates/admin/edit_user.html:32
 #: app/templates/admin/users.html:29
 msgid "Username"
 msgstr ""
-
-#: app/templates/admin/dashboard.html:67 app/templates/admin/edit_user.html:38
-#: app/templates/admin/users.html:30 app/templates/auth/register.html:32
-#, fuzzy
-msgid "Role"
-msgstr "Profile"
 
 #: app/templates/admin/dashboard.html:68
 #, fuzzy
@@ -490,22 +541,6 @@ msgstr "Go to Dashboard"
 msgid "Username cannot be changed"
 msgstr ""
 
-#: app/templates/admin/edit_user.html:40
-msgid "Admin"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:41 app/templates/auth/register.html:35
-msgid "Manager"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:42 app/templates/auth/register.html:36
-msgid "Driver"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:43 app/templates/auth/register.html:34
-msgid "Employee"
-msgstr ""
-
 #: app/templates/admin/edit_user.html:49 app/templates/admin/users.html:47
 msgid "Active"
 msgstr ""
@@ -526,10 +561,6 @@ msgstr ""
 #, fuzzy
 msgid "Rejected"
 msgstr "Reject"
-
-#: app/templates/admin/edit_user.html:62 app/templates/admin/users.html:88
-msgid "Cancel"
-msgstr ""
 
 #: app/templates/admin/edit_user.html:63
 msgid "Save Changes"
@@ -568,10 +599,6 @@ msgstr "Go to Dashboard"
 
 #: app/templates/admin/users.html:15
 msgid "All Users"
-msgstr ""
-
-#: app/templates/admin/users.html:17
-msgid "Create User"
 msgstr ""
 
 #: app/templates/admin/users.html:31 app/templates/driver/dashboard.html:17
@@ -1315,5 +1342,8 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "You can oversee schedules, addresses, and staff operations."
+#~ msgstr ""
+
+#~ msgid "Error creating user"
 #~ msgstr ""
 
