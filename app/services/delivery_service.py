@@ -205,4 +205,30 @@ class DeliveryService:
             
             return optimized
         finally:
-            cursor.close() 
+            cursor.close()
+
+    @staticmethod
+    def get_driver_stats(driver_id: int) -> Dict[str, Any]:
+        """Get delivery statistics for a specific driver"""
+        cursor = mysql.connection.cursor()
+        try:
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) as total_deliveries,
+                    COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_deliveries,
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_deliveries,
+                    COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress_deliveries,
+                    COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_deliveries
+                FROM deliveries
+                WHERE driver_id = %s
+            """, (driver_id,))
+            result = cursor.fetchone()
+            return {
+                'total_deliveries': result[0] or 0,
+                'completed_deliveries': result[1] or 0,
+                'pending_deliveries': result[2] or 0,
+                'in_progress_deliveries': result[3] or 0,
+                'cancelled_deliveries': result[4] or 0
+            }
+        finally:
+            cursor.close()
