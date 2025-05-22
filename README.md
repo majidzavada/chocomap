@@ -80,15 +80,22 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
 - MariaDB
 - Redis (required for rate limiting and caching)
 - Google Maps API key
+- Build tools & MySQL/MariaDB client dev headers (e.g. `build-essential`, `python3-dev`, `default-libmysqlclient-dev` on Ubuntu/Debian) — required to compile the `mysqlclient` library
 
 ### System Requirements
 
-1. **Python Dependencies**
+1. **System packages (only once, required for mysqlclient)**
+   ```bash
+   sudo apt-get update
+   sudo apt-get install build-essential python3-dev default-libmysqlclient-dev
+   ```
+
+2. **Python Dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-2. **MariaDB**
+3. **MariaDB**
    ```bash
    sudo apt-get update
    sudo apt-get install mariadb-server
