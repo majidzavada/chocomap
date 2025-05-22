@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify
+from flask_babel import _
 from datetime import datetime, date, timedelta
 from app.services.delivery_service import DeliveryService
 from app.services.user_service import UserService
@@ -36,7 +37,7 @@ def dashboard():
                              system_health=system_health)
     except Exception as e:
         logger.error(f"Error loading manager dashboard: {str(e)}")
-        flash("Error loading dashboard", "danger")
+        flash(_("Error loading dashboard"), "danger")
         return render_template('manager/dashboard.html')
 
 @manager_bp.route('/drivers')
@@ -48,7 +49,7 @@ def drivers():
         return render_template('manager/drivers.html', drivers=drivers)
     except Exception as e:
         logger.error(f"Error loading drivers: {str(e)}")
-        flash("Error loading drivers", "danger")
+        flash(_("Error loading drivers"), "danger")
         return render_template('manager/drivers.html')
 
 @manager_bp.route('/driver/<int:driver_id>/stats')
@@ -79,7 +80,7 @@ def driver_stats(driver_id):
                              end_date=end_date)
     except Exception as e:
         logger.error(f"Error loading driver stats: {str(e)}")
-        flash("Error loading driver statistics", "danger")
+        flash(_("Error loading driver statistics"), "danger")
         return redirect(url_for('manager.drivers'))
 
 @manager_bp.route('/addresses')
@@ -91,7 +92,7 @@ def addresses():
         return render_template('manager/addresses.html', addresses=addresses)
     except Exception as e:
         logger.error(f"Error loading addresses: {str(e)}")
-        flash("Error loading addresses", "danger")
+        flash(_("Error loading addresses"), "danger")
         return render_template('manager/addresses.html')
 
 @manager_bp.route('/address/<int:address_id>/edit', methods=['GET', 'POST'])
@@ -110,9 +111,9 @@ def edit_address(address_id):
                 city=city,
                 zip_code=zip_code
             ):
-                flash("Address updated successfully", "success")
+                flash(_("Address updated successfully"), "success")
             else:
-                flash("Error updating address", "danger")
+                flash(_("Error updating address"), "danger")
                 
             return redirect(url_for('manager.addresses'))
             
@@ -120,7 +121,7 @@ def edit_address(address_id):
         return render_template('manager/edit_address.html', address=address)
     except Exception as e:
         logger.error(f"Error editing address: {str(e)}")
-        flash("Error loading address", "danger")
+        flash(_("Error loading address"), "danger")
         return redirect(url_for('manager.addresses'))
 
 @manager_bp.route('/reports')
@@ -153,7 +154,7 @@ def reports():
                              end_date=end_date)
     except Exception as e:
         logger.error(f"Error loading reports: {str(e)}")
-        flash("Error loading reports", "danger")
+        flash(_("Error loading reports"), "danger")
         return render_template('manager/reports.html')
 
 @manager_bp.route('/api/system-health')
@@ -165,4 +166,4 @@ def get_system_health():
         return jsonify(health_data)
     except Exception as e:
         logger.error(f"Error getting system health: {str(e)}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": _("Internal server error")}), 500

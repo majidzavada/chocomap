@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify
+from flask_babel import _
 from datetime import datetime, date, timedelta
 from typing import Dict, Any
 
@@ -54,7 +55,7 @@ def dashboard():
                              stats=stats,
                              next_delivery=next_delivery)
     except Exception as e:
-        flash("Error loading dashboard data", "danger")
+        flash(_("Error loading dashboard data"), "danger")
         return render_template('employee/dashboard.html')
 
 @employee_bp.route('/addresses', methods=['GET', 'POST'])
@@ -73,11 +74,11 @@ def addresses():
                 lat = float(request.form.get('latitude', 0))
                 lon = float(request.form.get('longitude', 0))
             except ValueError:
-                flash("Invalid coordinates", "danger")
+                flash(_("Invalid coordinates"), "danger")
                 return redirect(url_for('employee.addresses'))
 
             if not all([label, street, city, zip_code]):
-                flash("All fields are required", "danger")
+                flash(_("All fields are required"), "danger")
                 return redirect(url_for('employee.addresses'))
 
             # Create address
@@ -92,13 +93,11 @@ def addresses():
             )
 
             if address_id:
-                flash("Address added successfully", "success")
+                flash(_("Address added successfully"), "success")
             else:
-                flash("Error adding address", "danger")
-
+                flash(_("Error adding address"), "danger")
         except Exception as e:
-            flash("Error processing address", "danger")
-
+            flash(_("Error processing address"), "danger")
         return redirect(url_for('employee.addresses'))
 
     addresses = get_all_addresses()
@@ -120,7 +119,7 @@ def schedule():
             notes = sanitize_input(request.form.get('notes', ''))
 
             if not all([driver_id, address_id, delivery_date, start_time, end_time]):
-                flash("All fields are required", "danger")
+                flash(_("All fields are required"), "danger")
                 return redirect(url_for('employee.schedule'))
 
             # Validate driver and address exist
@@ -128,7 +127,7 @@ def schedule():
             address = get_address_by_id(address_id)
             
             if not driver or not address:
-                flash("Invalid driver or address", "danger")
+                flash(_("Invalid driver or address"), "danger")
                 return redirect(url_for('employee.schedule'))
 
             # Create delivery
@@ -143,13 +142,11 @@ def schedule():
             )
 
             if delivery_id:
-                flash("Delivery scheduled successfully", "success")
+                flash(_("Delivery scheduled successfully"), "success")
             else:
-                flash("Error scheduling delivery", "danger")
-
+                flash(_("Error scheduling delivery"), "danger")
         except Exception as e:
-            flash("Error processing delivery schedule", "danger")
-
+            flash(_("Error processing delivery schedule"), "danger")
         return redirect(url_for('employee.schedule'))
 
     drivers = get_all_drivers()
@@ -172,12 +169,12 @@ def calendar():
                 datetime.strptime(filter_date, '%Y-%m-%d')
             except ValueError:
                 filter_date = None
-                flash("Invalid date format", "warning")
+                flash(_("Invalid date format"), "warning")
 
         schedule = DeliveryService.get_all_deliveries_grouped(filter_driver, filter_date)
         return render_template('employee/calendar.html', schedule=schedule)
     except Exception as e:
-        flash("Error loading calendar", "danger")
+        flash(_("Error loading calendar"), "danger")
         return render_template('employee/calendar.html', schedule={})
 
 @employee_bp.route('/delivery/<int:delivery_id>/delete', methods=['POST'])
@@ -186,12 +183,11 @@ def calendar():
 def delete_delivery_route(delivery_id):
     try:
         if DeliveryService.delete_delivery(delivery_id):
-            flash("Delivery deleted successfully", "success")
+            flash(_("Delivery deleted successfully"), "success")
         else:
-            flash("Error deleting delivery", "danger")
+            flash(_("Error deleting delivery"), "danger")
     except Exception as e:
-        flash("Error processing deletion", "danger")
-    
+        flash(_("Error processing deletion"), "danger")
     return redirect(url_for('employee.calendar'))
 
 @employee_bp.route('/delivery/<int:delivery_id>/edit', methods=['GET', 'POST'])
@@ -209,7 +205,7 @@ def edit_delivery(delivery_id):
             notes = sanitize_input(request.form.get('notes', ''))
 
             if not all([driver_id, address_id, delivery_date, start_time, end_time]):
-                flash("All fields are required", "danger")
+                flash(_("All fields are required"), "danger")
                 return redirect(url_for('employee.edit_delivery', delivery_id=delivery_id))
 
             # Update delivery
@@ -222,16 +218,16 @@ def edit_delivery(delivery_id):
                 end_time=end_time,
                 notes=notes
             ):
-                flash("Delivery updated successfully", "success")
+                flash(_("Delivery updated successfully"), "success")
             else:
-                flash("Error updating delivery", "danger")
+                flash(_("Error updating delivery"), "danger")
 
             return redirect(url_for('employee.calendar'))
 
         # Get delivery details
         delivery = DeliveryService.get_delivery_by_id(delivery_id)
         if not delivery:
-            flash("Delivery not found", "danger")
+            flash(_("Delivery not found"), "danger")
             return redirect(url_for('employee.calendar'))
 
         drivers = get_all_drivers()
@@ -242,7 +238,7 @@ def edit_delivery(delivery_id):
                              drivers=drivers,
                              addresses=addresses)
     except Exception as e:
-        flash("Error processing delivery edit", "danger")
+        flash(_("Error processing delivery edit"), "danger")
         return redirect(url_for('employee.calendar'))
 
 @employee_bp.route('/api/delivery-stats')
@@ -254,12 +250,12 @@ def delivery_stats():
         end_date = request.args.get('end_date')
         
         if not start_date or not end_date:
-            return jsonify({"error": "Start and end dates are required"}), 400
+            return jsonify({"error": _("Start and end dates are required")}), 400
 
         stats = DeliveryService.get_delivery_stats(start_date, end_date)
         return jsonify(stats)
     except Exception as e:
-        return jsonify({"error": "Error fetching delivery statistics"}), 500
+        return jsonify({"error": _("Error fetching delivery statistics")}), 500
 
 @employee_bp.route('/api/optimize-route/<int:driver_id>')
 @login_required
@@ -268,9 +264,9 @@ def optimize_route(driver_id):
     try:
         delivery_date = request.args.get('date')
         if not delivery_date:
-            return jsonify({"error": "Date is required"}), 400
+            return jsonify({"error": _("Date is required")}), 400
 
         optimized_route = DeliveryService.optimize_delivery_route(driver_id, delivery_date)
         return jsonify(optimized_route)
     except Exception as e:
-        return jsonify({"error": "Error optimizing route"}), 500
+        return jsonify({"error": _("Error optimizing route")}), 500

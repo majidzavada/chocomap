@@ -1,5 +1,6 @@
 import secrets
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort, jsonify
+from flask_babel import _
 # from werkzeug.security import check_password_hash
 from app import mysql
 # from app.models.users import get_user_by_email, verify_password, update_user
@@ -40,31 +41,26 @@ def login():
         try:
             login_input = request.form.get('email', '').strip()
             password = request.form.get('password', '')
-            
             logger.info(f"Login attempt for: {login_input} from IP: {request.remote_addr}")
-            
             if not login_input or not password:
-                flash("Email/Username and password are required", "danger")
+                logger.warning(f"Login failed: missing credentials for {login_input} from {request.remote_addr}")
+                flash(_("Email/Username and password are required"), "danger")
                 return redirect(url_for('auth.login'))
-            
             # Attempt login
             user = UserService.authenticate_user(login_input, password)
-            
             if user:
                 logger.info(f"Successful login for user: {user['id']} ({user['email']})")
                 session['user_id'] = user['id']
                 session['user_role'] = user['role']
                 session['role'] = user['role']
                 session['name'] = user['name']
-                
                 # Track login activity
                 UserService.track_user_activity(
                     user['id'],
                     'login',
                     {'ip': request.remote_addr}
                 )
-                
-                flash("Login successful", "success")
+                flash(_("Login successful"), "success")
                 # Redirect to the appropriate dashboard based on user role
                 if user['role'] == 'admin':
                     return redirect(url_for('admin.dashboard'))
@@ -75,15 +71,13 @@ def login():
                 else:
                     return redirect(url_for('employee.dashboard'))
             else:
-                logger.warning(f"Failed login attempt for: {login_input}")
-                flash("Invalid email/username or password", "danger")
+                logger.warning(f"Failed login attempt for: {login_input} from {request.remote_addr}")
+                flash(_("Invalid email/username or password"), "danger")
                 return redirect(url_for('auth.login'))
-                
         except Exception as e:
             logger.error(f"Login error: {str(e)}", exc_info=True)
-            flash("An error occurred during login. Please try again.", "danger")
+            flash(_("An error occurred during login. Please try again."), "danger")
             return redirect(url_for('auth.login'))
-
     return render_template('auth/login.html')
 
 @auth_bp.route('/logout')
@@ -97,7 +91,7 @@ def logout():
         )
         
     session.clear()
-    flash("You have been logged out", "info")
+    flash(_("You have been logged out"), "info")
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/')
@@ -140,7 +134,7 @@ def lang(lang_code):
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     """Public self-registration is disabled. Redirect to login."""
-    flash("Registration is currently disabled. Please contact the administrator.", "warning")
+    flash(_("Registration is currently disabled. Please contact the administrator."), "warning")
     return redirect(url_for('auth.login'))
 
 @auth_bp.route('/reset-password', methods=['GET', 'POST'])
@@ -149,24 +143,28 @@ def reset_password():
     if request.method == 'POST':
         try:
             email = request.form.get('email', '').strip()
-            
             if not email or not validate_email(email):
-                flash("Please enter a valid email address", "danger")
+                logger.warning(f"Password reset failed: invalid email '{email}' from {request.remote_addr}")
+                flash(_("Please enter a valid email address"), "danger")
                 return redirect(url_for('auth.reset_password'))
-            
             # Send password reset email
-            if UserService.send_password_reset_email(email):
-                flash("Password reset instructions have been sent to your email", "success")
+            try:
+                sent = UserService.send_password_reset_email(email)
+            except Exception as mail_err:
+                logger.error(f"Error sending password reset email: {mail_err}")
+                flash(_("Error sending password reset email"), "danger")
+                return redirect(url_for('auth.reset_password'))
+            if sent:
+                logger.info(f"Password reset email sent to {email}")
+                flash(_("Password reset instructions have been sent to your email"), "success")
             else:
-                flash("Error sending password reset email", "danger")
-                
+                logger.warning(f"Password reset failed: user not found or error for {email}")
+                flash(_("Error sending password reset email"), "danger")
             return redirect(url_for('auth.login'))
-            
         except Exception as e:
             logger.error(f"Password reset error: {str(e)}")
-            flash("An error occurred while processing your request", "danger")
+            flash(_("An error occurred while processing your request"), "danger")
             return redirect(url_for('auth.reset_password'))
-            
     return render_template('auth/reset_password.html')
 
 @auth_bp.route('/change-password', methods=['GET', 'POST'])
@@ -181,17 +179,16 @@ def change_password():
             confirm_password = request.form.get('confirm_password', '')
             
             if not all([current_password, new_password, confirm_password]):
-                flash("All fields are required", "danger")
+                flash(_("All fields are required"), "danger")
                 return redirect(url_for('auth.change_password'))
-                
             if new_password != confirm_password:
-                flash("New passwords do not match", "danger")
+                flash(_("New passwords do not match"), "danger")
                 return redirect(url_for('auth.change_password'))
                 
             # Validate password strength
             is_valid, message = is_valid_password(new_password)
             if not is_valid:
-                flash(message, "danger")
+                flash(_(message), "danger")
                 return redirect(url_for('auth.change_password'))
             
             # Change password
@@ -200,7 +197,7 @@ def change_password():
                 current_password=current_password,
                 new_password=new_password
             ):
-                flash("Password changed successfully", "success")
+                flash(_("Password changed successfully"), "success")
                 # Redirect to appropriate dashboard based on user role
                 if session['user_role'] == 'admin':
                     return redirect(url_for('admin.dashboard'))
@@ -211,24 +208,24 @@ def change_password():
                 else:
                     return redirect(url_for('employee.dashboard'))
             else:
-                flash("Current password is incorrect", "danger")
+                flash(_("Current password is incorrect"), "danger")
                 return redirect(url_for('auth.change_password'))
                 
         except Exception as e:
             logger.error(f"Password change error: {str(e)}")
-            flash("An error occurred while changing your password", "danger")
+            flash(_("An error occurred while changing your password"), "danger")
             return redirect(url_for('auth.change_password'))
             
     return render_template('auth/change_password.html')
 
 @auth_bp.errorhandler(403)
 def forbidden_error(error):
-    flash("Access forbidden. Please try again.", "danger")
+    flash(_("Access forbidden. Please try again."), "danger")
     return redirect(url_for('auth.login'))
 
 @auth_bp.errorhandler(429)
 def ratelimit_error(error):
-    flash("Too many attempts. Please try again later.", "danger")
+    flash(_("Too many attempts. Please try again later."), "danger")
     return render_template('auth/login.html'), 429
 
 @auth_bp.route('/debug/login-status')

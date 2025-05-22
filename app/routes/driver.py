@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify
+from flask_babel import _
 from datetime import datetime, date, timedelta
 from app.services.delivery_service import DeliveryService
 from app.services.user_service import UserService
@@ -29,7 +30,7 @@ def dashboard():
                              stats=stats)
     except Exception as e:
         logger.error(f"Error loading driver dashboard: {str(e)}")
-        flash("Error loading dashboard", "danger")
+        flash(_("Error loading dashboard"), "danger")
         return render_template('driver/dashboard.html')
 
 @driver_bp.route('/deliveries')
@@ -50,7 +51,7 @@ def deliveries():
                              deliveries=deliveries)
     except Exception as e:
         logger.error(f"Error loading deliveries: {str(e)}")
-        flash("Error loading deliveries", "danger")
+        flash(_("Error loading deliveries"), "danger")
         return render_template('driver/deliveries.html')
 
 @driver_bp.route('/delivery/<int:delivery_id>/update-status', methods=['POST'])
@@ -61,7 +62,7 @@ def update_delivery_status(delivery_id):
     try:
         status = request.form.get('status')
         if not status:
-            return jsonify({"error": "Status is required"}), 400
+            return jsonify({"error": _("Status is required")}), 400
             
         if DeliveryService.update_delivery_status(delivery_id, status):
             # Track activity
@@ -70,12 +71,12 @@ def update_delivery_status(delivery_id):
                 'update_delivery_status',
                 {'delivery_id': delivery_id, 'status': status}
             )
-            return jsonify({"message": "Status updated successfully"})
+            return jsonify({"message": _("Status updated successfully")})
         else:
-            return jsonify({"error": "Error updating status"}), 400
+            return jsonify({"error": _("Error updating status")}), 400
     except Exception as e:
         logger.error(f"Error updating delivery status: {str(e)}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": _("Internal server error")}), 500
 
 @driver_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
@@ -93,9 +94,9 @@ def profile():
                 email=email,
                 phone=phone
             ):
-                flash("Profile updated successfully", "success")
+                flash(_("Profile updated successfully"), "success")
             else:
-                flash("Error updating profile", "danger")
+                flash(_("Error updating profile"), "danger")
                 
             return redirect(url_for('driver.profile'))
             
@@ -104,7 +105,7 @@ def profile():
         return render_template('driver/profile.html', user=user)
     except Exception as e:
         logger.error(f"Error in profile management: {str(e)}")
-        flash("Error loading profile", "danger")
+        flash(_("Error loading profile"), "danger")
         return redirect(url_for('driver.dashboard'))
 
 @driver_bp.route('/stats')
@@ -131,7 +132,7 @@ def stats():
                              end_date=end_date)
     except Exception as e:
         logger.error(f"Error loading driver stats: {str(e)}")
-        flash("Error loading statistics", "danger")
+        flash(_("Error loading statistics"), "danger")
         return render_template('driver/stats.html')
 
 @driver_bp.route('/api/delivery-route/<int:delivery_id>')
@@ -143,7 +144,7 @@ def get_delivery_route(delivery_id):
         if route:
             return jsonify(route)
         else:
-            return jsonify({"error": "Route not found"}), 404
+            return jsonify({"error": _("Route not found")}), 404
     except Exception as e:
         logger.error(f"Error getting delivery route: {str(e)}")
-        return jsonify({"error": "Internal server error"}), 500
+        return jsonify({"error": _("Internal server error")}), 500
