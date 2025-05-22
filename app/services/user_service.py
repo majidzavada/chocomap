@@ -29,8 +29,8 @@ class UserService:
             cursor.execute("""
                 INSERT INTO users (
                     name, email, password_hash, role,
-                    active, status, created_at, updated_at
-                ) VALUES (%s, %s, %s, %s, TRUE, 'active', NOW(), NOW())
+                    active, created_at, updated_at
+                ) VALUES (%s, %s, %s, %s, TRUE, NOW(), NOW())
             """, (name, email, password_hash, role))
             
             mysql.connection.commit()
