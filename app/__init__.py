@@ -48,15 +48,18 @@ def create_app(config_class=Config):
         
         # Then try to get from user preferences if logged in
         if 'user_id' in session:
+            # Attempt to read language preference from database
             try:
-                with get_db() as conn:
-                    with conn.cursor() as cursor:
-                        cursor.execute('SELECT preferred_lang FROM users WHERE id = %s', (session['user_id'],))
-                        result = cursor.fetchone()
-                        if result and result[0]:
-                            return result[0]
-            except Exception as e:
-                current_app.logger.error(f"Error getting user language: {str(e)}")
+                conn = mysql.connection
+                cursor = conn.cursor()
+                cursor.execute('SELECT preferred_lang FROM users WHERE id = %s', (session['user_id'],))
+                result = cursor.fetchone()
+                cursor.close()
+                if result and result[0]:
+                    return result[0]
+            except Exception as db_err:
+                current_app.logger.error(f"Database error fetching user language: {db_err}")
+            # If any DB error occurs we silently fall back to default detection
         
         # Finally, try to get from browser settings
         return request.accept_languages.best_match(['en', 'cs'])
@@ -136,6 +139,7 @@ def create_app(config_class=Config):
     @app.route('/')
     def root():
         """Root endpoint that shows basic app info"""
+        # Serve JSON when explicitly requested, otherwise show the public landing page
         if request.headers.get('Accept') == 'application/json':
             return jsonify({
                 'status': 'ok',
@@ -147,7 +151,8 @@ def create_app(config_class=Config):
                     'register': url_for('auth.register', _external=True)
                 }
             })
-        return redirect(url_for('auth.login'))
+        # Render the landing page which handles redirecting/logged-in users itself
+        return render_template('index.html')
     
     # Register before_request handlers
     @app.before_request
@@ -232,7 +237,7 @@ def create_app(config_class=Config):
             mysql.connection.ping(reconnect=True)
             db_status = 'healthy'
         except Exception as e:
-            logger.error(f"Database health check failed: {str(e)}")
+            app.logger.error(f"Database health check failed: {str(e)}")
             db_status = 'unhealthy'
             
         health_info = {

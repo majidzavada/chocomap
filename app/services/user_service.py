@@ -51,7 +51,8 @@ class UserService:
         phone: Optional[str] = None,
         role: Optional[str] = None,
         status: Optional[str] = None,
-        active: Optional[bool] = None
+        active: Optional[bool] = None,
+        approval_status: Optional[str] = None
     ) -> bool:
         """Update user information"""
         cursor = mysql.connection.cursor()
@@ -77,6 +78,9 @@ class UserService:
             if active is not None:
                 updates.append("active = %s")
                 params.append(active)
+            if approval_status is not None:
+                updates.append("approval_status = %s")
+                params.append(approval_status)
             
             if not updates:
                 return False
@@ -115,8 +119,7 @@ class UserService:
                     COUNT(*) as total_users,
                     COUNT(CASE WHEN role = 'driver' THEN 1 END) as total_drivers,
                     COUNT(CASE WHEN role = 'manager' THEN 1 END) as total_managers,
-                    COUNT(CASE WHEN active = TRUE THEN 1 END) as active_users,
-                    COUNT(CASE WHEN last_login >= DATE_SUB(NOW(), INTERVAL 7 DAY) THEN 1 END) as active_last_week
+                    COUNT(CASE WHEN active = TRUE THEN 1 END) as active_users
                 FROM users
             """)
             result = cursor.fetchone()
@@ -126,7 +129,7 @@ class UserService:
                     'total_drivers': result[1],
                     'total_managers': result[2],
                     'active_users': result[3],
-                    'active_last_week': result[4]
+                    'active_last_week': 0  # Default value since we don't have last_login data
                 }
             return {
                 'total_users': 0,

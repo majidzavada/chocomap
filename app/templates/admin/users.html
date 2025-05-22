@@ -11,8 +11,11 @@
     </div>
 
     <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">{{ _('All Users') }}</h5>
+            <a href="{{ url_for('admin.create_user_route') }}" class="btn btn-sm btn-primary">
+              <i class="fas fa-user-plus"></i> {{ _('Create User') }}
+            </a>
         </div>
         <div class="card-body">
             {% if users %}

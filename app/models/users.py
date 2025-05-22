@@ -102,7 +102,7 @@ def verify_password(user_id, password):
         cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
         result = cursor.fetchone()
         if result:
-            return bcrypt.checkpw(password.encode(), result['password_hash'].encode())
+            return bcrypt.checkpw(password.encode(), result[0].encode())
         return False
     except Exception as e:
         logger.error(f"Error verifying password: {str(e)}")
@@ -147,35 +147,89 @@ class User:
 
     @staticmethod
     def get_by_id(user_id):
-        cursor = mysql.connection.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM users WHERE id = %s', (user_id,))
-        user = cursor.fetchone()
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE id = %s', (user_id,))
+        user_tuple = cursor.fetchone()
         cursor.close()
-        return User(**user) if user else None
+        
+        if not user_tuple:
+            return None
+            
+        # Convert tuple to kwargs for User constructor
+        user_data = {
+            'id': user_tuple[0],
+            'name': user_tuple[1],
+            'email': user_tuple[2],
+            'role': user_tuple[3],
+            'preferred_lang': user_tuple[4],
+            'approval_status': user_tuple[5],
+            'created_at': user_tuple[6]
+        }
+        return User(**user_data)
 
     @staticmethod
     def get_by_email(email):
-        cursor = mysql.connection.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM users WHERE email = %s', (email,))
-        user = cursor.fetchone()
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE email = %s', (email,))
+        user_tuple = cursor.fetchone()
         cursor.close()
-        return User(**user) if user else None
+        
+        if not user_tuple:
+            return None
+            
+        # Convert tuple to kwargs for User constructor
+        user_data = {
+            'id': user_tuple[0],
+            'name': user_tuple[1],
+            'email': user_tuple[2],
+            'role': user_tuple[3],
+            'preferred_lang': user_tuple[4],
+            'approval_status': user_tuple[5],
+            'created_at': user_tuple[6]
+        }
+        return User(**user_data)
 
     @staticmethod
     def get_all_pending():
-        cursor = mysql.connection.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM users WHERE approval_status = %s', ('pending',))
-        users = cursor.fetchall()
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE approval_status = %s', ('pending',))
+        users_tuples = cursor.fetchall()
         cursor.close()
-        return [User(**user) for user in users]
+        
+        users = []
+        for user_tuple in users_tuples:
+            user_data = {
+                'id': user_tuple[0],
+                'name': user_tuple[1],
+                'email': user_tuple[2],
+                'role': user_tuple[3],
+                'preferred_lang': user_tuple[4],
+                'approval_status': user_tuple[5],
+                'created_at': user_tuple[6]
+            }
+            users.append(User(**user_data))
+        return users
 
     @staticmethod
     def get_all():
-        cursor = mysql.connection.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM users')
-        users = cursor.fetchall()
+        cursor = mysql.connection.cursor()
+        cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users')
+        users_tuples = cursor.fetchall()
         cursor.close()
-        return [User(**user) for user in users]
+        
+        users = []
+        for user_tuple in users_tuples:
+            user_data = {
+                'id': user_tuple[0],
+                'name': user_tuple[1],
+                'email': user_tuple[2],
+                'role': user_tuple[3],
+                'preferred_lang': user_tuple[4],
+                'approval_status': user_tuple[5],
+                'created_at': user_tuple[6]
+            }
+            users.append(User(**user_data))
+        return users
 
     def update(self, **kwargs):
         allowed_fields = {'name', 'email', 'role', 'preferred_lang', 'approval_status'}

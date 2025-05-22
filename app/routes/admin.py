@@ -285,4 +285,36 @@ def stop_impersonating():
         
         flash("Returned to admin account", "info")
     
-    return redirect(url_for('admin.dashboard')) 
+    return redirect(url_for('admin.dashboard'))
+
+# -------------------- Create New User --------------------
+
+@admin_bp.route('/users/create', methods=['GET', 'POST'])
+@login_required
+@role_required('admin')
+def create_user_route():
+    """Allow admin to create a new user and assign role"""
+    if request.method == 'POST':
+        try:
+            name = sanitize_input(request.form.get('name', ''))
+            email = request.form.get('email', '').strip()
+            role = request.form.get('role', 'employee')
+            password = request.form.get('password', '').strip()
+
+            if not all([name, email, password, role]):
+                flash('All fields are required', 'danger')
+                return redirect(url_for('admin.create_user_route'))
+
+            new_id = UserService.create_user(name=name, email=email, password=password, role=role)
+            if new_id:
+                # Immediately approve/activate user if desired
+                UserService.update_user(new_id, approval_status='approved', active=True)
+                flash('User created successfully', 'success')
+                return redirect(url_for('admin.users'))
+            else:
+                flash('Error creating user', 'danger')
+        except Exception as e:
+            logger.error(f'Error creating user: {str(e)}', exc_info=True)
+            flash('Error creating user', 'danger')
+
+    return render_template('admin/create_user.html') 

@@ -54,6 +54,7 @@ def login():
                 logger.info(f"Successful login for user: {user['id']} ({user['email']})")
                 session['user_id'] = user['id']
                 session['user_role'] = user['role']
+                session['role'] = user['role']
                 session['name'] = user['name']
                 
                 # Track login activity
@@ -123,12 +124,13 @@ def lang(lang_code):
     # If user is logged in, update their preferred language
     if 'user_id' in session:
         try:
-            with mysql.cursor() as cursor:
-                cursor.execute(
-                    'UPDATE users SET preferred_lang = %s WHERE id = %s',
-                    (lang_code, session['user_id'])
-                )
-                mysql.commit()
+            cursor = mysql.connection.cursor()
+            cursor.execute(
+                'UPDATE users SET preferred_lang = %s WHERE id = %s',
+                (lang_code, session['user_id'])
+            )
+            mysql.connection.commit()
+            cursor.close()
         except Exception as e:
             logger.error(f"Error updating user language: {str(e)}")
     
@@ -136,55 +138,10 @@ def lang(lang_code):
     return redirect(request.referrer or url_for('auth.index'))
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
-@rate_limit_by_ip("3 per hour")
 def register():
-    if request.method == 'POST':
-        try:
-            name = sanitize_input(request.form.get('name', ''))
-            email = request.form.get('email', '').strip()
-            password = request.form.get('password', '')
-            confirm_password = request.form.get('confirm_password', '')
-            
-            # Validate input
-            if not all([name, email, password, confirm_password]):
-                flash("All fields are required", "danger")
-                return redirect(url_for('auth.register'))
-                
-            if not validate_email(email):
-                flash("Invalid email format", "danger")
-                return redirect(url_for('auth.register'))
-                
-            if password != confirm_password:
-                flash("Passwords do not match", "danger")
-                return redirect(url_for('auth.register'))
-                
-            # Validate password strength
-            is_valid, message = is_valid_password(password)
-            if not is_valid:
-                flash(message, "danger")
-                return redirect(url_for('auth.register'))
-            
-            # Create user
-            user_id = UserService.create_user(
-                name=name,
-                email=email,
-                password=password,
-                role='driver'  # Default role
-            )
-            
-            if user_id:
-                flash("Registration successful. Please login.", "success")
-                return redirect(url_for('auth.login'))
-            else:
-                flash("Error creating account", "danger")
-                return redirect(url_for('auth.register'))
-                
-        except Exception as e:
-            logger.error(f"Registration error: {str(e)}")
-            flash("An error occurred during registration", "danger")
-            return redirect(url_for('auth.register'))
-            
-    return render_template('auth/register.html')
+    """Public self-registration is disabled. Redirect to login."""
+    flash("Registration is currently disabled. Please contact the administrator.", "warning")
+    return redirect(url_for('auth.login'))
 
 @auth_bp.route('/reset-password', methods=['GET', 'POST'])
 @rate_limit_by_ip("3 per hour")
@@ -244,7 +201,15 @@ def change_password():
                 new_password=new_password
             ):
                 flash("Password changed successfully", "success")
-                return redirect(url_for('dashboard'))
+                # Redirect to appropriate dashboard based on user role
+                if session['user_role'] == 'admin':
+                    return redirect(url_for('admin.dashboard'))
+                elif session['user_role'] == 'manager':
+                    return redirect(url_for('manager.dashboard'))
+                elif session['user_role'] == 'driver':
+                    return redirect(url_for('driver.dashboard'))
+                else:
+                    return redirect(url_for('employee.dashboard'))
             else:
                 flash("Current password is incorrect", "danger")
                 return redirect(url_for('auth.change_password'))

@@ -1,6 +1,62 @@
 {% extends 'base.html' %}
 {% block title %}{{ _('Manager Dashboard') }}{% endblock %}
 {% block content %}
-<h2>{{ _('Welcome, Manager') }}</h2>
-<p>{{ _('You can oversee schedules, addresses, and staff operations.') }}</p>
+<div class="container py-4">
+  <h1 class="mb-4">{{ _('Manager Dashboard') }}</h1>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card border-primary h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ _('Drivers') }}</h5>
+          <p class="card-text display-6">{{ user_analytics.total_drivers|default(0) }}</p>
+          <a href="{{ url_for('manager.drivers') }}" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-success h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ _('Addresses') }}</h5>
+          <p class="card-text display-6">{{ user_analytics.total_addresses|default('-') }}</p>
+          <a href="{{ url_for('manager.addresses') }}" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-info h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ _('Calendar') }}</h5>
+          <p class="card-text display-6"><i class="fas fa-calendar-alt"></i></p>
+          <a href="{{ url_for('employee.calendar') }}" class="stretched-link"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">{{ _('Recent Deliveries (30d)') }}</div>
+        <div class="card-body">
+          <!-- Placeholder chart or list -->
+          {% if delivery_analytics.recent_count %}
+            <p class="display-6">{{ delivery_analytics.recent_count }}</p>
+          {% else %}
+            <p>{{ _('No data available.') }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">{{ _('System Health') }}</div>
+        <div class="card-body">
+          <p>{{ _('Database') }}: <span class="badge bg-{{ 'success' if system_health.database=='healthy' else 'danger' }}">{{ system_health.database }}</span></p>
+          <p>{{ _('Redis') }}: <span class="badge bg-{{ 'success' if system_health.redis=='healthy' else 'danger' }}">{{ system_health.redis }}</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

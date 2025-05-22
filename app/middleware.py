@@ -29,7 +29,8 @@ def role_required(*roles: str) -> Callable:
     def decorator(f: Callable) -> Callable:
         @wraps(f)
         def decorated_function(*args: Any, **kwargs: Any) -> Any:
-            if session.get('role') not in roles:
+            user_role = session.get('user_role') or session.get('role')
+            if user_role not in roles:
                 if request.is_json:
                     return jsonify({'error': 'Permission denied'}), 403
                 return redirect(url_for('auth.login'))
