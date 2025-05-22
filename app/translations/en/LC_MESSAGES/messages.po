@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  ChocoMap\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-22 12:27+0200\n"
+"POT-Creation-Date: 2025-05-22 12:43+0200\n"
 "PO-Revision-Date: 2024-05-19 21:40+0000\n"
 "Last-Translator: Majid Zavada\n"
 "Language: en\n"
@@ -14,1238 +14,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: app/routes/admin.py:55 app/routes/driver.py:33 app/routes/manager.py:40
-#, fuzzy
-msgid "Error loading dashboard"
-msgstr "Employee Dashboard"
-
-#: app/routes/admin.py:88
-msgid "Error loading users"
-msgstr ""
-
-#: app/routes/admin.py:118
-msgid "Error loading pending users"
-msgstr ""
-
-#: app/routes/admin.py:128
-msgid "User approved successfully"
-msgstr ""
-
-#: app/routes/admin.py:131
-msgid "Error approving user"
-msgstr ""
-
-#: app/routes/admin.py:141
-msgid "User rejected successfully"
-msgstr ""
-
-#: app/routes/admin.py:144
-msgid "Error rejecting user"
-msgstr ""
-
-#: app/routes/admin.py:163 app/routes/admin.py:219 app/routes/admin.py:250
-#, fuzzy
-msgid "User not found"
-msgstr "Not Found"
-
-#: app/routes/admin.py:184 app/routes/admin.py:303 app/routes/auth.py:182
-#: app/routes/employee.py:81 app/routes/employee.py:122
-#: app/routes/employee.py:208
-msgid "All fields are required"
-msgstr ""
-
-#: app/routes/admin.py:187
-msgid "Invalid email format"
-msgstr ""
-
-#: app/routes/admin.py:191
-msgid "User updated successfully"
-msgstr ""
-
-#: app/routes/admin.py:194
-msgid "Error updating user"
-msgstr ""
-
-#: app/routes/admin.py:202
-msgid "Error editing user"
-msgstr ""
-
-#: app/routes/admin.py:217
-msgid "User deleted successfully"
-msgstr ""
-
-#: app/routes/admin.py:224
-msgid "Error deleting user"
-msgstr ""
-
-#: app/routes/admin.py:259
-#, python-brace-format
-msgid "You are now impersonating {name}"
-msgstr ""
-
-#: app/routes/admin.py:271
-msgid "Error impersonating user"
-msgstr ""
-
-#: app/routes/admin.py:284
-msgid "Returned to admin account"
-msgstr ""
-
-#: app/routes/admin.py:309
-msgid "A user with this email already exists."
-msgstr ""
-
-#: app/routes/admin.py:322
-msgid "User created successfully"
-msgstr ""
-
-#: app/routes/admin.py:325
-msgid "Error creating user. Please check the form and try again."
-msgstr ""
-
-#: app/routes/admin.py:328
-#, python-format
-msgid "Error creating user: %(error)s"
-msgstr ""
-
-#: app/routes/auth.py:47
-msgid "Email/Username and password are required"
-msgstr ""
-
-#: app/routes/auth.py:63
-msgid "Login successful"
-msgstr ""
-
-#: app/routes/auth.py:75
-msgid "Invalid email/username or password"
-msgstr ""
-
-#: app/routes/auth.py:79
-msgid "An error occurred during login. Please try again."
-msgstr ""
-
-#: app/routes/auth.py:94
-msgid "You have been logged out"
-msgstr ""
-
-#: app/routes/auth.py:137
-msgid "Registration is currently disabled. Please contact the administrator."
-msgstr ""
-
-#: app/routes/auth.py:148
-msgid "Please enter a valid email address"
-msgstr ""
-
-#: app/routes/auth.py:155 app/routes/auth.py:162
-msgid "Error sending password reset email"
-msgstr ""
-
-#: app/routes/auth.py:159
-msgid "Password reset instructions have been sent to your email"
-msgstr ""
-
-#: app/routes/auth.py:166
-msgid "An error occurred while processing your request"
-msgstr ""
-
-#: app/routes/auth.py:185 app/templates/auth/change_password.html:58
-msgid "New passwords do not match"
-msgstr ""
-
-#: app/routes/auth.py:200
-msgid "Password changed successfully"
-msgstr ""
-
-#: app/routes/auth.py:211
-msgid "Current password is incorrect"
-msgstr ""
-
-#: app/routes/auth.py:216
-msgid "An error occurred while changing your password"
-msgstr ""
-
-#: app/routes/auth.py:223
-msgid "Access forbidden. Please try again."
-msgstr ""
-
-#: app/routes/auth.py:228
-#, fuzzy
-msgid "Too many attempts. Please try again later."
-msgstr "You have made too many requests. Please try again later."
-
-#: app/routes/driver.py:54
-#, fuzzy
-msgid "Error loading deliveries"
-msgstr "Today's Deliveries"
-
-#: app/routes/driver.py:65
-msgid "Status is required"
-msgstr ""
-
-#: app/routes/driver.py:74
-msgid "Status updated successfully"
-msgstr ""
-
-#: app/routes/driver.py:76
-msgid "Error updating status"
-msgstr ""
-
-#: app/routes/driver.py:79 app/routes/driver.py:150 app/routes/manager.py:169
-#, fuzzy
-msgid "Internal server error"
-msgstr "Internal Server Error"
-
-#: app/routes/driver.py:97
-msgid "Profile updated successfully"
-msgstr ""
-
-#: app/routes/driver.py:99
-msgid "Error updating profile"
-msgstr ""
-
-#: app/routes/driver.py:108
-msgid "Error loading profile"
-msgstr ""
-
-#: app/routes/driver.py:135
-msgid "Error loading statistics"
-msgstr ""
-
-#: app/routes/driver.py:147
-#, fuzzy
-msgid "Route not found"
-msgstr "Not Found"
-
-#: app/routes/employee.py:58
-msgid "Error loading dashboard data"
-msgstr ""
-
-#: app/routes/employee.py:77
-msgid "Invalid coordinates"
-msgstr ""
-
-#: app/routes/employee.py:96
-msgid "Address added successfully"
-msgstr ""
-
-#: app/routes/employee.py:98
-#, fuzzy
-msgid "Error adding address"
-msgstr "Edit Address"
-
-#: app/routes/employee.py:100
-msgid "Error processing address"
-msgstr ""
-
-#: app/routes/employee.py:130
-#, fuzzy
-msgid "Invalid driver or address"
-msgstr "Edit Address"
-
-#: app/routes/employee.py:145
-msgid "Delivery scheduled successfully"
-msgstr ""
-
-#: app/routes/employee.py:147
-#, fuzzy
-msgid "Error scheduling delivery"
-msgstr "Schedule a Delivery"
-
-#: app/routes/employee.py:149
-msgid "Error processing delivery schedule"
-msgstr ""
-
-#: app/routes/employee.py:172
-msgid "Invalid date format"
-msgstr ""
-
-#: app/routes/employee.py:177
-msgid "Error loading calendar"
-msgstr ""
-
-#: app/routes/employee.py:186
-msgid "Delivery deleted successfully"
-msgstr ""
-
-#: app/routes/employee.py:188
-#, fuzzy
-msgid "Error deleting delivery"
-msgstr "Edit Delivery"
-
-#: app/routes/employee.py:190
-msgid "Error processing deletion"
-msgstr ""
-
-#: app/routes/employee.py:221
-msgid "Delivery updated successfully"
-msgstr ""
-
-#: app/routes/employee.py:223
-#, fuzzy
-msgid "Error updating delivery"
-msgstr "Edit Delivery"
-
-#: app/routes/employee.py:230
-#, fuzzy
-msgid "Delivery not found"
-msgstr "Not Found"
-
-#: app/routes/employee.py:241
-msgid "Error processing delivery edit"
-msgstr ""
-
-#: app/routes/employee.py:253
-msgid "Start and end dates are required"
-msgstr ""
-
-#: app/routes/employee.py:258
-msgid "Error fetching delivery statistics"
-msgstr ""
-
-#: app/routes/employee.py:267
-msgid "Date is required"
-msgstr ""
-
-#: app/routes/employee.py:272
-msgid "Error optimizing route"
-msgstr ""
-
-#: app/routes/manager.py:52
-msgid "Error loading drivers"
-msgstr ""
-
-#: app/routes/manager.py:83
-msgid "Error loading driver statistics"
-msgstr ""
-
-#: app/routes/manager.py:95
-#, fuzzy
-msgid "Error loading addresses"
-msgstr "Addresses"
-
-#: app/routes/manager.py:114
-msgid "Address updated successfully"
-msgstr ""
-
-#: app/routes/manager.py:116
-msgid "Error updating address"
-msgstr ""
-
-#: app/routes/manager.py:124
-#, fuzzy
-msgid "Error loading address"
-msgstr "Edit Address"
-
-#: app/routes/manager.py:157
-msgid "Error loading reports"
-msgstr ""
-
-#: app/templates/base.html:115
-msgid "Logout"
-msgstr ""
-
-#: app/templates/auth/login.html:3 app/templates/auth/login.html:11
-#: app/templates/auth/login.html:47 app/templates/auth/register.html:50
-#: app/templates/base.html:119 app/templates/index.html:33
-msgid "Login"
-msgstr "Login"
-
-#: app/templates/base.html:146
-msgid "All rights reserved."
-msgstr ""
-
-#: app/templates/index.html:3 app/templates/index.html:7
-msgid "Welcome to ChocoMap"
-msgstr "Welcome to ChocoMap"
-
-#: app/templates/index.html:8
-msgid "Your efficient delivery management system"
-msgstr "Your efficient delivery management system"
-
-#: app/templates/index.html:16
-#, fuzzy
-msgid "Go to Admin Dashboard"
-msgstr "Go to Dashboard"
-
-#: app/templates/index.html:20
-#, fuzzy
-msgid "Go to Manager Dashboard"
-msgstr "Driver Dashboard"
-
-#: app/templates/index.html:24
-#, fuzzy
-msgid "Go to Driver Dashboard"
-msgstr "Driver Dashboard"
-
-#: app/templates/index.html:28
-#, fuzzy
-msgid "Go to Employee Dashboard"
-msgstr "Employee Dashboard"
-
-#: app/templates/admin/create_user.html:3
-#: app/templates/admin/create_user.html:30 app/templates/admin/users.html:17
-msgid "Create User"
-msgstr ""
-
-#: app/templates/admin/create_user.html:7
-msgid "Create New User"
-msgstr ""
-
-#: app/templates/admin/create_user.html:10
-#: app/templates/admin/dashboard.html:64 app/templates/admin/edit_user.html:22
-#: app/templates/admin/users.html:27
-msgid "Name"
-msgstr ""
-
-#: app/templates/admin/create_user.html:14
-#: app/templates/admin/dashboard.html:65 app/templates/admin/edit_user.html:27
-#: app/templates/admin/users.html:28 app/templates/auth/register.html:17
-msgid "Email"
-msgstr "Email"
-
-#: app/templates/admin/create_user.html:18
-#, fuzzy
-msgid "Temporary Password"
-msgstr "Password"
-
-#: app/templates/admin/create_user.html:22
-#: app/templates/admin/dashboard.html:67 app/templates/admin/edit_user.html:38
-#: app/templates/admin/users.html:30 app/templates/auth/register.html:32
-#, fuzzy
-msgid "Role"
-msgstr "Profile"
-
-#: app/templates/admin/create_user.html:24
-#: app/templates/admin/edit_user.html:43 app/templates/auth/register.html:34
-msgid "Employee"
-msgstr ""
-
-#: app/templates/admin/create_user.html:25
-#: app/templates/admin/edit_user.html:41 app/templates/auth/register.html:35
-msgid "Manager"
-msgstr ""
-
-#: app/templates/admin/create_user.html:26
-#: app/templates/admin/edit_user.html:42 app/templates/auth/register.html:36
-msgid "Driver"
-msgstr ""
-
-#: app/templates/admin/create_user.html:27
-#: app/templates/admin/edit_user.html:40
-msgid "Admin"
-msgstr ""
-
-#: app/templates/admin/create_user.html:31
-#: app/templates/admin/edit_user.html:62 app/templates/admin/users.html:88
-msgid "Cancel"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:2 app/templates/admin/dashboard.html:7
-#, fuzzy
-msgid "Admin Dashboard"
-msgstr "Driver Dashboard"
-
-#: app/templates/admin/dashboard.html:10
-msgid "Stop Impersonating"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:19
-msgid "Total Users"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:27
-msgid "Active Users"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:35
-#, fuzzy
-msgid "Managers"
-msgstr "Driver Dashboard"
-
-#: app/templates/admin/dashboard.html:43
-#: app/templates/manager/dashboard.html:11
-#, fuzzy
-msgid "Drivers"
-msgstr "Driver Dashboard"
-
-#: app/templates/admin/dashboard.html:54
-msgid "Pending Approvals"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:55
-msgid "View All Users"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:63 app/templates/admin/users.html:26
-msgid "ID"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:66 app/templates/admin/edit_user.html:32
-#: app/templates/admin/users.html:29
-msgid "Username"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:68
-#, fuzzy
-msgid "Registered"
-msgstr "Register"
-
-#: app/templates/admin/dashboard.html:69 app/templates/admin/users.html:34
-msgid "Actions"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:84
-msgid "Approve"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:88 app/templates/driver/dashboard.html:21
-msgid "Reject"
-msgstr "Reject"
-
-#: app/templates/admin/dashboard.html:97
-msgid "No pending registrations"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:108
-msgid "Admin Actions"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:113
-msgid "Manage Users"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:116
-msgid "System Settings"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:119
-msgid "Database Maintenance"
-msgstr ""
-
-#: app/templates/admin/dashboard.html:122
-msgid "View Logs"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:2 app/templates/admin/edit_user.html:7
-#: app/templates/admin/edit_user.html:15
-#, fuzzy
-msgid "Edit User"
-msgstr "Edit Delivery"
-
-#: app/templates/admin/edit_user.html:9
-#, fuzzy
-msgid "Back to Users"
-msgstr "Go to Dashboard"
-
-#: app/templates/admin/edit_user.html:34
-msgid "Username cannot be changed"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:49 app/templates/admin/users.html:47
-msgid "Active"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:53
-msgid "Approval Status"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:55 app/templates/admin/users.html:54
-msgid "Approved"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:56 app/templates/admin/users.html:56
-msgid "Pending"
-msgstr ""
-
-#: app/templates/admin/edit_user.html:57 app/templates/admin/users.html:58
-#, fuzzy
-msgid "Rejected"
-msgstr "Reject"
-
-#: app/templates/admin/edit_user.html:63
-msgid "Save Changes"
-msgstr ""
-
-#: app/templates/admin/index.html:2 app/templates/admin/index.html:7
-msgid "Admin Area"
-msgstr ""
-
-#: app/templates/admin/index.html:14
-msgid "Welcome to the Admin Area. Choose an option below:"
-msgstr ""
-
-#: app/templates/admin/index.html:19
-#, fuzzy
-msgid "Dashboard"
-msgstr "Go to Dashboard"
-
-#: app/templates/admin/index.html:21
-msgid "View system statistics and pending approvals"
-msgstr ""
-
-#: app/templates/admin/index.html:26 app/templates/admin/users.html:2
-#: app/templates/admin/users.html:7
-msgid "User Management"
-msgstr ""
-
-#: app/templates/admin/index.html:28
-msgid "Manage user accounts, roles, and permissions"
-msgstr ""
-
-#: app/templates/admin/users.html:9 app/templates/auth/change_password.html:38
-#, fuzzy
-msgid "Back to Dashboard"
-msgstr "Go to Dashboard"
-
-#: app/templates/admin/users.html:15
-msgid "All Users"
-msgstr ""
-
-#: app/templates/admin/users.html:31 app/templates/driver/dashboard.html:17
-msgid "Status"
-msgstr ""
-
-#: app/templates/admin/users.html:32
-msgid "Approval"
-msgstr ""
-
-#: app/templates/admin/users.html:33
-msgid "Created"
-msgstr ""
-
-#: app/templates/admin/users.html:49
-msgid "Inactive"
-msgstr ""
-
-#: app/templates/admin/users.html:67
-msgid "Impersonate"
-msgstr ""
-
-#: app/templates/admin/users.html:80
-msgid "Confirm Delete"
-msgstr ""
-
-#: app/templates/admin/users.html:81
-msgid "Close"
-msgstr ""
-
-#: app/templates/admin/users.html:84
-msgid "Are you sure you want to delete user"
-msgstr ""
-
-#: app/templates/admin/users.html:85
-msgid "This action cannot be undone."
-msgstr ""
-
-#: app/templates/admin/users.html:91
-msgid "Delete"
-msgstr ""
-
-#: app/templates/admin/users.html:104
-msgid "No users found"
-msgstr ""
-
-#: app/templates/auth/change_password.html:3
-#: app/templates/auth/change_password.html:11
-#: app/templates/auth/change_password.html:32
-#, fuzzy
-msgid "Change Password"
-msgstr "Password"
-
-#: app/templates/auth/change_password.html:17
-msgid "Current Password"
-msgstr ""
-
-#: app/templates/auth/change_password.html:22
-#: app/templates/auth/reset_password.html:17
-#, fuzzy
-msgid "New Password"
-msgstr "Password"
-
-#: app/templates/auth/change_password.html:27
-#: app/templates/auth/reset_password.html:22
-msgid "Confirm New Password"
-msgstr ""
-
-#: app/templates/auth/login.html:28
-msgid "Email or Username"
-msgstr ""
-
-#: app/templates/auth/login.html:30
-msgid "Enter your email or username"
-msgstr ""
-
-#: app/templates/auth/login.html:31
-msgid "You can use either your email or username to login"
-msgstr ""
-
-#: app/templates/auth/login.html:35 app/templates/auth/register.html:22
-msgid "Password"
-msgstr "Password"
-
-#: app/templates/auth/login.html:37
-#, fuzzy
-msgid "Enter your password"
-msgstr "Password"
-
-#: app/templates/auth/login.html:42
-msgid "Remember me"
-msgstr ""
-
-#: app/templates/auth/login.html:54
-msgid "Forgot password?"
-msgstr ""
-
-#: app/templates/auth/login.html:79
-msgid "Logging in..."
-msgstr ""
-
-#: app/templates/auth/register.html:3 app/templates/auth/register.html:11
-#: app/templates/auth/register.html:41
-msgid "Register"
-msgstr "Register"
-
-#: app/templates/auth/register.html:27
-msgid "Confirm Password"
-msgstr ""
-
-#: app/templates/auth/register.html:48
-msgid "Already have an account?"
-msgstr ""
-
-#: app/templates/auth/register.html:70
-msgid "Passwords do not match"
-msgstr ""
-
-#: app/templates/auth/reset_password.html:3
-#: app/templates/auth/reset_password.html:11
-#: app/templates/auth/reset_password.html:27
-#, fuzzy
-msgid "Reset Password"
-msgstr "Password"
-
-#: app/templates/auth/reset_password.html:33
-msgid "Back to Login"
-msgstr ""
-
-#: app/templates/driver/dashboard.html:2
-msgid "Driver Dashboard"
-msgstr "Driver Dashboard"
-
-#: app/templates/driver/dashboard.html:4
-#: app/templates/employee/dashboard.html:9
-msgid "Today's Deliveries"
-msgstr "Today's Deliveries"
-
-#: app/templates/driver/dashboard.html:20
-msgid "Accept"
-msgstr "Accept"
-
-#: app/templates/driver/dashboard.html:23
-msgid "Mark as Completed"
-msgstr "Mark as Completed"
-
-#: app/templates/driver/dashboard.html:57
-msgid "No deliveries assigned."
-msgstr ""
-
-#: app/templates/employee/addresses.html:2
-#: app/templates/employee/addresses.html:4
-msgid "Address Book"
-msgstr ""
-
-#: app/templates/employee/addresses.html:7
-msgid "Label"
-msgstr ""
-
-#: app/templates/employee/addresses.html:8
-#, fuzzy
-msgid "Street Address"
-msgstr "Delete Address"
-
-#: app/templates/employee/addresses.html:9
-msgid "City"
-msgstr ""
-
-#: app/templates/employee/addresses.html:10
-msgid "ZIP Code"
-msgstr ""
-
-#: app/templates/employee/addresses.html:11
-msgid "Latitude"
-msgstr ""
-
-#: app/templates/employee/addresses.html:12
-msgid "Longitude"
-msgstr ""
-
-#: app/templates/employee/addresses.html:13
-#, fuzzy
-msgid "Add Address"
-msgstr "Edit Address"
-
-#: app/templates/employee/addresses.html:16
-#, fuzzy
-msgid "Saved Addresses"
-msgstr "Addresses"
-
-#: app/templates/employee/calendar.html:2
-#, fuzzy
-msgid "Weekly Delivery Calendar"
-msgstr "Delivery Calendar"
-
-#: app/templates/employee/calendar.html:4
-msgid "Delivery Calendar"
-msgstr "Delivery Calendar"
-
-#: app/templates/employee/calendar.html:7
-msgid "Filter by driver"
-msgstr ""
-
-#: app/templates/employee/calendar.html:8
-msgid "Filter by date"
-msgstr ""
-
-#: app/templates/employee/calendar.html:9
-msgid "Apply Filters"
-msgstr ""
-
-#: app/templates/employee/dashboard.html:2
-#: app/templates/employee/dashboard.html:5
-msgid "Employee Dashboard"
-msgstr "Employee Dashboard"
-
-#: app/templates/employee/dashboard.html:13
-msgid "This Week"
-msgstr "This Week"
-
-#: app/templates/employee/dashboard.html:17
-msgid "Upcoming Delivery"
-msgstr ""
-
-#: app/templates/employee/dashboard.html:21
-msgid "None"
-msgstr ""
-
-#: app/templates/employee/dashboard.html:27
-#, fuzzy
-msgid "📅 Schedule a Delivery"
-msgstr "Schedule a Delivery"
-
-#: app/templates/employee/dashboard.html:28
-msgid "🏠 Manage Addresses"
-msgstr ""
-
-#: app/templates/employee/dashboard.html:29
-msgid "📆 View Calendar"
-msgstr ""
-
-#: app/templates/employee/edit_delivery.html:2
-#: app/templates/employee/edit_delivery.html:4
-msgid "Edit Delivery"
-msgstr "Edit Delivery"
-
-#: app/templates/employee/edit_delivery.html:24
-msgid "Update"
-msgstr "Update"
-
-#: app/templates/errors/403.html:3 app/templates/errors/403.html:8
-msgid "Access Denied"
-msgstr ""
-
-#: app/templates/errors/403.html:9
-#, fuzzy
-msgid "You do not have permission to access this page."
-msgstr "You don't have permission to access this resource."
-
-#: app/templates/errors/403.html:11 app/templates/errors/404.html:11
-#: app/templates/errors/429.html:11 app/templates/errors/500.html:11
-#, fuzzy
-msgid "Return to Homepage"
-msgstr "Go to Homepage"
-
-#: app/templates/errors/404.html:3 app/templates/errors/404.html:8
-#, fuzzy
-msgid "Page Not Found"
-msgstr "Not Found"
-
-#: app/templates/errors/404.html:9
-msgid "The page you are looking for does not exist."
-msgstr ""
-
-#: app/templates/errors/429.html:3 app/templates/errors/429.html:8
-msgid "Too Many Requests"
-msgstr "Too Many Requests"
-
-#: app/templates/errors/429.html:9
-msgid "You have made too many requests. Please try again later."
-msgstr "You have made too many requests. Please try again later."
-
-#: app/templates/errors/500.html:3 app/templates/errors/500.html:8
-msgid "Internal Server Error"
-msgstr "Internal Server Error"
-
-#: app/templates/errors/500.html:9
-#, fuzzy
-msgid "Something went wrong on our end. Please try again later."
-msgstr ""
-"Something went wrong on our end. Please try again later or contact "
-"support if the problem persists."
-
-#: app/templates/manager/dashboard.html:2
-#: app/templates/manager/dashboard.html:5
-#, fuzzy
-msgid "Manager Dashboard"
-msgstr "Driver Dashboard"
-
-#: app/templates/manager/dashboard.html:20
-#, fuzzy
-msgid "Addresses"
-msgstr "Addresses"
-
-#: app/templates/manager/dashboard.html:29
-#, fuzzy
-msgid "Calendar"
-msgstr "Delivery Calendar"
-
-#: app/templates/manager/dashboard.html:40
-msgid "Recent Deliveries (30d)"
-msgstr ""
-
-#: app/templates/manager/dashboard.html:46
-msgid "No data available."
-msgstr ""
-
-#: app/templates/manager/dashboard.html:53
-msgid "System Health"
-msgstr ""
-
-#: app/templates/manager/dashboard.html:55
-msgid "Database"
-msgstr ""
-
-#: app/templates/manager/dashboard.html:56
-#, fuzzy
-msgid "Redis"
-msgstr "Register"
-
-#: venv/lib/python3.12/site-packages/click/_termui_impl.py:600
-#, python-brace-format
-msgid "{editor}: Editing failed"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/_termui_impl.py:604
-#, python-brace-format
-msgid "{editor}: Editing failed: {e}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1084
-#: venv/lib/python3.12/site-packages/click/core.py:1121
-#, python-brace-format
-msgid "{text} {deprecated_message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1140
-msgid "Options"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1202
-#, python-brace-format
-msgid "Got unexpected extra argument ({args})"
-msgid_plural "Got unexpected extra arguments ({args})"
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1221
-#, python-brace-format
-msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1405
-msgid "Aborted!"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1779
-msgid "Commands"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1810
-msgid "Missing command."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:1888
-#, python-brace-format
-msgid "No such command {name!r}."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:2303
-msgid "Value must be an iterable."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:2324
-#, python-brace-format
-msgid "Takes {nargs} values but 1 was given."
-msgid_plural "Takes {nargs} values but {len} were given."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:2404
-#, python-brace-format
-msgid ""
-"DeprecationWarning: The {param_type} {name!r} is "
-"deprecated.{extra_message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:2806
-#, python-brace-format
-msgid "env var: {var}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:2809
-#, python-brace-format
-msgid "default: {default}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:2813
-msgid "required"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/core.py:2869
-msgid "(dynamic)"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/decorators.py:465
-#, python-format
-msgid "%(prog)s, version %(version)s"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/decorators.py:522
-msgid "Show the version and exit."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/decorators.py:548
-msgid "Show this message and exit."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:50
-#: venv/lib/python3.12/site-packages/click/exceptions.py:89
-#, python-brace-format
-msgid "Error: {message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:81
-#, python-brace-format
-msgid "Try '{command} {option}' for help."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:130
-#, python-brace-format
-msgid "Invalid value: {message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:132
-#, python-brace-format
-msgid "Invalid value for {param_hint}: {message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:190
-msgid "Missing argument"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:192
-msgid "Missing option"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:194
-msgid "Missing parameter"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:196
-#, python-brace-format
-msgid "Missing {param_type}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:203
-#, python-brace-format
-msgid "Missing parameter: {param_name}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:223
-#, python-brace-format
-msgid "No such option: {name}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:235
-#, python-brace-format
-msgid "Did you mean {possibility}?"
-msgid_plural "(Possible options: {possibilities})"
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:282
-msgid "unknown error"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/exceptions.py:289
-#, python-brace-format
-msgid "Could not open file {filename!r}: {message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/formatting.py:156
-msgid "Usage:"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/parser.py:200
-#, python-brace-format
-msgid "Argument {name!r} takes {nargs} values."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/parser.py:383
-#, python-brace-format
-msgid "Option {name!r} does not take a value."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/parser.py:444
-#, python-brace-format
-msgid "Option {name!r} requires an argument."
-msgid_plural "Option {name!r} requires {nargs} arguments."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/lib/python3.12/site-packages/click/shell_completion.py:326
-msgid "Shell completion is not supported for Bash versions older than 4.4."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/shell_completion.py:333
-msgid "Couldn't detect Bash version, shell completion is not supported."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/termui.py:162
-msgid "Repeat for confirmation"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/termui.py:178
-msgid "Error: The value you entered was invalid."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/termui.py:180
-#, python-brace-format
-msgid "Error: {e.message}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/termui.py:191
-msgid "Error: The two entered values do not match."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/termui.py:247
-msgid "Error: invalid input"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/termui.py:866
-msgid "Press any key to continue..."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:332
-#, python-brace-format
-msgid ""
-"Choose from:\n"
-"\t{choices}"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:369
-#, python-brace-format
-msgid "{value!r} is not {choice}."
-msgid_plural "{value!r} is not one of {choices}."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:460
-#, python-brace-format
-msgid "{value!r} does not match the format {format}."
-msgid_plural "{value!r} does not match the formats {formats}."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:482
-#, python-brace-format
-msgid "{value!r} is not a valid {number_type}."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:538
-#, python-brace-format
-msgid "{value} is not in the range {range}."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:679
-#, python-brace-format
-msgid "{value!r} is not a valid boolean."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:703
-#, python-brace-format
-msgid "{value!r} is not a valid UUID."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:893
-#, fuzzy
-msgid "file"
-msgstr "Profile"
-
-#: venv/lib/python3.12/site-packages/click/types.py:895
-msgid "directory"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:897
-#, fuzzy
-msgid "path"
-msgstr "Update"
-
-#: venv/lib/python3.12/site-packages/click/types.py:944
-#, python-brace-format
-msgid "{name} {filename!r} does not exist."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:953
-#, python-brace-format
-msgid "{name} {filename!r} is a file."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:961
-#, python-brace-format
-msgid "{name} {filename!r} is a directory."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:970
-#, python-brace-format
-msgid "{name} {filename!r} is not readable."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:979
-#, python-brace-format
-msgid "{name} {filename!r} is not writable."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:988
-#, python-brace-format
-msgid "{name} {filename!r} is not executable."
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/click/types.py:1055
-#, python-brace-format
-msgid "{len_type} values are required, but {len_value} was given."
-msgid_plural "{len_type} values are required, but {len_value} were given."
-msgstr[0] ""
-msgstr[1] ""
-
-#: venv/lib/python3.12/site-packages/isort/main.py:158
-msgid "show this help message and exit"
-msgstr ""
-
-#: venv/lib/python3.12/site-packages/mypy/main.py:392
-#, python-format
-msgid "%(prog)s: error: %(message)s\n"
-msgstr ""
-
 #~ msgid "Login to ChocoMap"
 #~ msgstr "Login to ChocoMap"
 
@@ -1255,9 +23,8 @@ msgstr ""
 #~ msgid "Forbidden"
 #~ msgstr "Forbidden"
 
-# Dashboard messages
 #~ msgid "Dashboard"
-#~ msgstr "Dashboard"
+#~ msgstr "Go to Dashboard"
 
 #~ msgid "Deliveries"
 #~ msgstr "Deliveries"
@@ -1294,13 +61,13 @@ msgstr ""
 #~ msgstr "Submit"
 
 #~ msgid "Cancel"
-#~ msgstr "Cancel"
+#~ msgstr ""
 
 #~ msgid "Save"
 #~ msgstr "Save"
 
 #~ msgid "Delete"
-#~ msgstr "Delete"
+#~ msgstr ""
 
 # Navigation
 #~ msgid "Home"
@@ -1312,15 +79,14 @@ msgstr ""
 #~ msgid "Help"
 #~ msgstr "Help"
 
-# Status messages
 #~ msgid "Active"
-#~ msgstr "Active"
+#~ msgstr ""
 
 #~ msgid "Inactive"
-#~ msgstr "Inactive"
+#~ msgstr ""
 
 #~ msgid "Pending"
-#~ msgstr "Pending"
+#~ msgstr ""
 
 #~ msgid "Completed"
 #~ msgstr "Completed"
@@ -1345,5 +111,824 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid "Error creating user"
+#~ msgstr ""
+
+#~ msgid "Error loading dashboard"
+#~ msgstr "Employee Dashboard"
+
+#~ msgid "Error loading users"
+#~ msgstr ""
+
+#~ msgid "Error loading pending users"
+#~ msgstr ""
+
+#~ msgid "User approved successfully"
+#~ msgstr ""
+
+#~ msgid "Error approving user"
+#~ msgstr ""
+
+#~ msgid "User rejected successfully"
+#~ msgstr ""
+
+#~ msgid "Error rejecting user"
+#~ msgstr ""
+
+#~ msgid "User not found"
+#~ msgstr "Not Found"
+
+#~ msgid "All fields are required"
+#~ msgstr ""
+
+#~ msgid "Invalid email format"
+#~ msgstr ""
+
+#~ msgid "User updated successfully"
+#~ msgstr ""
+
+#~ msgid "Error updating user"
+#~ msgstr ""
+
+#~ msgid "Error editing user"
+#~ msgstr ""
+
+#~ msgid "User deleted successfully"
+#~ msgstr ""
+
+#~ msgid "Error deleting user"
+#~ msgstr ""
+
+#~ msgid "You are now impersonating {name}"
+#~ msgstr ""
+
+#~ msgid "Error impersonating user"
+#~ msgstr ""
+
+#~ msgid "Returned to admin account"
+#~ msgstr ""
+
+#~ msgid "A user with this email already exists."
+#~ msgstr ""
+
+#~ msgid "User created successfully"
+#~ msgstr ""
+
+#~ msgid "Error creating user. Please check the form and try again."
+#~ msgstr ""
+
+#~ msgid "Error creating user: %(error)s"
+#~ msgstr ""
+
+#~ msgid "Email/Username and password are required"
+#~ msgstr ""
+
+#~ msgid "Login successful"
+#~ msgstr ""
+
+#~ msgid "Invalid email/username or password"
+#~ msgstr ""
+
+#~ msgid "An error occurred during login. Please try again."
+#~ msgstr ""
+
+#~ msgid "You have been logged out"
+#~ msgstr ""
+
+#~ msgid "Registration is currently disabled. Please contact the administrator."
+#~ msgstr ""
+
+#~ msgid "Please enter a valid email address"
+#~ msgstr ""
+
+#~ msgid "Error sending password reset email"
+#~ msgstr ""
+
+#~ msgid "Password reset instructions have been sent to your email"
+#~ msgstr ""
+
+#~ msgid "An error occurred while processing your request"
+#~ msgstr ""
+
+#~ msgid "New passwords do not match"
+#~ msgstr ""
+
+#~ msgid "Password changed successfully"
+#~ msgstr ""
+
+#~ msgid "Current password is incorrect"
+#~ msgstr ""
+
+#~ msgid "An error occurred while changing your password"
+#~ msgstr ""
+
+#~ msgid "Access forbidden. Please try again."
+#~ msgstr ""
+
+#~ msgid "Too many attempts. Please try again later."
+#~ msgstr "You have made too many requests. Please try again later."
+
+#~ msgid "Error loading deliveries"
+#~ msgstr "Today's Deliveries"
+
+#~ msgid "Status is required"
+#~ msgstr ""
+
+#~ msgid "Status updated successfully"
+#~ msgstr ""
+
+#~ msgid "Error updating status"
+#~ msgstr ""
+
+#~ msgid "Internal server error"
+#~ msgstr "Internal Server Error"
+
+#~ msgid "Profile updated successfully"
+#~ msgstr ""
+
+#~ msgid "Error updating profile"
+#~ msgstr ""
+
+#~ msgid "Error loading profile"
+#~ msgstr ""
+
+#~ msgid "Error loading statistics"
+#~ msgstr ""
+
+#~ msgid "Route not found"
+#~ msgstr "Not Found"
+
+#~ msgid "Error loading dashboard data"
+#~ msgstr ""
+
+#~ msgid "Invalid coordinates"
+#~ msgstr ""
+
+#~ msgid "Address added successfully"
+#~ msgstr ""
+
+#~ msgid "Error adding address"
+#~ msgstr "Edit Address"
+
+#~ msgid "Error processing address"
+#~ msgstr ""
+
+#~ msgid "Invalid driver or address"
+#~ msgstr "Edit Address"
+
+#~ msgid "Delivery scheduled successfully"
+#~ msgstr ""
+
+#~ msgid "Error scheduling delivery"
+#~ msgstr "Schedule a Delivery"
+
+#~ msgid "Error processing delivery schedule"
+#~ msgstr ""
+
+#~ msgid "Invalid date format"
+#~ msgstr ""
+
+#~ msgid "Error loading calendar"
+#~ msgstr ""
+
+#~ msgid "Delivery deleted successfully"
+#~ msgstr ""
+
+#~ msgid "Error deleting delivery"
+#~ msgstr "Edit Delivery"
+
+#~ msgid "Error processing deletion"
+#~ msgstr ""
+
+#~ msgid "Delivery updated successfully"
+#~ msgstr ""
+
+#~ msgid "Error updating delivery"
+#~ msgstr "Edit Delivery"
+
+#~ msgid "Delivery not found"
+#~ msgstr "Not Found"
+
+#~ msgid "Error processing delivery edit"
+#~ msgstr ""
+
+#~ msgid "Start and end dates are required"
+#~ msgstr ""
+
+#~ msgid "Error fetching delivery statistics"
+#~ msgstr ""
+
+#~ msgid "Date is required"
+#~ msgstr ""
+
+#~ msgid "Error optimizing route"
+#~ msgstr ""
+
+#~ msgid "Error loading drivers"
+#~ msgstr ""
+
+#~ msgid "Error loading driver statistics"
+#~ msgstr ""
+
+#~ msgid "Error loading addresses"
+#~ msgstr "Addresses"
+
+#~ msgid "Address updated successfully"
+#~ msgstr ""
+
+#~ msgid "Error updating address"
+#~ msgstr ""
+
+#~ msgid "Error loading address"
+#~ msgstr "Edit Address"
+
+#~ msgid "Error loading reports"
+#~ msgstr ""
+
+#~ msgid "Logout"
+#~ msgstr ""
+
+#~ msgid "Login"
+#~ msgstr "Login"
+
+#~ msgid "All rights reserved."
+#~ msgstr ""
+
+#~ msgid "Welcome to ChocoMap"
+#~ msgstr "Welcome to ChocoMap"
+
+#~ msgid "Your efficient delivery management system"
+#~ msgstr "Your efficient delivery management system"
+
+#~ msgid "Go to Admin Dashboard"
+#~ msgstr "Go to Dashboard"
+
+#~ msgid "Go to Manager Dashboard"
+#~ msgstr "Driver Dashboard"
+
+#~ msgid "Go to Driver Dashboard"
+#~ msgstr "Driver Dashboard"
+
+#~ msgid "Go to Employee Dashboard"
+#~ msgstr "Employee Dashboard"
+
+#~ msgid "Create User"
+#~ msgstr ""
+
+#~ msgid "Create New User"
+#~ msgstr ""
+
+#~ msgid "Name"
+#~ msgstr ""
+
+#~ msgid "Email"
+#~ msgstr "Email"
+
+#~ msgid "Temporary Password"
+#~ msgstr "Password"
+
+#~ msgid "Role"
+#~ msgstr "Profile"
+
+#~ msgid "Employee"
+#~ msgstr ""
+
+#~ msgid "Manager"
+#~ msgstr ""
+
+#~ msgid "Driver"
+#~ msgstr ""
+
+#~ msgid "Admin"
+#~ msgstr ""
+
+#~ msgid "Admin Dashboard"
+#~ msgstr "Driver Dashboard"
+
+#~ msgid "Stop Impersonating"
+#~ msgstr ""
+
+#~ msgid "Total Users"
+#~ msgstr ""
+
+#~ msgid "Active Users"
+#~ msgstr ""
+
+#~ msgid "Managers"
+#~ msgstr "Driver Dashboard"
+
+#~ msgid "Drivers"
+#~ msgstr "Driver Dashboard"
+
+#~ msgid "Pending Approvals"
+#~ msgstr ""
+
+#~ msgid "View All Users"
+#~ msgstr ""
+
+#~ msgid "ID"
+#~ msgstr ""
+
+#~ msgid "Username"
+#~ msgstr ""
+
+#~ msgid "Registered"
+#~ msgstr "Register"
+
+#~ msgid "Actions"
+#~ msgstr ""
+
+#~ msgid "Approve"
+#~ msgstr ""
+
+#~ msgid "Reject"
+#~ msgstr "Reject"
+
+#~ msgid "No pending registrations"
+#~ msgstr ""
+
+#~ msgid "Admin Actions"
+#~ msgstr ""
+
+#~ msgid "Manage Users"
+#~ msgstr ""
+
+#~ msgid "System Settings"
+#~ msgstr ""
+
+#~ msgid "Database Maintenance"
+#~ msgstr ""
+
+#~ msgid "View Logs"
+#~ msgstr ""
+
+#~ msgid "Edit User"
+#~ msgstr "Edit Delivery"
+
+#~ msgid "Back to Users"
+#~ msgstr "Go to Dashboard"
+
+#~ msgid "Username cannot be changed"
+#~ msgstr ""
+
+#~ msgid "Approval Status"
+#~ msgstr ""
+
+#~ msgid "Approved"
+#~ msgstr ""
+
+#~ msgid "Rejected"
+#~ msgstr "Reject"
+
+#~ msgid "Save Changes"
+#~ msgstr ""
+
+#~ msgid "Admin Area"
+#~ msgstr ""
+
+#~ msgid "Welcome to the Admin Area. Choose an option below:"
+#~ msgstr ""
+
+#~ msgid "View system statistics and pending approvals"
+#~ msgstr ""
+
+#~ msgid "User Management"
+#~ msgstr ""
+
+#~ msgid "Manage user accounts, roles, and permissions"
+#~ msgstr ""
+
+#~ msgid "Back to Dashboard"
+#~ msgstr "Go to Dashboard"
+
+#~ msgid "All Users"
+#~ msgstr ""
+
+#~ msgid "Status"
+#~ msgstr ""
+
+#~ msgid "Approval"
+#~ msgstr ""
+
+#~ msgid "Created"
+#~ msgstr ""
+
+#~ msgid "Impersonate"
+#~ msgstr ""
+
+#~ msgid "Confirm Delete"
+#~ msgstr ""
+
+#~ msgid "Close"
+#~ msgstr ""
+
+#~ msgid "Are you sure you want to delete user"
+#~ msgstr ""
+
+#~ msgid "This action cannot be undone."
+#~ msgstr ""
+
+#~ msgid "No users found"
+#~ msgstr ""
+
+#~ msgid "Change Password"
+#~ msgstr "Password"
+
+#~ msgid "Current Password"
+#~ msgstr ""
+
+#~ msgid "New Password"
+#~ msgstr "Password"
+
+#~ msgid "Confirm New Password"
+#~ msgstr ""
+
+#~ msgid "Email or Username"
+#~ msgstr ""
+
+#~ msgid "Enter your email or username"
+#~ msgstr ""
+
+#~ msgid "You can use either your email or username to login"
+#~ msgstr ""
+
+#~ msgid "Password"
+#~ msgstr "Password"
+
+#~ msgid "Enter your password"
+#~ msgstr "Password"
+
+#~ msgid "Remember me"
+#~ msgstr ""
+
+#~ msgid "Forgot password?"
+#~ msgstr ""
+
+#~ msgid "Logging in..."
+#~ msgstr ""
+
+#~ msgid "Register"
+#~ msgstr "Register"
+
+#~ msgid "Confirm Password"
+#~ msgstr ""
+
+#~ msgid "Already have an account?"
+#~ msgstr ""
+
+#~ msgid "Passwords do not match"
+#~ msgstr ""
+
+#~ msgid "Reset Password"
+#~ msgstr "Password"
+
+#~ msgid "Back to Login"
+#~ msgstr ""
+
+#~ msgid "Driver Dashboard"
+#~ msgstr "Driver Dashboard"
+
+#~ msgid "Today's Deliveries"
+#~ msgstr "Today's Deliveries"
+
+#~ msgid "Accept"
+#~ msgstr "Accept"
+
+#~ msgid "Mark as Completed"
+#~ msgstr "Mark as Completed"
+
+#~ msgid "No deliveries assigned."
+#~ msgstr ""
+
+#~ msgid "Address Book"
+#~ msgstr ""
+
+#~ msgid "Label"
+#~ msgstr ""
+
+#~ msgid "Street Address"
+#~ msgstr "Delete Address"
+
+#~ msgid "City"
+#~ msgstr ""
+
+#~ msgid "ZIP Code"
+#~ msgstr ""
+
+#~ msgid "Latitude"
+#~ msgstr ""
+
+#~ msgid "Longitude"
+#~ msgstr ""
+
+#~ msgid "Add Address"
+#~ msgstr "Edit Address"
+
+#~ msgid "Saved Addresses"
+#~ msgstr "Addresses"
+
+#~ msgid "Weekly Delivery Calendar"
+#~ msgstr "Delivery Calendar"
+
+#~ msgid "Delivery Calendar"
+#~ msgstr "Delivery Calendar"
+
+#~ msgid "Filter by driver"
+#~ msgstr ""
+
+#~ msgid "Filter by date"
+#~ msgstr ""
+
+#~ msgid "Apply Filters"
+#~ msgstr ""
+
+#~ msgid "Employee Dashboard"
+#~ msgstr "Employee Dashboard"
+
+#~ msgid "This Week"
+#~ msgstr "This Week"
+
+#~ msgid "Upcoming Delivery"
+#~ msgstr ""
+
+#~ msgid "None"
+#~ msgstr ""
+
+#~ msgid "📅 Schedule a Delivery"
+#~ msgstr "Schedule a Delivery"
+
+#~ msgid "🏠 Manage Addresses"
+#~ msgstr ""
+
+#~ msgid "📆 View Calendar"
+#~ msgstr ""
+
+#~ msgid "Edit Delivery"
+#~ msgstr "Edit Delivery"
+
+#~ msgid "Update"
+#~ msgstr "Update"
+
+#~ msgid "Access Denied"
+#~ msgstr ""
+
+#~ msgid "You do not have permission to access this page."
+#~ msgstr "You don't have permission to access this resource."
+
+#~ msgid "Return to Homepage"
+#~ msgstr "Go to Homepage"
+
+#~ msgid "Page Not Found"
+#~ msgstr "Not Found"
+
+#~ msgid "The page you are looking for does not exist."
+#~ msgstr ""
+
+#~ msgid "Too Many Requests"
+#~ msgstr "Too Many Requests"
+
+#~ msgid "You have made too many requests. Please try again later."
+#~ msgstr "You have made too many requests. Please try again later."
+
+#~ msgid "Internal Server Error"
+#~ msgstr "Internal Server Error"
+
+#~ msgid "Something went wrong on our end. Please try again later."
+#~ msgstr ""
+#~ "Something went wrong on our end. "
+#~ "Please try again later or contact "
+#~ "support if the problem persists."
+
+#~ msgid "Manager Dashboard"
+#~ msgstr "Driver Dashboard"
+
+#~ msgid "Addresses"
+#~ msgstr "Addresses"
+
+#~ msgid "Calendar"
+#~ msgstr "Delivery Calendar"
+
+#~ msgid "Recent Deliveries (30d)"
+#~ msgstr ""
+
+#~ msgid "No data available."
+#~ msgstr ""
+
+#~ msgid "System Health"
+#~ msgstr ""
+
+#~ msgid "Database"
+#~ msgstr ""
+
+#~ msgid "Redis"
+#~ msgstr "Register"
+
+#~ msgid "{editor}: Editing failed"
+#~ msgstr ""
+
+#~ msgid "{editor}: Editing failed: {e}"
+#~ msgstr ""
+
+#~ msgid "{text} {deprecated_message}"
+#~ msgstr ""
+
+#~ msgid "Options"
+#~ msgstr ""
+
+#~ msgid "Got unexpected extra argument ({args})"
+#~ msgid_plural "Got unexpected extra arguments ({args})"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "DeprecationWarning: The command {name!r} is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "Aborted!"
+#~ msgstr ""
+
+#~ msgid "Commands"
+#~ msgstr ""
+
+#~ msgid "Missing command."
+#~ msgstr ""
+
+#~ msgid "No such command {name!r}."
+#~ msgstr ""
+
+#~ msgid "Value must be an iterable."
+#~ msgstr ""
+
+#~ msgid "Takes {nargs} values but 1 was given."
+#~ msgid_plural "Takes {nargs} values but {len} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid ""
+#~ "DeprecationWarning: The {param_type} {name!r} "
+#~ "is deprecated.{extra_message}"
+#~ msgstr ""
+
+#~ msgid "env var: {var}"
+#~ msgstr ""
+
+#~ msgid "default: {default}"
+#~ msgstr ""
+
+#~ msgid "required"
+#~ msgstr ""
+
+#~ msgid "(dynamic)"
+#~ msgstr ""
+
+#~ msgid "%(prog)s, version %(version)s"
+#~ msgstr ""
+
+#~ msgid "Show the version and exit."
+#~ msgstr ""
+
+#~ msgid "Show this message and exit."
+#~ msgstr ""
+
+#~ msgid "Error: {message}"
+#~ msgstr ""
+
+#~ msgid "Try '{command} {option}' for help."
+#~ msgstr ""
+
+#~ msgid "Invalid value: {message}"
+#~ msgstr ""
+
+#~ msgid "Invalid value for {param_hint}: {message}"
+#~ msgstr ""
+
+#~ msgid "Missing argument"
+#~ msgstr ""
+
+#~ msgid "Missing option"
+#~ msgstr ""
+
+#~ msgid "Missing parameter"
+#~ msgstr ""
+
+#~ msgid "Missing {param_type}"
+#~ msgstr ""
+
+#~ msgid "Missing parameter: {param_name}"
+#~ msgstr ""
+
+#~ msgid "No such option: {name}"
+#~ msgstr ""
+
+#~ msgid "Did you mean {possibility}?"
+#~ msgid_plural "(Possible options: {possibilities})"
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "unknown error"
+#~ msgstr ""
+
+#~ msgid "Could not open file {filename!r}: {message}"
+#~ msgstr ""
+
+#~ msgid "Usage:"
+#~ msgstr ""
+
+#~ msgid "Argument {name!r} takes {nargs} values."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} does not take a value."
+#~ msgstr ""
+
+#~ msgid "Option {name!r} requires an argument."
+#~ msgid_plural "Option {name!r} requires {nargs} arguments."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "Shell completion is not supported for Bash versions older than 4.4."
+#~ msgstr ""
+
+#~ msgid "Couldn't detect Bash version, shell completion is not supported."
+#~ msgstr ""
+
+#~ msgid "Repeat for confirmation"
+#~ msgstr ""
+
+#~ msgid "Error: The value you entered was invalid."
+#~ msgstr ""
+
+#~ msgid "Error: {e.message}"
+#~ msgstr ""
+
+#~ msgid "Error: The two entered values do not match."
+#~ msgstr ""
+
+#~ msgid "Error: invalid input"
+#~ msgstr ""
+
+#~ msgid "Press any key to continue..."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Choose from:\n"
+#~ "\t{choices}"
+#~ msgstr ""
+
+#~ msgid "{value!r} is not {choice}."
+#~ msgid_plural "{value!r} is not one of {choices}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "{value!r} does not match the format {format}."
+#~ msgid_plural "{value!r} does not match the formats {formats}."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "{value!r} is not a valid {number_type}."
+#~ msgstr ""
+
+#~ msgid "{value} is not in the range {range}."
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid boolean."
+#~ msgstr ""
+
+#~ msgid "{value!r} is not a valid UUID."
+#~ msgstr ""
+
+#~ msgid "file"
+#~ msgstr "Profile"
+
+#~ msgid "directory"
+#~ msgstr ""
+
+#~ msgid "path"
+#~ msgstr "Update"
+
+#~ msgid "{name} {filename!r} does not exist."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a file."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is a directory."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not readable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not writable."
+#~ msgstr ""
+
+#~ msgid "{name} {filename!r} is not executable."
+#~ msgstr ""
+
+#~ msgid "{len_type} values are required, but {len_value} was given."
+#~ msgid_plural "{len_type} values are required, but {len_value} were given."
+#~ msgstr[0] ""
+#~ msgstr[1] ""
+
+#~ msgid "show this help message and exit"
+#~ msgstr ""
+
+#~ msgid "%(prog)s: error: %(message)s\n"
 #~ msgstr ""
 
