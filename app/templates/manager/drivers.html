@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ _('Drivers') }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1>{{ _('Drivers') }}</h1>
+    {% if drivers %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>{{ _('Name') }}</th>
+                    <th>{{ _('Username') }}</th>
+                    <th>{{ _('Email') }}</th>
+                    <th>{{ _('Status') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for driver in drivers %}
+                <tr>
+                    <td>{{ driver.name }}</td>
+                    <td>{{ driver.username }}</td>
+                    <td>{{ driver.email }}</td>
+                    <td>{% if driver.active %}{{ _('Active') }}{% else %}{{ _('Inactive') }}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>{{ _('No drivers found.') }}</p>
+    {% endif %}
+</div>
+{% endblock %}
