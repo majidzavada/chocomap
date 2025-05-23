@@ -31,9 +31,11 @@
     let map;
     let marker;
     let autocomplete;
+    let directionsService;
+    let directionsRenderer;
 
     function initMap() {
-        const warehouseLocation = { lat: 37.7749, lng: -122.4194 }; // Example coordinates for the warehouse
+        const warehouseLocation = { lat: 50.0614508, lng: 14.3062742 }; // Updated warehouse coordinates
 
         map = new google.maps.Map(document.getElementById('map'), {
             center: warehouseLocation,
@@ -46,6 +48,10 @@
             title: 'Warehouse',
         });
 
+        directionsService = new google.maps.DirectionsService();
+        directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
         autocomplete = new google.maps.places.Autocomplete(
             document.getElementById('destination')
         );
@@ -55,6 +61,23 @@
             if (place.geometry) {
                 map.setCenter(place.geometry.location);
                 marker.setPosition(place.geometry.location);
+                calculateRoute(warehouseLocation, place.geometry.location);
+            }
+        });
+    }
+
+    function calculateRoute(origin, destination) {
+        const request = {
+            origin: origin,
+            destination: destination,
+            travelMode: 'DRIVING',
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === 'OK') {
+                directionsRenderer.setDirections(result);
+            } else {
+                alert('Could not calculate route: ' + status);
             }
         });
     }
