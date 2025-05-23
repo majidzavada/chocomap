@@ -330,13 +330,15 @@ def create_user_route():
                 return redirect(url_for('admin.create_user_route'))
 
             # Validate role
-            allowed_roles = ['driver', 'manager', 'admin']
+            allowed_roles = ['driver', 'manager', 'admin', 'employee']
             if role not in allowed_roles:
                 flash(_("Invalid role selected. Allowed roles are: %(roles)s", roles=', '.join(allowed_roles)), "danger")
                 return redirect(url_for('admin.create_user_route'))
 
             # Improved error handling
             try:
+                # Log the role value
+                logger.debug(f"Creating user with role: {role}")
                 new_id = UserService.create_user(name=name, email=email, username=username, password=password, role=role)
                 if new_id:
                     UserService.update_user(new_id, approval_status='approved', active=True)
