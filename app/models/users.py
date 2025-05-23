@@ -47,7 +47,7 @@ def get_user_by_id(user_id):
 def get_all_drivers():
     cursor = mysql.connection.cursor()
     try:
-        cursor.execute("SELECT id, name, email, status FROM users WHERE role = 'driver' AND active = TRUE")
+        cursor.execute("SELECT id, name, email FROM users WHERE role = 'driver' AND active = TRUE")
         drivers = cursor.fetchall()
         return drivers
     finally:
