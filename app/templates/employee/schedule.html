@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Employee Schedule{% endblock %}
+
+{% block content %}
+<h1>Schedule a Delivery</h1>
+
+<form id="schedule-form" method="POST" action="/schedule">
+    <!-- Driver Selection -->
+    <label for="driver">Select Driver:</label>
+    <select id="driver" name="driver" required>
+        <option value="">-- Select a Driver --</option>
+        <!-- Options will be dynamically populated -->
+    </select>
+
+    <!-- Destination Selection -->
+    <label for="destination">Destination:</label>
+    <input id="destination" name="destination" type="text" placeholder="Search for a destination" required>
+    <div id="map" style="height: 400px; width: 100%; margin-top: 10px;"></div>
+
+    <!-- Order Details -->
+    <label for="order-details">Order Details / Order Number:</label>
+    <input id="order-details" name="order_details" type="text" placeholder="Enter order details or number" required>
+
+    <!-- Submit Button -->
+    <button type="submit">Schedule Delivery</button>
+</form>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4ydX5yuWubeVcRF6BwY0AgH1SmFQV3Mw&libraries=places"></script>
+<script>
+    let map;
+    let marker;
+    let autocomplete;
+
+    function initMap() {
+        const warehouseLocation = { lat: 37.7749, lng: -122.4194 }; // Example coordinates for the warehouse
+
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: warehouseLocation,
+            zoom: 12,
+        });
+
+        marker = new google.maps.Marker({
+            position: warehouseLocation,
+            map: map,
+            title: 'Warehouse',
+        });
+
+        autocomplete = new google.maps.places.Autocomplete(
+            document.getElementById('destination')
+        );
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (place.geometry) {
+                map.setCenter(place.geometry.location);
+                marker.setPosition(place.geometry.location);
+            }
+        });
+    }
+
+    window.onload = initMap;
+</script>
+{% endblock %}
