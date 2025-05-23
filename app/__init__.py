@@ -27,6 +27,17 @@ def create_app(config_class=Config):
     app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'chocomap')
     app.config['MYSQL_PORT'] = int(os.environ.get('MYSQL_PORT', 3306))
     
+    # Debug: Print MySQL config (excluding password)
+    print(f"[DEBUG] MySQL config: host={app.config['MYSQL_HOST']}, user={app.config['MYSQL_USER']}, db={app.config['MYSQL_DB']}, port={app.config['MYSQL_PORT']}, password={'set' if app.config['MYSQL_PASSWORD'] else 'NOT SET'}")
+    
+    # Debug: Print MySQL password (masked)
+    pw = app.config['MYSQL_PASSWORD']
+    if pw:
+        pw_masked = pw[:2] + '*'*(len(pw)-4) + pw[-2:] if len(pw) > 4 else '*'*len(pw)
+    else:
+        pw_masked = 'NOT SET'
+    print(f"[DEBUG] MySQL password: {pw_masked}")
+    
     # Initialize extensions
     mysql.init_app(app)
     db.init_app(app)
@@ -38,6 +49,9 @@ def create_app(config_class=Config):
     
     cache.init_app(app)
     mail.init_app(app)
+    
+    # Debug: Log MySQL config (excluding password)
+    app.logger.info(f"MySQL config: host={app.config['MYSQL_HOST']}, user={app.config['MYSQL_USER']}, db={app.config['MYSQL_DB']}, port={app.config['MYSQL_PORT']}")
     
     # Define locale selector function
     def get_locale():
