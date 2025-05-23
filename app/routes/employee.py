@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, session, redirect, url_for, reques
 from flask_babel import _
 from datetime import datetime, date, timedelta
 from typing import Dict, Any
+import logging
 
 from app.models.addresses import get_all_addresses, create_address, get_address_by_id
 from app.models.users import get_all_drivers, get_user_by_id
@@ -9,6 +10,8 @@ from app.services.delivery_service import DeliveryService
 from app.middleware import login_required, role_required, rate_limit_by_ip
 from app.utils import validate_email, sanitize_input, format_datetime
 from app import mysql
+
+logger = logging.getLogger(__name__)
 
 employee_bp = Blueprint('employee', __name__, url_prefix='/employee')
 
@@ -303,3 +306,19 @@ def configure_map():
     db.session.commit()
 
     return jsonify({'message': 'API key configured successfully'}), 200
+
+@employee_bp.route('/drivers', methods=['GET'])
+@login_required
+@role_required(['admin', 'manager', 'driver', 'employee'])
+def get_drivers():
+    """Fetch all drivers for the dropdown."""
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT id, name FROM users WHERE role = 'driver' AND active = TRUE")
+        drivers = cursor.fetchall()
+        cursor.close()
+
+        return jsonify({"drivers": [{"id": driver[0], "name": driver[1]} for driver in drivers]}), 200
+    except Exception as e:
+        logger.error(f"Error fetching drivers: {str(e)}", exc_info=True)
+        return jsonify({"error": "Failed to fetch drivers."}), 500

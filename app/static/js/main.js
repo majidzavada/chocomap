@@ -191,4 +191,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-}); 
+
+    // Driver dropdown population
+    const driverDropdown = document.getElementById('driver');
+
+    fetch('/drivers')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch drivers');
+            }
+            return response.json();
+        })
+        .then(data => {
+            data.drivers.forEach(driver => {
+                const option = document.createElement('option');
+                option.value = driver.id;
+                option.textContent = driver.name;
+                driverDropdown.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching drivers:', error);
+        });
+});
