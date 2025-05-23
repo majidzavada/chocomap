@@ -329,13 +329,24 @@ def create_user_route():
                 flash(_(message), "danger")
                 return redirect(url_for('admin.create_user_route'))
 
-            new_id = UserService.create_user(name=name, email=email, username=username, password=password, role=role)
-            if new_id:
-                UserService.update_user(new_id, approval_status='approved', active=True)
-                flash(_("User created successfully"), "success")
-                return redirect(url_for('admin.users'))
-            else:
-                flash(_("Error creating user. Please check the form and try again."), "danger")
+            # Validate role
+            allowed_roles = ['driver', 'manager', 'admin']
+            if role not in allowed_roles:
+                flash(_("Invalid role selected. Allowed roles are: %(roles)s", roles=', '.join(allowed_roles)), "danger")
+                return redirect(url_for('admin.create_user_route'))
+
+            # Improved error handling
+            try:
+                new_id = UserService.create_user(name=name, email=email, username=username, password=password, role=role)
+                if new_id:
+                    UserService.update_user(new_id, approval_status='approved', active=True)
+                    flash(_("User created successfully"), "success")
+                    return redirect(url_for('admin.users'))
+                else:
+                    flash(_("Error creating user. Please check the form and try again."), "danger")
+            except Exception as e:
+                logger.error(f'Error creating user: {str(e)}', exc_info=True)
+                flash(_("Error creating user: %(error)s", error=str(e)), "danger")
         except Exception as e:
             logger.error(f'Error creating user: {str(e)}', exc_info=True)
             flash(_("Error creating user: %(error)s", error=str(e)), "danger")

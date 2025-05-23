@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify
+from flask import Blueprint, render_template, session, redirect, url_for, request, flash, jsonify, current_app
 from flask_babel import _
 from datetime import datetime, date, timedelta
 from typing import Dict, Any
@@ -270,3 +270,36 @@ def optimize_route(driver_id):
         return jsonify(optimized_route)
     except Exception as e:
         return jsonify({"error": _("Error optimizing route")}), 500
+
+@employee_bp.route('/map-config', methods=['POST'])
+@login_required
+@role_required('employee', 'manager')
+def configure_map():
+    from app.extensions import db
+    from app.models.map_config import MapConfig
+    from flask import request, jsonify
+
+    data = request.get_json()
+    api_key = data.get('api_key')
+    environment = data.get('environment')
+
+    if not api_key or not environment:
+        return jsonify({'error': 'API key and environment are required'}), 400
+
+    # Validate API key by geocoding warehouse location
+    import requests
+    warehouse_lat = current_app.config['WAREHOUSE_LAT']
+    warehouse_lng = current_app.config['WAREHOUSE_LNG']
+    response = requests.get(
+        f"https://maps.googleapis.com/maps/api/geocode/json?latlng={warehouse_lat},{warehouse_lng}&key={api_key}"
+    )
+
+    if response.status_code != 200 or response.json().get('status') != 'OK':
+        return jsonify({'error': 'Invalid API key or quota exceeded'}), 400
+
+    # Save to database
+    map_config = MapConfig(api_key=api_key, environment=environment, last_validated=datetime.utcnow())
+    db.session.add(map_config)
+    db.session.commit()
+
+    return jsonify({'message': 'API key configured successfully'}), 200
