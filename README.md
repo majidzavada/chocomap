@@ -47,6 +47,16 @@ ChocoMap is a warehouse delivery planning app for a chocolate company. It helps 
   - Data validation
   - Error handling
 
+- **Delivery Scheduling**
+  - Schedule deliveries with driver selection and destination search.
+  - Integrated Google Maps for route planning and visualization.
+  - Real-time route updates and distance calculations.
+
+- **Google Maps Integration**
+  - Autocomplete for destination search.
+  - Route visualization with Directions API.
+  - Support for advanced map features like distance and geometry calculations.
+
 ## 🚀 Tech Stack
 
 - **Backend**
