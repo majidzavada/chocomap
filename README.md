@@ -302,3 +302,15 @@ Password: Admin123!
 ## Additional Dependencies
 
 - `pymysql`: Used for database operations with dictionary-like cursors.
+
+## System Settings
+
+The System Settings section allows administrators to manage:
+- Application settings (e.g., enabling/disabling logging and debugging).
+- Email server settings (SMTP configuration).
+- API keys for external services like Google Maps.
+
+### Configuration Files
+- `config/app_settings.json`: Stores application settings.
+- `config/email_settings.json`: Stores email server settings.
+- `config/api_keys.json`: Stores API keys for external services.

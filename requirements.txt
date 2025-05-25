@@ -43,6 +43,7 @@ mypy==1.6.1
 mypy_extensions==1.1.0
 mysql-connector-python==9.3.0
 mysqlclient==2.2.0  # C extension; on Ubuntu/Debian install `build-essential python3-dev default-libmysqlclient-dev` before pip install
+json
 ordered-set==4.1.0
 packaging==25.0
 pathspec==0.12.1

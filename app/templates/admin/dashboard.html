@@ -109,22 +109,100 @@
                 </div>
                 <div class="card-body">
                     <div class="list-group">
-                        <a href="{{ url_for('admin.users') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-users"></i> {{ _('Manage Users') }}
+                        <!-- Sidebar links -->
+                        <a href="#logsModal" class="list-group-item list-group-item-action" data-bs-toggle="modal">
+                            <i class="fas fa-file-alt"></i> {{ _('View Logs') }}
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-cog"></i> {{ _('System Settings') }}
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
+                        <a href="#dbMaintenanceModal" class="list-group-item list-group-item-action" data-bs-toggle="modal">
                             <i class="fas fa-database"></i> {{ _('Database Maintenance') }}
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-file-alt"></i> {{ _('View Logs') }}
+                        <a href="#systemSettingsModal" class="list-group-item list-group-item-action" data-bs-toggle="modal">
+                            <i class="fas fa-cog"></i> {{ _('System Settings') }}
                         </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal for displaying logs -->
+    <div class="modal" id="logsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ _('Logs') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <pre id="logs-content"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Close') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for database maintenance -->
+    <div class="modal" id="dbMaintenanceModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ _('Database Maintenance') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button id="backup-db-btn" class="btn btn-primary">{{ _('Backup Database') }}</button>
+                    <button id="restore-db-btn" class="btn btn-secondary">{{ _('Restore Database') }}</button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Close') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for system settings -->
+    <div class="modal" id="systemSettingsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ _('System Settings') }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="system-settings-form">
+                        <h6>{{ _('Application Settings') }}</h6>
+                        <label>
+                            <input type="checkbox" id="logging" /> {{ _('Enable Logging') }}
+                        </label>
+                        <label>
+                            <input type="checkbox" id="debugging" /> {{ _('Enable Debugging') }}
+                        </label>
+                        <hr />
+                        <h6>{{ _('Email Server Settings') }}</h6>
+                        <input type="text" id="smtp_server" placeholder="{{ _('SMTP Server') }}" class="form-control mb-2" />
+                        <input type="number" id="port" placeholder="{{ _('Port') }}" class="form-control mb-2" />
+                        <input type="text" id="username" placeholder="{{ _('Username') }}" class="form-control mb-2" />
+                        <input type="password" id="password" placeholder="{{ _('Password') }}" class="form-control mb-2" />
+                        <hr />
+                        <h6>{{ _('API Keys') }}</h6>
+                        <input type="text" id="google_maps" placeholder="{{ _('Google Maps API Key') }}" class="form-control mb-2" />
+                        <input type="text" id="other_service" placeholder="{{ _('Other Service API Key') }}" class="form-control mb-2" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="save-settings-btn">{{ _('Save Settings') }}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Close') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-{% endblock %} 
+{% endblock %}

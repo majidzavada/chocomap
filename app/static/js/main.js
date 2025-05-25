@@ -213,4 +213,134 @@ document.addEventListener('DOMContentLoaded', () => {
         .catch(error => {
             console.error('Error fetching drivers:', error);
         });
+
+    // Logs button click event
+    document.getElementById('view-logs-btn').addEventListener('click', function() {
+        fetch('/admin/logs')
+            .then(response => response.json())
+            .then(data => {
+                if (data.logs) {
+                    document.getElementById('logs-content').textContent = data.logs.join('\n');
+                } else {
+                    alert('Error fetching logs.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching logs:', error);
+                alert('Error fetching logs.');
+            });
+    });
+
+    // Database maintenance button click event
+    document.getElementById('db-maintenance-btn').addEventListener('click', function() {
+        // Modal is triggered by data-target attribute, no additional JS needed
+    });
+
+    // Backup database button click event
+    document.getElementById('backup-db-btn').addEventListener('click', function() {
+        fetch('/admin/database/maintenance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'backup' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+            } else {
+                alert('Error during database backup.');
+            }
+        })
+        .catch(error => {
+            console.error('Error during database backup:', error);
+            alert('Error during database backup.');
+        });
+    });
+
+    // Restore database button click event
+    document.getElementById('restore-db-btn').addEventListener('click', function() {
+        const restoreFile = prompt('Enter the path to the backup file:');
+        if (restoreFile) {
+            fetch('/admin/database/maintenance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'restore', file: restoreFile })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    alert(data.message);
+                } else {
+                    alert('Error during database restore.');
+                }
+            })
+            .catch(error => {
+                console.error('Error during database restore:', error);
+                alert('Error during database restore.');
+            });
+        }
+    });
+
+    // System settings button click event
+    document.getElementById('system-settings-btn').addEventListener('click', function() {
+        fetch('/admin/system/settings')
+            .then(response => response.json())
+            .then(data => {
+                if (data.application) {
+                    document.getElementById('logging').checked = data.application.logging;
+                    document.getElementById('debugging').checked = data.application.debugging;
+                }
+                if (data.email) {
+                    document.getElementById('smtp_server').value = data.email.smtp_server;
+                    document.getElementById('port').value = data.email.port;
+                    document.getElementById('username').value = data.email.username;
+                    document.getElementById('password').value = data.email.password;
+                }
+                if (data.api_keys) {
+                    document.getElementById('google_maps').value = data.api_keys.google_maps;
+                    document.getElementById('other_service').value = data.api_keys.other_service;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading settings:', error);
+                alert('Error loading settings.');
+            });
+    });
+
+    document.getElementById('save-settings-btn').addEventListener('click', function() {
+        const settings = {
+            application: {
+                logging: document.getElementById('logging').checked,
+                debugging: document.getElementById('debugging').checked
+            },
+            email: {
+                smtp_server: document.getElementById('smtp_server').value,
+                port: parseInt(document.getElementById('port').value, 10),
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            },
+            api_keys: {
+                google_maps: document.getElementById('google_maps').value,
+                other_service: document.getElementById('other_service').value
+            }
+        };
+
+        fetch('/admin/system/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(settings)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+            } else {
+                alert('Error saving settings.');
+            }
+        })
+        .catch(error => {
+            console.error('Error saving settings:', error);
+            alert('Error saving settings.');
+        });
+    });
 });

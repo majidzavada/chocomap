@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, abort, jsonify, current_app
 from flask_babel import _
 from app.models.users import User
 from app.middleware import login_required, role_required, rate_limit_by_ip
@@ -7,6 +7,8 @@ from app.services.user_service import UserService
 from datetime import datetime, date, timedelta
 from app import mysql
 import logging
+import os
+import json
 
 logger = logging.getLogger(__name__)
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -354,3 +356,84 @@ def create_user_route():
             flash(_("Error creating user: %(error)s", error=str(e)), "danger")
 
     return render_template('admin/create_user.html')
+
+@admin_bp.route('/logs', methods=['GET'])
+@login_required
+@role_required('admin')
+def view_logs():
+    """Serve logs for the admin dashboard."""
+    try:
+        log_file_path = '/home/choco/chocomap/logs/chocomap.log'  # Example log file
+        with open(log_file_path, 'r') as log_file:
+            logs = log_file.readlines()
+        return jsonify({'logs': logs[-100:]})  # Return the last 100 log lines
+    except Exception as e:
+        current_app.logger.error(f"Error reading logs: {str(e)}")
+        return jsonify({'error': 'Unable to fetch logs'}), 500
+
+@admin_bp.route('/database/maintenance', methods=['GET', 'POST'])
+def database_maintenance():
+    """Handle database maintenance actions."""
+    if request.method == 'POST':
+        action = request.json.get('action')
+        try:
+            if action == 'backup':
+                # Example: Backup database
+                backup_file = f"/home/choco/chocomap/backups/db_backup_{datetime.now().strftime('%Y%m%d%H%M%S')}.sql"
+                os.system(f"mysqldump -u root -pYOUR_PASSWORD chocomap > {backup_file}")
+                return jsonify({'message': 'Database backup created successfully.', 'file': backup_file})
+            elif action == 'restore':
+                # Example: Restore database (requires file path in request)
+                restore_file = request.json.get('file')
+                os.system(f"mysql -u root -pYOUR_PASSWORD chocomap < {restore_file}")
+                return jsonify({'message': 'Database restored successfully.'})
+            else:
+                return jsonify({'error': 'Invalid action.'}), 400
+        except Exception as e:
+            current_app.logger.error(f"Error during database maintenance: {str(e)}")
+            return jsonify({'error': 'Database maintenance failed.'}), 500
+    return jsonify({'message': 'Database maintenance endpoint.'})
+
+@admin_bp.route('/system/settings', methods=['GET', 'POST'])
+def system_settings():
+    """Manage system settings."""
+    if request.method == 'POST':
+        settings_type = request.json.get('type')
+        settings_data = request.json.get('data')
+        try:
+            if settings_type == 'application':
+                # Save application settings (e.g., logging, debugging)
+                with open('/home/choco/chocomap/config/app_settings.json', 'w') as f:
+                    json.dump(settings_data, f)
+                return jsonify({'message': 'Application settings updated successfully.'})
+            elif settings_type == 'email':
+                # Save email server settings
+                with open('/home/choco/chocomap/config/email_settings.json', 'w') as f:
+                    json.dump(settings_data, f)
+                return jsonify({'message': 'Email server settings updated successfully.'})
+            elif settings_type == 'api_keys':
+                # Save API keys
+                with open('/home/choco/chocomap/config/api_keys.json', 'w') as f:
+                    json.dump(settings_data, f)
+                return jsonify({'message': 'API keys updated successfully.'})
+            else:
+                return jsonify({'error': 'Invalid settings type.'}), 400
+        except Exception as e:
+            current_app.logger.error(f"Error updating settings: {str(e)}")
+            return jsonify({'error': 'Failed to update settings.'}), 500
+    # Load existing settings for GET request
+    try:
+        with open('/home/choco/chocomap/config/app_settings.json', 'r') as f:
+            app_settings = json.load(f)
+        with open('/home/choco/chocomap/config/email_settings.json', 'r') as f:
+            email_settings = json.load(f)
+        with open('/home/choco/chocomap/config/api_keys.json', 'r') as f:
+            api_keys = json.load(f)
+        return jsonify({
+            'application': app_settings,
+            'email': email_settings,
+            'api_keys': api_keys
+        })
+    except Exception as e:
+        current_app.logger.error(f"Error loading settings: {str(e)}")
+        return jsonify({'error': 'Failed to load settings.'}), 500
