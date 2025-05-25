@@ -2,13 +2,14 @@ from app import mysql
 from typing import List, Dict, Any, Optional
 import logging
 from datetime import datetime
+from pymysql.cursors import DictCursor
 
 logger = logging.getLogger(__name__)
 
 def get_all_addresses() -> List[Dict[str, Any]]:
     """Get all addresses with their details."""
     try:
-        cursor = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor(DictCursor)
         cursor.execute("""
             SELECT a.*, u.name as created_by_name 
             FROM addresses a 
@@ -25,7 +26,7 @@ def get_all_addresses() -> List[Dict[str, Any]]:
 def get_address_by_id(address_id: int) -> Optional[Dict[str, Any]]:
     """Get address details by ID."""
     try:
-        cursor = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor(DictCursor)
         cursor.execute("""
             SELECT a.*, u.name as created_by_name 
             FROM addresses a 
@@ -97,7 +98,7 @@ def delete_address(address_id: int) -> bool:
 def get_addresses_by_user(user_id: int) -> List[Dict[str, Any]]:
     """Get all addresses created by a specific user."""
     try:
-        cursor = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor(DictCursor)
         cursor.execute("""
             SELECT * FROM addresses 
             WHERE created_by = %s 
@@ -113,7 +114,7 @@ def get_addresses_by_user(user_id: int) -> List[Dict[str, Any]]:
 def search_addresses(query: str) -> List[Dict[str, Any]]:
     """Search addresses by label, street, city, or zip code."""
     try:
-        cursor = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor(DictCursor)
         search_term = f"%{query}%"
         cursor.execute("""
             SELECT * FROM addresses 
@@ -133,7 +134,7 @@ def search_addresses(query: str) -> List[Dict[str, Any]]:
 def get_address_stats() -> Dict[str, Any]:
     """Get statistics about addresses."""
     try:
-        cursor = mysql.connection.cursor(dictionary=True)
+        cursor = mysql.connection.cursor(DictCursor)
         cursor.execute("""
             SELECT 
                 COUNT(*) as total_addresses,

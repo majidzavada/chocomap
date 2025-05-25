@@ -298,3 +298,7 @@ Username: Admin
 Email: majid@steinerkovarik.com
 Password: Admin123!
 ```
+
+## Additional Dependencies
+
+- `pymysql`: Used for database operations with dictionary-like cursors.
