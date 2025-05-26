@@ -26,36 +26,52 @@ def cache_with_timeout(timeout=300):  # 5 minutes default
     return decorator
 
 def get_user_by_email(email):
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
         return user
+    except Exception as e:
+        logger.error(f"Error fetching user by email: {str(e)}")
+        return None
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 def get_user_by_id(user_id):
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
         return user
+    except Exception as e:
+        logger.error(f"Error fetching user by id: {str(e)}")
+        return None
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 @cache_with_timeout(timeout=300)
 def get_all_drivers():
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
-        cursor.execute("SELECT id, name, email FROM users WHERE role = 'driver' AND active = TRUE")
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT id, name, email FROM users WHERE role = 'driver' AND active = TRUE ORDER BY name")
         drivers = cursor.fetchall()
         return drivers
+    except Exception as e:
+        logger.error(f"Error fetching drivers: {str(e)}")
+        return []
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 def create_user(name, email, password, role='employee', preferred_lang='cs'):
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         cursor.execute("""
             INSERT INTO users (name, email, password_hash, role, preferred_lang, active)
@@ -63,8 +79,13 @@ def create_user(name, email, password, role='employee', preferred_lang='cs'):
         """, (name, email, password_hash, role, preferred_lang))
         mysql.connection.commit()
         return cursor.lastrowid
+    except Exception as e:
+        logger.error(f"Error creating user: {str(e)}")
+        mysql.connection.rollback()
+        return None
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 def update_user(user_id, **kwargs):
     allowed_fields = {'name', 'email', 'role', 'preferred_lang', 'status', 'active'}
@@ -73,8 +94,9 @@ def update_user(user_id, **kwargs):
     if not update_fields:
         return False
     
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         query = "UPDATE users SET " + ", ".join(f"{k} = %s" for k in update_fields.keys())
         query += " WHERE id = %s"
         values = list(update_fields.values()) + [user_id]
@@ -82,23 +104,35 @@ def update_user(user_id, **kwargs):
         cursor.execute(query, values)
         mysql.connection.commit()
         return cursor.rowcount > 0
+    except Exception as e:
+        logger.error(f"Error updating user: {str(e)}")
+        mysql.connection.rollback()
+        return False
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 def change_password(user_id, new_password):
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
         cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s",
                       (password_hash, user_id))
         mysql.connection.commit()
         return cursor.rowcount > 0
+    except Exception as e:
+        logger.error(f"Error changing password: {str(e)}")
+        mysql.connection.rollback()
+        return False
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 def verify_password(user_id, password):
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
         result = cursor.fetchone()
         if result:
@@ -108,20 +142,28 @@ def verify_password(user_id, password):
         logger.error(f"Error verifying password: {str(e)}")
         return False
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 def deactivate_user(user_id):
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         cursor.execute("UPDATE users SET active = FALSE WHERE id = %s", (user_id,))
         mysql.connection.commit()
         return cursor.rowcount > 0
+    except Exception as e:
+        logger.error(f"Error deactivating user: {str(e)}")
+        mysql.connection.rollback()
+        return False
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 def get_user_stats(user_id):
-    cursor = mysql.connection.cursor()
+    cursor = None
     try:
+        cursor = mysql.connection.cursor()
         cursor.execute("""
             SELECT 
                 COUNT(DISTINCT d.id) as total_deliveries,
@@ -132,8 +174,12 @@ def get_user_stats(user_id):
             WHERE u.id = %s
         """, (user_id,))
         return cursor.fetchone()
+    except Exception as e:
+        logger.error(f"Error fetching user stats: {str(e)}")
+        return None
     finally:
-        cursor.close()
+        if cursor:
+            cursor.close()
 
 class User:
     def __init__(self, id, name, email, role, preferred_lang='en', approval_status='pending', created_at=None):
@@ -147,25 +193,32 @@ class User:
 
     @staticmethod
     def get_by_id(user_id):
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE id = %s', (user_id,))
-        user_tuple = cursor.fetchone()
-        cursor.close()
-        
-        if not user_tuple:
-            return None
+        cursor = None
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE id = %s', (user_id,))
+            user_tuple = cursor.fetchone()
             
-        # Convert tuple to kwargs for User constructor
-        user_data = {
-            'id': user_tuple[0],
-            'name': user_tuple[1],
-            'email': user_tuple[2],
-            'role': user_tuple[3],
-            'preferred_lang': user_tuple[4],
-            'approval_status': user_tuple[5],
-            'created_at': user_tuple[6]
-        }
-        return User(**user_data)
+            if not user_tuple:
+                return None
+                
+            # Convert tuple to kwargs for User constructor
+            user_data = {
+                'id': user_tuple[0],
+                'name': user_tuple[1],
+                'email': user_tuple[2],
+                'role': user_tuple[3],
+                'preferred_lang': user_tuple[4],
+                'approval_status': user_tuple[5],
+                'created_at': user_tuple[6]
+            }
+            return User(**user_data)
+        except Exception as e:
+            logger.error(f"Error fetching user by id: {str(e)}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
 
     @staticmethod
     def get_by_email(email):
@@ -191,45 +244,59 @@ class User:
 
     @staticmethod
     def get_all_pending():
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE approval_status = %s', ('pending',))
-        users_tuples = cursor.fetchall()
-        cursor.close()
-        
-        users = []
-        for user_tuple in users_tuples:
-            user_data = {
-                'id': user_tuple[0],
-                'name': user_tuple[1],
-                'email': user_tuple[2],
-                'role': user_tuple[3],
-                'preferred_lang': user_tuple[4],
-                'approval_status': user_tuple[5],
-                'created_at': user_tuple[6]
-            }
-            users.append(User(**user_data))
-        return users
+        cursor = None
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE approval_status = %s', ('pending',))
+            users_tuples = cursor.fetchall()
+            
+            users = []
+            for user_tuple in users_tuples:
+                user_data = {
+                    'id': user_tuple[0],
+                    'name': user_tuple[1],
+                    'email': user_tuple[2],
+                    'role': user_tuple[3],
+                    'preferred_lang': user_tuple[4],
+                    'approval_status': user_tuple[5],
+                    'created_at': user_tuple[6]
+                }
+                users.append(User(**user_data))
+            return users
+        except Exception as e:
+            logger.error(f"Error fetching pending users: {str(e)}")
+            return []
+        finally:
+            if cursor:
+                cursor.close()
 
     @staticmethod
     def get_all():
-        cursor = mysql.connection.cursor()
-        cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users')
-        users_tuples = cursor.fetchall()
-        cursor.close()
-        
-        users = []
-        for user_tuple in users_tuples:
-            user_data = {
-                'id': user_tuple[0],
-                'name': user_tuple[1],
-                'email': user_tuple[2],
-                'role': user_tuple[3],
-                'preferred_lang': user_tuple[4],
-                'approval_status': user_tuple[5],
-                'created_at': user_tuple[6]
-            }
-            users.append(User(**user_data))
-        return users
+        cursor = None
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users')
+            users_tuples = cursor.fetchall()
+            
+            users = []
+            for user_tuple in users_tuples:
+                user_data = {
+                    'id': user_tuple[0],
+                    'name': user_tuple[1],
+                    'email': user_tuple[2],
+                    'role': user_tuple[3],
+                    'preferred_lang': user_tuple[4],
+                    'approval_status': user_tuple[5],
+                    'created_at': user_tuple[6]
+                }
+                users.append(User(**user_data))
+            return users
+        except Exception as e:
+            logger.error(f"Error fetching all users: {str(e)}")
+            return []
+        finally:
+            if cursor:
+                cursor.close()
 
     def update(self, **kwargs):
         allowed_fields = {'name', 'email', 'role', 'preferred_lang', 'approval_status'}

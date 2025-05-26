@@ -19,6 +19,7 @@ employee_bp = Blueprint('employee', __name__, url_prefix='/employee')
 @login_required
 @role_required('employee', 'manager')
 def dashboard():
+    cursor = None
     try:
         # Get current date and time ranges
         today = date.today()
@@ -120,8 +121,6 @@ def dashboard():
             ORDER BY delivery_date
         """, ((today - timedelta(days=7)).isoformat(),))
         weekly_trend = cursor.fetchall()
-        
-        cursor.close()
 
         # Format datetime fields
         if next_delivery:
@@ -155,6 +154,9 @@ def dashboard():
                              status_breakdown={}, recent_deliveries=[],
                              next_delivery=None, active_drivers=0,
                              total_addresses=0, weekly_trend=[])
+    finally:
+        if cursor:
+            cursor.close()
 
 @employee_bp.route('/addresses', methods=['GET', 'POST'])
 @login_required
@@ -271,55 +273,58 @@ def calendar():
                 flash(_("Invalid date format"), "warning")
 
         # Get deliveries with enhanced filtering
-        cursor = mysql.connection.cursor()
-        
-        query = """
-            SELECT d.*, u.name AS driver_name, a.label, a.street_address, a.city
-            FROM deliveries d
-            JOIN users u ON d.driver_id = u.id
-            JOIN addresses a ON d.address_id = a.id
-            WHERE 1=1
-        """
-        params = []
-        
-        if filter_driver:
-            query += " AND u.name LIKE %s"
-            params.append(f"%{filter_driver}%")
-        if filter_date:
-            query += " AND d.delivery_date = %s"
-            params.append(filter_date)
-        if filter_status:
-            query += " AND d.status = %s"
-            params.append(filter_status)
+        cursor = None
+        try:
+            cursor = mysql.connection.cursor()
             
-        query += " ORDER BY d.delivery_date, d.start_time"
-        
-        cursor.execute(query, tuple(params))
-        deliveries = cursor.fetchall()
-        
-        # Format datetime fields
-        for delivery in deliveries:
-            delivery['created_at'] = format_datetime(delivery['created_at'])
-            delivery['updated_at'] = format_datetime(delivery['updated_at'])
-            delivery['delivery_date'] = format_datetime(delivery['delivery_date'])
-            if delivery['start_time']:
-                delivery['start_time'] = format_datetime(delivery['start_time'])
-            if delivery['end_time']:
-                delivery['end_time'] = format_datetime(delivery['end_time'])
-        
-        # Group deliveries by date and driver
-        schedule = {}
-        for d in deliveries:
-            key = (d['delivery_date'], d['driver_name'])
-            if key not in schedule:
-                schedule[key] = []
-            schedule[key].append(d)
-        
-        # Get all drivers for filter dropdown
-        cursor.execute("SELECT DISTINCT id, name FROM users WHERE role = 'driver' AND active = TRUE ORDER BY name")
-        drivers = cursor.fetchall()
-        
-        cursor.close()
+            query = """
+                SELECT d.*, u.name AS driver_name, a.label, a.street_address, a.city
+                FROM deliveries d
+                JOIN users u ON d.driver_id = u.id
+                JOIN addresses a ON d.address_id = a.id
+                WHERE 1=1
+            """
+            params = []
+            
+            if filter_driver:
+                query += " AND u.name LIKE %s"
+                params.append(f"%{filter_driver}%")
+            if filter_date:
+                query += " AND d.delivery_date = %s"
+                params.append(filter_date)
+            if filter_status:
+                query += " AND d.status = %s"
+                params.append(filter_status)
+                
+            query += " ORDER BY d.delivery_date, d.start_time"
+            
+            cursor.execute(query, tuple(params))
+            deliveries = cursor.fetchall()
+            
+            # Format datetime fields
+            for delivery in deliveries:
+                delivery['created_at'] = format_datetime(delivery['created_at'])
+                delivery['updated_at'] = format_datetime(delivery['updated_at'])
+                delivery['delivery_date'] = format_datetime(delivery['delivery_date'])
+                if delivery['start_time']:
+                    delivery['start_time'] = format_datetime(delivery['start_time'])
+                if delivery['end_time']:
+                    delivery['end_time'] = format_datetime(delivery['end_time'])
+            
+            # Group deliveries by date and driver
+            schedule = {}
+            for d in deliveries:
+                key = (d['delivery_date'], d['driver_name'])
+                if key not in schedule:
+                    schedule[key] = []
+                schedule[key].append(d)
+            
+            # Get all drivers for filter dropdown
+            cursor.execute("SELECT DISTINCT id, name FROM users WHERE role = 'driver' AND active = TRUE ORDER BY name")
+            drivers = cursor.fetchall()
+        finally:
+            if cursor:
+                cursor.close()
         
         return render_template('employee/calendar.html', 
                              schedule=schedule, 
@@ -569,22 +574,26 @@ def configure_map():
 @role_required(['admin', 'manager', 'driver', 'employee'])
 def get_drivers():
     """Fetch all drivers for the dropdown."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor()
         cursor.execute("SELECT id, name FROM users WHERE role = 'driver' AND active = TRUE")
         drivers = cursor.fetchall()
-        cursor.close()
 
         return jsonify({"drivers": [{"id": driver[0], "name": driver[1]} for driver in drivers]}), 200
     except Exception as e:
         logger.error(f"Error fetching drivers: {str(e)}", exc_info=True)
         return jsonify({"error": "Failed to fetch drivers."}), 500
+    finally:
+        if cursor:
+            cursor.close()
 
 @employee_bp.route('/api/dashboard-updates')
 @login_required
 @role_required('employee', 'manager')
 def dashboard_updates():
     """Get real-time dashboard updates"""
+    cursor = None
     try:
         cursor = mysql.connection.cursor()
         today = date.today()
@@ -621,8 +630,6 @@ def dashboard_updates():
         if latest_update:
             latest_update['updated_at'] = format_datetime(latest_update['updated_at'])
         
-        cursor.close()
-        
         return jsonify({
             'today_stats': stats,
             'latest_update': latest_update,
@@ -631,6 +638,9 @@ def dashboard_updates():
     except Exception as e:
         logger.error(f"Error fetching dashboard updates: {str(e)}", exc_info=True)
         return jsonify({"error": _("Error fetching updates")}), 500
+    finally:
+        if cursor:
+            cursor.close()
 
 @employee_bp.route('/api/search')
 @login_required

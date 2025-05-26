@@ -381,7 +381,13 @@ let directionsRenderer;
 // Initialize form
 document.addEventListener('DOMContentLoaded', function() {
   initForm();
-  initMap();
+  
+  // Initialize Google Maps
+  if (typeof google === 'undefined') {
+    loadGoogleMaps();
+  } else {
+    initMap();
+  }
 });
 
 function initForm() {
@@ -405,41 +411,75 @@ function initForm() {
 }
 
 function initMap() {
-  const warehouseLocation = { lat: 50.0755, lng: 14.4378 }; // Prague coordinates
-  
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: warehouseLocation,
-    zoom: 11,
-    styles: [
-      {
-        featureType: 'poi',
-        elementType: 'labels',
-        stylers: [{ visibility: 'off' }]
+  try {
+    // Check if Google Maps API is available
+    if (typeof google === 'undefined' || !google.maps) {
+      console.warn('Google Maps API not available, showing fallback');
+      showMapFallback();
+      return;
+    }
+
+    const warehouseLocation = { lat: 50.0755, lng: 14.4378 }; // Prague coordinates
+    
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: warehouseLocation,
+      zoom: 11,
+      styles: [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }]
+        }
+      ]
+    });
+    
+    warehouseMarker = new google.maps.Marker({
+      position: warehouseLocation,
+      map: map,
+      title: '{{ _("Warehouse") }}',
+      icon: {
+        url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23FF5722"%3E%3Cpath d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/%3E%3C/svg%3E',
+        scaledSize: new google.maps.Size(30, 30),
+        anchor: new google.maps.Point(15, 15)
       }
-    ]
-  });
+    });
+    
+    directionsService = new google.maps.DirectionsService();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+      suppressMarkers: false,
+      polylineOptions: {
+        strokeColor: '#2196F3',
+        strokeWeight: 4,
+        strokeOpacity: 0.8
+      }
+    });
+    directionsRenderer.setMap(map);
+    
+    console.log('Google Maps initialized successfully');
+  } catch (error) {
+    console.error('Error initializing Google Maps:', error);
+    showMapFallback();
+  }
+}
+
+function showMapFallback() {
+  const mapElement = document.getElementById('map');
+  if (mapElement) {
+    mapElement.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; background: #f8f9fa; border-radius: 8px; color: #666; text-align: center; padding: 40px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🗺️</div>
+        <h4 style="margin: 0 0 8px 0; color: #333;">{{ _('Map Preview Unavailable') }}</h4>
+        <p style="margin: 0 0 8px 0;">{{ _('Google Maps API is not configured') }}</p>
+        <small style="color: #888;">{{ _('Route planning will work without visual preview') }}</small>
+      </div>
+    `;
+  }
   
-  warehouseMarker = new google.maps.Marker({
-    position: warehouseLocation,
-    map: map,
-    title: '{{ _("Warehouse") }}',
-    icon: {
-      url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23FF5722"%3E%3Cpath d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/%3E%3C/svg%3E',
-      scaledSize: new google.maps.Size(30, 30),
-      anchor: new google.maps.Point(15, 15)
-    }
-  });
-  
-  directionsService = new google.maps.DirectionsService();
-  directionsRenderer = new google.maps.DirectionsRenderer({
-    suppressMarkers: false,
-    polylineOptions: {
-      strokeColor: '#2196F3',
-      strokeWeight: 4,
-      strokeOpacity: 0.8
-    }
-  });
-  directionsRenderer.setMap(map);
+  // Hide route info section since we can't calculate routes
+  const routeInfo = document.getElementById('routeInfo');
+  if (routeInfo) {
+    routeInfo.style.display = 'none';
+  }
 }
 
 function updateRoutePreview() {
@@ -447,6 +487,18 @@ function updateRoutePreview() {
   const selectedOption = addressSelect.options[addressSelect.selectedIndex];
   
   if (selectedOption.value) {
+    // Show basic route info without Google Maps
+    if (typeof google === 'undefined' || !google.maps || !map) {
+      const routeInfo = document.getElementById('routeInfo');
+      if (routeInfo) {
+        document.getElementById('routeDistance').textContent = '{{ _("Map not available") }}';
+        document.getElementById('routeDuration').textContent = '{{ _("Estimate: 30 min") }}';
+        document.getElementById('routeETA').textContent = '-';
+        routeInfo.style.display = 'block';
+      }
+      return;
+    }
+
     const lat = parseFloat(selectedOption.dataset.lat);
     const lng = parseFloat(selectedOption.dataset.lng);
     const destination = { lat: lat, lng: lng };
@@ -470,7 +522,9 @@ function updateRoutePreview() {
     calculateRoute(destination);
   } else {
     // Clear route
-    directionsRenderer.setDirections({routes: []});
+    if (typeof google !== 'undefined' && directionsRenderer) {
+      directionsRenderer.setDirections({routes: []});
+    }
     if (destinationMarker) {
       destinationMarker.setMap(null);
     }
@@ -479,6 +533,12 @@ function updateRoutePreview() {
 }
 
 function calculateRoute(destination) {
+  // Skip if Google Maps is not available
+  if (typeof google === 'undefined' || !google.maps || !directionsService) {
+    console.log('Google Maps not available for route calculation');
+    return;
+  }
+
   const warehouseLocation = { lat: 50.0755, lng: 14.4378 };
   
   const request = {
@@ -593,17 +653,28 @@ function handleSubmit(event) {
 
 // Load Google Maps API
 function loadGoogleMaps() {
+  // Check if we have a valid API key
+  const hasApiKey = false; // Set to true when you have a valid Google Maps API key
+  
+  if (!hasApiKey) {
+    console.log('Google Maps API key not configured, using fallback');
+    // Initialize map fallback immediately
+    setTimeout(showMapFallback, 100);
+    return;
+  }
+  
   const script = document.createElement('script');
   script.src = 'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,directions,geometry&callback=initMap';
   script.async = true;
   script.defer = true;
+  script.onerror = function() {
+    console.error('Failed to load Google Maps API');
+    showMapFallback();
+  };
   document.head.appendChild(script);
 }
 
-// Initialize Google Maps when DOM is ready
-if (typeof google === 'undefined') {
-  loadGoogleMaps();
-}
+
 </script>
 
 {% endblock %}

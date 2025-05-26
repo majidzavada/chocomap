@@ -94,6 +94,7 @@ def users():
 @login_required
 @role_required('admin')
 def pending_users():
+    cursor = None
     try:
         cursor = mysql.connection.cursor()
         cursor.execute("""
@@ -113,12 +114,14 @@ def pending_users():
                 'role': row[4],
                 'created_at': row[5]
             })
-        cursor.close()
         return render_template('admin/pending_users.html', users=users)
     except Exception as e:
         logger.error(f"Error loading pending users: {str(e)}", exc_info=True)
         flash(_("Error loading pending users"), "danger")
         return render_template('admin/pending_users.html', users=[])
+    finally:
+        if cursor:
+            cursor.close()
 
 @admin_bp.route('/approve/<int:user_id>', methods=['POST'])
 @login_required
@@ -213,12 +216,12 @@ def edit_user(user_id):
 @login_required
 @role_required('admin')
 def delete_user(user_id):
+    cursor = None
     try:
         cursor = mysql.connection.cursor()
         cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
         mysql.connection.commit()
         affected_rows = cursor.rowcount
-        cursor.close()
         
         if affected_rows > 0:
             flash(_("User deleted successfully"), "success")
@@ -229,6 +232,9 @@ def delete_user(user_id):
         mysql.connection.rollback()
         logger.error(f"Error deleting user: {str(e)}", exc_info=True)
         flash(_("Error deleting user"), "danger")
+    finally:
+        if cursor:
+            cursor.close()
         
     return redirect(url_for('admin.users'))
 

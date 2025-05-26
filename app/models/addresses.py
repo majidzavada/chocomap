@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 def get_all_addresses() -> List[Dict[str, Any]]:
     """Get all addresses with their details."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor(DictCursor)
         cursor.execute("""
@@ -17,14 +18,17 @@ def get_all_addresses() -> List[Dict[str, Any]]:
             ORDER BY a.label
         """)
         addresses = cursor.fetchall()
-        cursor.close()
         return addresses
     except Exception as e:
         logger.error(f"Error fetching addresses: {str(e)}")
         return []
+    finally:
+        if cursor:
+            cursor.close()
 
 def get_address_by_id(address_id: int) -> Optional[Dict[str, Any]]:
     """Get address details by ID."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor(DictCursor)
         cursor.execute("""
@@ -34,15 +38,18 @@ def get_address_by_id(address_id: int) -> Optional[Dict[str, Any]]:
             WHERE a.id = %s
         """, (address_id,))
         address = cursor.fetchone()
-        cursor.close()
         return address
     except Exception as e:
         logger.error(f"Error fetching address {address_id}: {str(e)}")
         return None
+    finally:
+        if cursor:
+            cursor.close()
 
 def create_address(label: str, street: str, city: str, zip_code: str, 
                   lat: float, lon: float, user_id: int) -> Optional[int]:
     """Create a new address and return its ID."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor()
         cursor.execute("""
@@ -53,16 +60,19 @@ def create_address(label: str, street: str, city: str, zip_code: str,
         """, (label, street, city, zip_code, lat, lon, user_id, datetime.utcnow()))
         mysql.connection.commit()
         address_id = cursor.lastrowid
-        cursor.close()
         return address_id
     except Exception as e:
         logger.error(f"Error creating address: {str(e)}")
         mysql.connection.rollback()
         return None
+    finally:
+        if cursor:
+            cursor.close()
 
 def update_address(address_id: int, label: str, street: str, city: str, 
                   zip_code: str, lat: float, lon: float) -> bool:
     """Update an existing address."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor()
         cursor.execute("""
@@ -74,29 +84,35 @@ def update_address(address_id: int, label: str, street: str, city: str,
         """, (label, street, city, zip_code, lat, lon, datetime.utcnow(), address_id))
         mysql.connection.commit()
         success = cursor.rowcount > 0
-        cursor.close()
         return success
     except Exception as e:
         logger.error(f"Error updating address {address_id}: {str(e)}")
         mysql.connection.rollback()
         return False
+    finally:
+        if cursor:
+            cursor.close()
 
 def delete_address(address_id: int) -> bool:
     """Delete an address."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor()
         cursor.execute("DELETE FROM addresses WHERE id = %s", (address_id,))
         mysql.connection.commit()
         success = cursor.rowcount > 0
-        cursor.close()
         return success
     except Exception as e:
         logger.error(f"Error deleting address {address_id}: {str(e)}")
         mysql.connection.rollback()
         return False
+    finally:
+        if cursor:
+            cursor.close()
 
 def get_addresses_by_user(user_id: int) -> List[Dict[str, Any]]:
     """Get all addresses created by a specific user."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor(DictCursor)
         cursor.execute("""
@@ -105,14 +121,17 @@ def get_addresses_by_user(user_id: int) -> List[Dict[str, Any]]:
             ORDER BY created_at DESC
         """, (user_id,))
         addresses = cursor.fetchall()
-        cursor.close()
         return addresses
     except Exception as e:
         logger.error(f"Error fetching addresses for user {user_id}: {str(e)}")
         return []
+    finally:
+        if cursor:
+            cursor.close()
 
 def search_addresses(query: str) -> List[Dict[str, Any]]:
     """Search addresses by label, street, city, or zip code."""
+    cursor = None
     try:
         cursor = mysql.connection.cursor(DictCursor)
         search_term = f"%{query}%"
@@ -125,11 +144,13 @@ def search_addresses(query: str) -> List[Dict[str, Any]]:
             ORDER BY label
         """, (search_term, search_term, search_term, search_term))
         addresses = cursor.fetchall()
-        cursor.close()
         return addresses
     except Exception as e:
         logger.error(f"Error searching addresses: {str(e)}")
         return []
+    finally:
+        if cursor:
+            cursor.close()
 
 def get_address_stats() -> Dict[str, Any]:
     """Get statistics about addresses."""
