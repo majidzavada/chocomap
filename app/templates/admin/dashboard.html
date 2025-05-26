@@ -126,65 +126,61 @@
     </div>
 
     <!-- Modal for displaying logs -->
-    <div class="modal" id="logsModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="logsModal" tabindex="-1" aria-labelledby="logsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ _('Logs') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="logsModalLabel">{{ _('Logs') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <pre id="logs-content"></pre>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Close') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal for database maintenance -->
-    <div class="modal" id="dbMaintenanceModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="dbMaintenanceModal" tabindex="-1" aria-labelledby="dbMaintenanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ _('Database Maintenance') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="dbMaintenanceModalLabel">{{ _('Database Maintenance') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <button id="backup-db-btn" class="btn btn-primary">{{ _('Backup Database') }}</button>
                     <button id="restore-db-btn" class="btn btn-secondary">{{ _('Restore Database') }}</button>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Close') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal for system settings -->
-    <div class="modal" id="systemSettingsModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="systemSettingsModal" tabindex="-1" aria-labelledby="systemSettingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">{{ _('System Settings') }}</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <h5 class="modal-title" id="systemSettingsModalLabel">{{ _('System Settings') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form id="system-settings-form">
                         <h6>{{ _('Application Settings') }}</h6>
-                        <label>
-                            <input type="checkbox" id="logging" /> {{ _('Enable Logging') }}
-                        </label>
-                        <label>
-                            <input type="checkbox" id="debugging" /> {{ _('Enable Debugging') }}
-                        </label>
+                        <div class="form-check mb-2">
+                            <input type="checkbox" id="logging" class="form-check-input" />
+                            <label class="form-check-label" for="logging">{{ _('Enable Logging') }}</label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input type="checkbox" id="debugging" class="form-check-input" />
+                            <label class="form-check-label" for="debugging">{{ _('Enable Debugging') }}</label>
+                        </div>
                         <hr />
                         <h6>{{ _('Email Server Settings') }}</h6>
                         <input type="text" id="smtp_server" placeholder="{{ _('SMTP Server') }}" class="form-control mb-2" />
@@ -199,10 +195,35 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" id="save-settings-btn">{{ _('Save Settings') }}</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ _('Close') }}</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Ensure modal functionality works with Bootstrap 5
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap modals
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        new bootstrap.Modal(modal);
+    });
+
+    // Handle modal button clicks explicitly
+    document.querySelectorAll('[data-bs-toggle="modal"]').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetModal = document.querySelector(this.getAttribute('href'));
+            if (targetModal) {
+                const modal = bootstrap.Modal.getOrCreateInstance(targetModal);
+                modal.show();
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

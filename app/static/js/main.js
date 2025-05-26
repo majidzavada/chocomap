@@ -214,27 +214,27 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error fetching drivers:', error);
         });
 
-    // Logs button click event
-    document.getElementById('view-logs-btn').addEventListener('click', function() {
-        fetch('/admin/logs')
-            .then(response => response.json())
-            .then(data => {
-                if (data.logs) {
-                    document.getElementById('logs-content').textContent = data.logs.join('\n');
-                } else {
-                    alert('Error fetching logs.');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching logs:', error);
-                alert('Error fetching logs.');
-            });
-    });
+    // Logs modal - load logs when modal is shown
+    const logsModal = document.getElementById('logsModal');
+    if (logsModal) {
+        logsModal.addEventListener('shown.bs.modal', function() {
+            fetch('/admin/logs')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.logs) {
+                        document.getElementById('logs-content').textContent = data.logs.join('\n');
+                    } else {
+                        document.getElementById('logs-content').textContent = 'No logs available.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching logs:', error);
+                    document.getElementById('logs-content').textContent = 'Error fetching logs.';
+                });
+        });
+    }
 
-    // Database maintenance button click event
-    document.getElementById('db-maintenance-btn').addEventListener('click', function() {
-        // Modal is triggered by data-target attribute, no additional JS needed
-    });
+    // Database maintenance buttons
 
     // Backup database button click event
     document.getElementById('backup-db-btn').addEventListener('click', function() {
@@ -281,33 +281,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // System settings button click event
-    document.getElementById('system-settings-btn').addEventListener('click', function() {
-        fetch('/admin/system/settings')
-            .then(response => response.json())
-            .then(data => {
-                if (data.application) {
-                    document.getElementById('logging').checked = data.application.logging;
-                    document.getElementById('debugging').checked = data.application.debugging;
-                }
-                if (data.email) {
-                    document.getElementById('smtp_server').value = data.email.smtp_server;
-                    document.getElementById('port').value = data.email.port;
-                    document.getElementById('username').value = data.email.username;
-                    document.getElementById('password').value = data.email.password;
-                }
-                if (data.api_keys) {
-                    document.getElementById('google_maps').value = data.api_keys.google_maps;
-                    document.getElementById('other_service').value = data.api_keys.other_service;
-                }
-            })
-            .catch(error => {
-                console.error('Error loading settings:', error);
-                alert('Error loading settings.');
-            });
-    });
+    // System settings modal - load settings when modal is shown
+    const systemSettingsModal = document.getElementById('systemSettingsModal');
+    if (systemSettingsModal) {
+        systemSettingsModal.addEventListener('shown.bs.modal', function() {
+            fetch('/admin/system/settings')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.application) {
+                        document.getElementById('logging').checked = data.application.logging;
+                        document.getElementById('debugging').checked = data.application.debugging;
+                    }
+                    if (data.email) {
+                        document.getElementById('smtp_server').value = data.email.smtp_server || '';
+                        document.getElementById('port').value = data.email.port || '';
+                        document.getElementById('username').value = data.email.username || '';
+                        document.getElementById('password').value = data.email.password || '';
+                    }
+                    if (data.api_keys) {
+                        document.getElementById('google_maps').value = data.api_keys.google_maps || '';
+                        document.getElementById('other_service').value = data.api_keys.other_service || '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading settings:', error);
+                    alert('Error loading settings.');
+                });
+        });
+    }
 
-    document.getElementById('save-settings-btn').addEventListener('click', function() {
+    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', function() {
         const settings = {
             application: {
                 logging: document.getElementById('logging').checked,
@@ -334,6 +339,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(data => {
             if (data.message) {
                 alert(data.message);
+                // Close the modal after successful save
+                const modal = bootstrap.Modal.getInstance(systemSettingsModal);
+                if (modal) {
+                    modal.hide();
+                }
             } else {
                 alert('Error saving settings.');
             }
@@ -343,4 +353,5 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('Error saving settings.');
         });
     });
+    }
 });
