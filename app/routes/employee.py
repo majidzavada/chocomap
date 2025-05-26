@@ -20,18 +20,65 @@ employee_bp = Blueprint('employee', __name__, url_prefix='/employee')
 @role_required('employee', 'manager')
 def dashboard():
     try:
-        # Get delivery statistics
+        # Get current date and time ranges
         today = date.today()
         week_start = today - timedelta(days=today.weekday())
         week_end = week_start + timedelta(days=6)
+        month_start = today.replace(day=1)
         
-        stats = DeliveryService.get_delivery_stats(
-            week_start.isoformat(),
-            week_end.isoformat()
-        )
-
-        # Get next upcoming delivery
         cursor = mysql.connection.cursor()
+        
+        # Get today's delivery count
+        cursor.execute("""
+            SELECT COUNT(*) FROM deliveries 
+            WHERE delivery_date = %s
+        """, (today.isoformat(),))
+        today_count = cursor.fetchone()[0]
+        
+        # Get this week's delivery count
+        cursor.execute("""
+            SELECT COUNT(*) FROM deliveries 
+            WHERE delivery_date BETWEEN %s AND %s
+        """, (week_start.isoformat(), week_end.isoformat()))
+        week_count = cursor.fetchone()[0]
+        
+        # Get this month's delivery count
+        cursor.execute("""
+            SELECT COUNT(*) FROM deliveries 
+            WHERE delivery_date >= %s
+        """, (month_start.isoformat(),))
+        month_count = cursor.fetchone()[0]
+        
+        # Get delivery status breakdown for today
+        cursor.execute("""
+            SELECT 
+                status,
+                COUNT(*) as count
+            FROM deliveries 
+            WHERE delivery_date = %s
+            GROUP BY status
+        """, (today.isoformat(),))
+        status_breakdown = {row['status']: row['count'] for row in cursor.fetchall()}
+        
+        # Get recent deliveries (last 5)
+        cursor.execute("""
+            SELECT 
+                d.id,
+                d.delivery_date,
+                d.start_time,
+                d.status,
+                a.label as address_label,
+                u.name as driver_name,
+                d.created_at
+            FROM deliveries d
+            JOIN addresses a ON d.address_id = a.id
+            JOIN users u ON d.driver_id = u.id
+            ORDER BY d.created_at DESC
+            LIMIT 5
+        """)
+        recent_deliveries = cursor.fetchall()
+        
+        # Get next upcoming delivery
         cursor.execute("""
             SELECT 
                 d.id,
@@ -48,18 +95,66 @@ def dashboard():
             LIMIT 1
         """, (today.isoformat(),))
         next_delivery = cursor.fetchone()
+        
+        # Get active drivers count
+        cursor.execute("""
+            SELECT COUNT(*) FROM users 
+            WHERE role = 'driver' AND active = TRUE
+        """)
+        active_drivers = cursor.fetchone()[0]
+        
+        # Get total addresses count
+        cursor.execute("""
+            SELECT COUNT(*) FROM addresses
+        """)
+        total_addresses = cursor.fetchone()[0]
+        
+        # Get weekly delivery trend (last 7 days)
+        cursor.execute("""
+            SELECT 
+                delivery_date,
+                COUNT(*) as count
+            FROM deliveries 
+            WHERE delivery_date >= %s
+            GROUP BY delivery_date
+            ORDER BY delivery_date
+        """, ((today - timedelta(days=7)).isoformat(),))
+        weekly_trend = cursor.fetchall()
+        
         cursor.close()
 
+        # Format datetime fields
         if next_delivery:
             next_delivery['delivery_date'] = format_datetime(next_delivery['delivery_date'])
             next_delivery['start_time'] = format_datetime(next_delivery['start_time'])
+        
+        for delivery in recent_deliveries:
+            delivery['delivery_date'] = format_datetime(delivery['delivery_date'])
+            delivery['start_time'] = format_datetime(delivery['start_time'])
+            delivery['created_at'] = format_datetime(delivery['created_at'])
 
-        return render_template('employee/dashboard.html',
-                             stats=stats,
-                             next_delivery=next_delivery)
+        # Prepare dashboard data
+        dashboard_data = {
+            'today_count': today_count,
+            'week_count': week_count,
+            'month_count': month_count,
+            'status_breakdown': status_breakdown,
+            'recent_deliveries': recent_deliveries,
+            'next_delivery': next_delivery,
+            'active_drivers': active_drivers,
+            'total_addresses': total_addresses,
+            'weekly_trend': weekly_trend
+        }
+
+        return render_template('employee/dashboard.html', **dashboard_data)
     except Exception as e:
+        logger.error(f"Error loading dashboard data: {str(e)}", exc_info=True)
         flash(_("Error loading dashboard data"), "danger")
-        return render_template('employee/dashboard.html')
+        return render_template('employee/dashboard.html', 
+                             today_count=0, week_count=0, month_count=0,
+                             status_breakdown={}, recent_deliveries=[],
+                             next_delivery=None, active_drivers=0,
+                             total_addresses=0, weekly_trend=[])
 
 @employee_bp.route('/addresses', methods=['GET', 'POST'])
 @login_required
@@ -165,6 +260,7 @@ def calendar():
     try:
         filter_driver = request.args.get('driver')
         filter_date = request.args.get('date')
+        filter_status = request.args.get('status')
         
         # Validate date format if provided
         if filter_date:
@@ -174,11 +270,64 @@ def calendar():
                 filter_date = None
                 flash(_("Invalid date format"), "warning")
 
-        schedule = DeliveryService.get_all_deliveries_grouped(filter_driver, filter_date)
-        return render_template('employee/calendar.html', schedule=schedule)
+        # Get deliveries with enhanced filtering
+        cursor = mysql.connection.cursor()
+        
+        query = """
+            SELECT d.*, u.name AS driver_name, a.label, a.street_address, a.city
+            FROM deliveries d
+            JOIN users u ON d.driver_id = u.id
+            JOIN addresses a ON d.address_id = a.id
+            WHERE 1=1
+        """
+        params = []
+        
+        if filter_driver:
+            query += " AND u.name LIKE %s"
+            params.append(f"%{filter_driver}%")
+        if filter_date:
+            query += " AND d.delivery_date = %s"
+            params.append(filter_date)
+        if filter_status:
+            query += " AND d.status = %s"
+            params.append(filter_status)
+            
+        query += " ORDER BY d.delivery_date, d.start_time"
+        
+        cursor.execute(query, tuple(params))
+        deliveries = cursor.fetchall()
+        
+        # Format datetime fields
+        for delivery in deliveries:
+            delivery['created_at'] = format_datetime(delivery['created_at'])
+            delivery['updated_at'] = format_datetime(delivery['updated_at'])
+            delivery['delivery_date'] = format_datetime(delivery['delivery_date'])
+            if delivery['start_time']:
+                delivery['start_time'] = format_datetime(delivery['start_time'])
+            if delivery['end_time']:
+                delivery['end_time'] = format_datetime(delivery['end_time'])
+        
+        # Group deliveries by date and driver
+        schedule = {}
+        for d in deliveries:
+            key = (d['delivery_date'], d['driver_name'])
+            if key not in schedule:
+                schedule[key] = []
+            schedule[key].append(d)
+        
+        # Get all drivers for filter dropdown
+        cursor.execute("SELECT DISTINCT id, name FROM users WHERE role = 'driver' AND active = TRUE ORDER BY name")
+        drivers = cursor.fetchall()
+        
+        cursor.close()
+        
+        return render_template('employee/calendar.html', 
+                             schedule=schedule, 
+                             drivers=drivers)
     except Exception as e:
+        logger.error(f"Error loading calendar: {str(e)}", exc_info=True)
         flash(_("Error loading calendar"), "danger")
-        return render_template('employee/calendar.html', schedule={})
+        return render_template('employee/calendar.html', schedule={}, drivers=[])
 
 @employee_bp.route('/delivery/<int:delivery_id>/delete', methods=['POST'])
 @login_required
@@ -255,9 +404,80 @@ def delivery_stats():
         if not start_date or not end_date:
             return jsonify({"error": _("Start and end dates are required")}), 400
 
-        stats = DeliveryService.get_delivery_stats(start_date, end_date)
-        return jsonify(stats)
+        cursor = mysql.connection.cursor()
+        
+        # Get comprehensive delivery statistics
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as total_deliveries,
+                COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_deliveries,
+                COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_deliveries,
+                COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending_deliveries,
+                COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress_deliveries,
+                AVG(CASE 
+                    WHEN status = 'completed' 
+                    THEN TIMESTAMPDIFF(MINUTE, created_at, updated_at)
+                END) as avg_processing_time,
+                AVG(eta_minutes) as avg_eta,
+                MIN(delivery_date) as earliest_delivery,
+                MAX(delivery_date) as latest_delivery
+            FROM deliveries
+            WHERE delivery_date BETWEEN %s AND %s
+        """, (start_date, end_date))
+        
+        stats = cursor.fetchone()
+        
+        # Get daily breakdown
+        cursor.execute("""
+            SELECT 
+                delivery_date,
+                COUNT(*) as total,
+                COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed,
+                COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled
+            FROM deliveries
+            WHERE delivery_date BETWEEN %s AND %s
+            GROUP BY delivery_date
+            ORDER BY delivery_date
+        """, (start_date, end_date))
+        
+        daily_breakdown = cursor.fetchall()
+        
+        # Get driver performance
+        cursor.execute("""
+            SELECT 
+                u.name as driver_name,
+                COUNT(*) as total_deliveries,
+                COUNT(CASE WHEN d.status = 'completed' THEN 1 END) as completed_deliveries,
+                AVG(d.eta_minutes) as avg_eta
+            FROM deliveries d
+            JOIN users u ON d.driver_id = u.id
+            WHERE d.delivery_date BETWEEN %s AND %s
+            GROUP BY u.id, u.name
+            ORDER BY completed_deliveries DESC
+        """, (start_date, end_date))
+        
+        driver_performance = cursor.fetchall()
+        
+        cursor.close()
+        
+        result = {
+            'total_deliveries': stats['total_deliveries'] or 0,
+            'completed_deliveries': stats['completed_deliveries'] or 0,
+            'cancelled_deliveries': stats['cancelled_deliveries'] or 0,
+            'pending_deliveries': stats['pending_deliveries'] or 0,
+            'in_progress_deliveries': stats['in_progress_deliveries'] or 0,
+            'avg_processing_time': float(stats['avg_processing_time'] or 0),
+            'avg_eta': float(stats['avg_eta'] or 0),
+            'earliest_delivery': stats['earliest_delivery'].isoformat() if stats['earliest_delivery'] else None,
+            'latest_delivery': stats['latest_delivery'].isoformat() if stats['latest_delivery'] else None,
+            'daily_breakdown': daily_breakdown,
+            'driver_performance': driver_performance,
+            'completion_rate': (stats['completed_deliveries'] / stats['total_deliveries'] * 100) if stats['total_deliveries'] > 0 else 0
+        }
+        
+        return jsonify(result)
     except Exception as e:
+        logger.error(f"Error fetching delivery statistics: {str(e)}", exc_info=True)
         return jsonify({"error": _("Error fetching delivery statistics")}), 500
 
 @employee_bp.route('/api/optimize-route/<int:driver_id>')
@@ -278,34 +498,71 @@ def optimize_route(driver_id):
 @login_required
 @role_required('employee', 'manager')
 def configure_map():
-    from app.extensions import db
-    from app.models.map_config import MapConfig
-    from flask import request, jsonify
+    try:
+        data = request.get_json()
+        api_key = data.get('api_key')
+        environment = data.get('environment')
 
-    data = request.get_json()
-    api_key = data.get('api_key')
-    environment = data.get('environment')
+        if not api_key or not environment:
+            return jsonify({'error': 'API key and environment are required'}), 400
 
-    if not api_key or not environment:
-        return jsonify({'error': 'API key and environment are required'}), 400
+        # Validate API key by geocoding warehouse location
+        import requests
+        warehouse_lat = current_app.config.get('WAREHOUSE_LAT', '50.0755')
+        warehouse_lng = current_app.config.get('WAREHOUSE_LNG', '14.4378')
+        
+        try:
+            response = requests.get(
+                f"https://maps.googleapis.com/maps/api/geocode/json?latlng={warehouse_lat},{warehouse_lng}&key={api_key}",
+                timeout=10
+            )
+            
+            if response.status_code != 200 or response.json().get('status') != 'OK':
+                return jsonify({'error': 'Invalid API key or quota exceeded'}), 400
+        except requests.RequestException:
+            return jsonify({'error': 'Unable to validate API key'}), 400
 
-    # Validate API key by geocoding warehouse location
-    import requests
-    warehouse_lat = current_app.config['WAREHOUSE_LAT']
-    warehouse_lng = current_app.config['WAREHOUSE_LNG']
-    response = requests.get(
-        f"https://maps.googleapis.com/maps/api/geocode/json?latlng={warehouse_lat},{warehouse_lng}&key={api_key}"
-    )
-
-    if response.status_code != 200 or response.json().get('status') != 'OK':
-        return jsonify({'error': 'Invalid API key or quota exceeded'}), 400
-
-    # Save to database
-    map_config = MapConfig(api_key=api_key, environment=environment, last_validated=datetime.utcnow())
-    db.session.add(map_config)
-    db.session.commit()
-
-    return jsonify({'message': 'API key configured successfully'}), 200
+        # Save to database using MySQL cursor
+        cursor = mysql.connection.cursor()
+        try:
+            # Check if map_config table exists, if not create it
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS map_config (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    api_key VARCHAR(255) NOT NULL,
+                    environment VARCHAR(50) NOT NULL,
+                    last_validated DATETIME NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                )
+            """)
+            
+            # Insert or update the configuration
+            cursor.execute("""
+                INSERT INTO map_config (api_key, environment, last_validated)
+                VALUES (%s, %s, NOW())
+                ON DUPLICATE KEY UPDATE
+                api_key = VALUES(api_key),
+                environment = VALUES(environment),
+                last_validated = VALUES(last_validated),
+                updated_at = NOW()
+            """, (api_key, environment))
+            
+            mysql.connection.commit()
+            cursor.close()
+            
+            return jsonify({'message': 'API key configured successfully'}), 200
+            
+        except Exception as e:
+            mysql.connection.rollback()
+            logger.error(f"Error saving map config: {str(e)}")
+            return jsonify({'error': 'Error saving configuration'}), 500
+        finally:
+            cursor.close()
+            
+    except Exception as e:
+        logger.error(f"Error configuring map: {str(e)}")
+        return jsonify({'error': 'Error processing map configuration'}), 500
 
 @employee_bp.route('/drivers', methods=['GET'])
 @login_required
@@ -322,3 +579,339 @@ def get_drivers():
     except Exception as e:
         logger.error(f"Error fetching drivers: {str(e)}", exc_info=True)
         return jsonify({"error": "Failed to fetch drivers."}), 500
+
+@employee_bp.route('/api/dashboard-updates')
+@login_required
+@role_required('employee', 'manager')
+def dashboard_updates():
+    """Get real-time dashboard updates"""
+    try:
+        cursor = mysql.connection.cursor()
+        today = date.today()
+        
+        # Get quick stats
+        cursor.execute("""
+            SELECT 
+                COUNT(*) as today_total,
+                COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+                COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
+                COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed
+            FROM deliveries 
+            WHERE delivery_date = %s
+        """, (today.isoformat(),))
+        
+        stats = cursor.fetchone()
+        
+        # Get latest delivery update
+        cursor.execute("""
+            SELECT 
+                d.id,
+                d.status,
+                d.updated_at,
+                a.label as address_label,
+                u.name as driver_name
+            FROM deliveries d
+            JOIN addresses a ON d.address_id = a.id
+            JOIN users u ON d.driver_id = u.id
+            ORDER BY d.updated_at DESC
+            LIMIT 1
+        """)
+        
+        latest_update = cursor.fetchone()
+        if latest_update:
+            latest_update['updated_at'] = format_datetime(latest_update['updated_at'])
+        
+        cursor.close()
+        
+        return jsonify({
+            'today_stats': stats,
+            'latest_update': latest_update,
+            'timestamp': datetime.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Error fetching dashboard updates: {str(e)}", exc_info=True)
+        return jsonify({"error": _("Error fetching updates")}), 500
+
+@employee_bp.route('/api/search')
+@login_required
+@role_required('employee', 'manager')
+def search():
+    """Search deliveries, addresses, and drivers"""
+    try:
+        query = request.args.get('q', '').strip()
+        search_type = request.args.get('type', 'all')
+        limit = min(int(request.args.get('limit', 10)), 50)
+        
+        if not query or len(query) < 2:
+            return jsonify({"error": _("Search query must be at least 2 characters")}), 400
+        
+        cursor = mysql.connection.cursor()
+        results = {}
+        
+        if search_type in ['all', 'deliveries']:
+            # Search deliveries
+            cursor.execute("""
+                SELECT 
+                    d.id,
+                    d.delivery_date,
+                    d.status,
+                    a.label as address_label,
+                    u.name as driver_name
+                FROM deliveries d
+                JOIN addresses a ON d.address_id = a.id
+                JOIN users u ON d.driver_id = u.id
+                WHERE a.label LIKE %s OR u.name LIKE %s OR d.notes LIKE %s
+                ORDER BY d.delivery_date DESC
+                LIMIT %s
+            """, (f"%{query}%", f"%{query}%", f"%{query}%", limit))
+            
+            results['deliveries'] = cursor.fetchall()
+        
+        if search_type in ['all', 'addresses']:
+            # Search addresses
+            cursor.execute("""
+                SELECT id, label, street_address, city, zip_code
+                FROM addresses
+                WHERE label LIKE %s OR street_address LIKE %s OR city LIKE %s
+                LIMIT %s
+            """, (f"%{query}%", f"%{query}%", f"%{query}%", limit))
+            
+            results['addresses'] = cursor.fetchall()
+        
+        if search_type in ['all', 'drivers']:
+            # Search drivers
+            cursor.execute("""
+                SELECT id, name, email
+                FROM users
+                WHERE role = 'driver' AND active = TRUE
+                AND (name LIKE %s OR email LIKE %s)
+                LIMIT %s
+            """, (f"%{query}%", f"%{query}%", limit))
+            
+            results['drivers'] = cursor.fetchall()
+        
+        cursor.close()
+        return jsonify(results)
+    except Exception as e:
+        logger.error(f"Error performing search: {str(e)}", exc_info=True)
+        return jsonify({"error": _("Error performing search")}), 500
+
+@employee_bp.route('/api/bulk-operations', methods=['POST'])
+@login_required
+@role_required('employee', 'manager')
+def bulk_operations():
+    """Handle bulk operations on deliveries"""
+    try:
+        data = request.get_json()
+        operation = data.get('operation')
+        delivery_ids = data.get('delivery_ids', [])
+        
+        if not operation or not delivery_ids:
+            return jsonify({"error": _("Operation and delivery IDs are required")}), 400
+        
+        cursor = mysql.connection.cursor()
+        success_count = 0
+        
+        if operation == 'cancel':
+            for delivery_id in delivery_ids:
+                cursor.execute("""
+                    UPDATE deliveries 
+                    SET status = 'cancelled', updated_at = NOW()
+                    WHERE id = %s AND status = 'pending'
+                """, (delivery_id,))
+                if cursor.rowcount > 0:
+                    success_count += 1
+        
+        elif operation == 'reschedule':
+            new_date = data.get('new_date')
+            if not new_date:
+                return jsonify({"error": _("New date is required for rescheduling")}), 400
+            
+            for delivery_id in delivery_ids:
+                cursor.execute("""
+                    UPDATE deliveries 
+                    SET delivery_date = %s, updated_at = NOW()
+                    WHERE id = %s AND status = 'pending'
+                """, (new_date, delivery_id))
+                if cursor.rowcount > 0:
+                    success_count += 1
+        
+        elif operation == 'assign_driver':
+            new_driver_id = data.get('driver_id')
+            if not new_driver_id:
+                return jsonify({"error": _("Driver ID is required")}), 400
+            
+            for delivery_id in delivery_ids:
+                cursor.execute("""
+                    UPDATE deliveries 
+                    SET driver_id = %s, updated_at = NOW()
+                    WHERE id = %s AND status = 'pending'
+                """, (new_driver_id, delivery_id))
+                if cursor.rowcount > 0:
+                    success_count += 1
+        
+        else:
+            return jsonify({"error": _("Invalid operation")}), 400
+        
+        mysql.connection.commit()
+        cursor.close()
+        
+        return jsonify({
+            "success": True,
+            "message": _("Successfully updated {} deliveries").format(success_count),
+            "updated_count": success_count
+        })
+    except Exception as e:
+        mysql.connection.rollback()
+        logger.error(f"Error performing bulk operation: {str(e)}", exc_info=True)
+        return jsonify({"error": _("Error performing bulk operation")}), 500
+
+@employee_bp.route('/api/delivery-trends')
+@login_required
+@role_required('employee', 'manager')
+def delivery_trends():
+    """Get delivery trends for analytics"""
+    try:
+        days = int(request.args.get('days', 30))
+        cursor = mysql.connection.cursor()
+        
+        # Get daily delivery counts for the past X days
+        cursor.execute("""
+            SELECT 
+                delivery_date,
+                COUNT(*) as total_deliveries,
+                COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_deliveries,
+                AVG(eta_minutes) as avg_eta
+            FROM deliveries
+            WHERE delivery_date >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
+            GROUP BY delivery_date
+            ORDER BY delivery_date
+        """, (days,))
+        
+        daily_trends = cursor.fetchall()
+        
+        # Get hourly patterns
+        cursor.execute("""
+            SELECT 
+                HOUR(start_time) as hour,
+                COUNT(*) as delivery_count
+            FROM deliveries
+            WHERE delivery_date >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
+            GROUP BY HOUR(start_time)
+            ORDER BY hour
+        """, (days,))
+        
+        hourly_patterns = cursor.fetchall()
+        
+        # Get status distribution
+        cursor.execute("""
+            SELECT 
+                status,
+                COUNT(*) as count
+            FROM deliveries
+            WHERE delivery_date >= DATE_SUB(CURDATE(), INTERVAL %s DAY)
+            GROUP BY status
+        """, (days,))
+        
+        status_distribution = cursor.fetchall()
+        
+        cursor.close()
+        
+        return jsonify({
+            'daily_trends': daily_trends,
+            'hourly_patterns': hourly_patterns,
+            'status_distribution': status_distribution
+        })
+    except Exception as e:
+        logger.error(f"Error fetching delivery trends: {str(e)}", exc_info=True)
+        return jsonify({"error": _("Error fetching trends")}), 500
+
+@employee_bp.route('/api/export-data')
+@login_required
+@role_required('employee', 'manager')
+def export_data():
+    """Export delivery data as CSV"""
+    try:
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        format_type = request.args.get('format', 'csv')
+        
+        if not start_date or not end_date:
+            return jsonify({"error": _("Start and end dates are required")}), 400
+        
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            SELECT 
+                d.id,
+                d.delivery_date,
+                d.start_time,
+                d.end_time,
+                d.status,
+                a.label as address_label,
+                a.street_address,
+                a.city,
+                a.zip_code,
+                u.name as driver_name,
+                d.notes,
+                d.eta_minutes,
+                d.created_at,
+                d.updated_at
+            FROM deliveries d
+            JOIN addresses a ON d.address_id = a.id
+            JOIN users u ON d.driver_id = u.id
+            WHERE d.delivery_date BETWEEN %s AND %s
+            ORDER BY d.delivery_date, d.start_time
+        """, (start_date, end_date))
+        
+        deliveries = cursor.fetchall()
+        cursor.close()
+        
+        if format_type == 'csv':
+            import csv
+            import io
+            
+            output = io.StringIO()
+            writer = csv.writer(output)
+            
+            # Write header
+            writer.writerow([
+                'ID', 'Date', 'Start Time', 'End Time', 'Status',
+                'Address Label', 'Street Address', 'City', 'ZIP Code',
+                'Driver Name', 'Notes', 'ETA (minutes)', 'Created', 'Updated'
+            ])
+            
+            # Write data
+            for delivery in deliveries:
+                writer.writerow([
+                    delivery['id'],
+                    delivery['delivery_date'],
+                    delivery['start_time'],
+                    delivery['end_time'],
+                    delivery['status'],
+                    delivery['address_label'],
+                    delivery['street_address'],
+                    delivery['city'],
+                    delivery['zip_code'],
+                    delivery['driver_name'],
+                    delivery['notes'],
+                    delivery['eta_minutes'],
+                    delivery['created_at'],
+                    delivery['updated_at']
+                ])
+            
+            output_str = output.getvalue()
+            output.close()
+            
+            from flask import Response
+            return Response(
+                output_str,
+                mimetype='text/csv',
+                headers={'Content-Disposition': f'attachment; filename=deliveries_{start_date}_to_{end_date}.csv'}
+            )
+        
+        else:
+            return jsonify({'deliveries': deliveries})
+    
+    except Exception as e:
+        logger.error(f"Error exporting data: {str(e)}", exc_info=True)
+        return jsonify({"error": _("Error exporting data")}), 500

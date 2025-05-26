@@ -1,87 +1,609 @@
 {% extends 'base.html' %}
-
-{% block title %}Employee Schedule{% endblock %}
+{% block title %}{{ _('Schedule Delivery') }}{% endblock %}
 
 {% block content %}
-<h1>Schedule a Delivery</h1>
+<div class="schedule-container">
+  <div class="schedule-header">
+    <h1>{{ _('Schedule New Delivery') }}</h1>
+    <p class="header-subtitle">{{ _('Create and assign delivery routes to drivers') }}</p>
+  </div>
 
-<form id="schedule-form" method="POST" action="/schedule">
-    <!-- Driver Selection -->
-    <label for="driver">Select Driver:</label>
-    <select id="driver" name="driver" required>
-        <option value="">-- Select a Driver --</option>
-        <!-- Options will be dynamically populated -->
-    </select>
+  <div class="schedule-form-container">
+    <form method="POST" class="schedule-form" id="scheduleForm">
+      
+      <!-- Driver Selection -->
+      <div class="form-section">
+        <h3>{{ _('Driver Assignment') }}</h3>
+        <div class="form-group">
+          <label for="driver_id">{{ _('Select Driver:') }}</label>
+          <select id="driver_id" name="driver_id" class="form-control" required>
+            <option value="">{{ _('-- Select a Driver --') }}</option>
+            {% for driver in drivers %}
+              <option value="{{ driver.id }}" data-name="{{ driver.name }}">
+                {{ driver.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
 
-    <!-- Destination Selection -->
-    <label for="destination">Destination:</label>
-    <input id="destination" name="destination" type="text" placeholder="Search for a destination" required>
-    <div id="map" style="height: 400px; width: 100%; margin-top: 10px;"></div>
+      <!-- Address Selection -->
+      <div class="form-section">
+        <h3>{{ _('Delivery Address') }}</h3>
+        <div class="form-group">
+          <label for="address_id">{{ _('Select Address:') }}</label>
+          <select id="address_id" name="address_id" class="form-control" required>
+            <option value="">{{ _('-- Select an Address --') }}</option>
+            {% for address in addresses %}
+              <option value="{{ address.id }}" 
+                      data-label="{{ address.label }}"
+                      data-street="{{ address.street_address }}"
+                      data-city="{{ address.city }}"
+                      data-lat="{{ address.latitude }}"
+                      data-lng="{{ address.longitude }}">
+                {{ address.label }} - {{ address.street_address }}, {{ address.city }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="address-actions">
+          <a href="{{ url_for('employee.addresses') }}" class="btn btn-secondary">
+            {{ _('Manage Addresses') }}
+          </a>
+        </div>
+      </div>
 
-    <!-- Order Details -->
-    <label for="order-details">Order Details / Order Number:</label>
-    <input id="order-details" name="order_details" type="text" placeholder="Enter order details or number" required>
+      <!-- Schedule Details -->
+      <div class="form-section">
+        <h3>{{ _('Schedule Details') }}</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="delivery_date">{{ _('Delivery Date:') }}</label>
+            <input type="date" id="delivery_date" name="delivery_date" 
+                   class="form-control" required min="{{ today }}">
+          </div>
+          <div class="form-group">
+            <label for="start_time">{{ _('Start Time:') }}</label>
+            <input type="time" id="start_time" name="start_time" 
+                   class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="end_time">{{ _('End Time:') }}</label>
+            <input type="time" id="end_time" name="end_time" 
+                   class="form-control" required>
+          </div>
+        </div>
+      </div>
 
-    <!-- Submit Button -->
-    <button type="submit">Schedule Delivery</button>
-</form>
+      <!-- Additional Information -->
+      <div class="form-section">
+        <h3>{{ _('Additional Information') }}</h3>
+        <div class="form-group">
+          <label for="notes">{{ _('Notes:') }}</label>
+          <textarea id="notes" name="notes" class="form-control" 
+                    rows="3" placeholder="{{ _('Enter any special instructions or notes...') }}"></textarea>
+        </div>
+      </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB4ydX5yuWubeVcRF6BwY0AgH1SmFQV3Mw&libraries=places,directions,geometry,visualization"></script>
+      <!-- Route Preview -->
+      <div class="form-section">
+        <h3>{{ _('Route Preview') }}</h3>
+        <div id="routeInfo" class="route-info" style="display: none;">
+          <div class="route-stats">
+            <div class="stat-item">
+              <span class="stat-label">{{ _('Distance:') }}</span>
+              <span id="routeDistance" class="stat-value">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">{{ _('Duration:') }}</span>
+              <span id="routeDuration" class="stat-value">-</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">{{ _('ETA:') }}</span>
+              <span id="routeETA" class="stat-value">-</span>
+            </div>
+          </div>
+        </div>
+        <div id="map" class="delivery-map"></div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <span class="btn-icon">📅</span>
+          {{ _('Schedule Delivery') }}
+        </button>
+        <a href="{{ url_for('employee.calendar') }}" class="btn btn-secondary">
+          {{ _('Cancel') }}
+        </a>
+        <button type="button" class="btn btn-info" onclick="optimizeSchedule()">
+          <span class="btn-icon">🚀</span>
+          {{ _('Optimize Route') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.schedule-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.schedule-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.schedule-header h1 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.header-subtitle {
+  color: #666;
+  font-size: 16px;
+}
+
+.schedule-form-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+}
+
+.form-section {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.form-section h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #2196F3;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+}
+
+.form-control:invalid {
+  border-color: #f44336;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.address-actions {
+  margin-top: 15px;
+}
+
+.route-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.route-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.delivery-map {
+  height: 400px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 30px;
+  padding-top: 30px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.btn-primary {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+}
+
+.btn-info {
+  background: #17a2b8;
+  color: white;
+}
+
+.btn-info:hover {
+  background: #138496;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  font-size: 16px;
+}
+
+/* Loading states */
+.loading {
+  position: relative;
+  color: transparent;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .schedule-container {
+    padding: 15px;
+  }
+  
+  .schedule-form-container {
+    padding: 20px;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .route-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .delivery-map {
+    height: 300px;
+  }
+}
+</style>
+
 <script>
-    let map;
-    let marker;
-    let autocomplete;
-    let directionsService;
-    let directionsRenderer;
+let map;
+let warehouseMarker;
+let destinationMarker;
+let directionsService;
+let directionsRenderer;
 
-    function initMap() {
-        const warehouseLocation = { lat: 50.0614508, lng: 14.3062742 }; // Updated warehouse coordinates
+// Initialize form
+document.addEventListener('DOMContentLoaded', function() {
+  initForm();
+  initMap();
+});
 
-        map = new google.maps.Map(document.getElementById('map'), {
-            center: warehouseLocation,
-            zoom: 12,
-        });
+function initForm() {
+  // Set minimum date to today
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('delivery_date').min = today;
+  document.getElementById('delivery_date').value = today;
+  
+  // Set default time
+  const now = new Date();
+  const currentTime = now.toTimeString().slice(0, 5);
+  const endTime = new Date(now.getTime() + 2 * 60 * 60 * 1000).toTimeString().slice(0, 5);
+  
+  document.getElementById('start_time').value = currentTime;
+  document.getElementById('end_time').value = endTime;
+  
+  // Add event listeners
+  document.getElementById('address_id').addEventListener('change', updateRoutePreview);
+  document.getElementById('start_time').addEventListener('change', calculateETA);
+  document.getElementById('scheduleForm').addEventListener('submit', handleSubmit);
+}
 
-        marker = new google.maps.Marker({
-            position: warehouseLocation,
-            map: map,
-            title: 'Warehouse',
-        });
-
-        directionsService = new google.maps.DirectionsService();
-        directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
-
-        autocomplete = new google.maps.places.Autocomplete(
-            document.getElementById('destination')
-        );
-
-        autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (place.geometry) {
-                map.setCenter(place.geometry.location);
-                marker.setPosition(place.geometry.location);
-                calculateRoute(warehouseLocation, place.geometry.location);
-            }
-        });
+function initMap() {
+  const warehouseLocation = { lat: 50.0755, lng: 14.4378 }; // Prague coordinates
+  
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: warehouseLocation,
+    zoom: 11,
+    styles: [
+      {
+        featureType: 'poi',
+        elementType: 'labels',
+        stylers: [{ visibility: 'off' }]
+      }
+    ]
+  });
+  
+  warehouseMarker = new google.maps.Marker({
+    position: warehouseLocation,
+    map: map,
+    title: '{{ _("Warehouse") }}',
+    icon: {
+      url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23FF5722"%3E%3Cpath d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/%3E%3C/svg%3E',
+      scaledSize: new google.maps.Size(30, 30),
+      anchor: new google.maps.Point(15, 15)
     }
-
-    function calculateRoute(origin, destination) {
-        const request = {
-            origin: origin,
-            destination: destination,
-            travelMode: 'DRIVING',
-        };
-
-        directionsService.route(request, (result, status) => {
-            if (status === 'OK') {
-                directionsRenderer.setDirections(result);
-            } else {
-                alert('Could not calculate route: ' + status);
-            }
-        });
+  });
+  
+  directionsService = new google.maps.DirectionsService();
+  directionsRenderer = new google.maps.DirectionsRenderer({
+    suppressMarkers: false,
+    polylineOptions: {
+      strokeColor: '#2196F3',
+      strokeWeight: 4,
+      strokeOpacity: 0.8
     }
+  });
+  directionsRenderer.setMap(map);
+}
 
-    window.onload = initMap;
+function updateRoutePreview() {
+  const addressSelect = document.getElementById('address_id');
+  const selectedOption = addressSelect.options[addressSelect.selectedIndex];
+  
+  if (selectedOption.value) {
+    const lat = parseFloat(selectedOption.dataset.lat);
+    const lng = parseFloat(selectedOption.dataset.lng);
+    const destination = { lat: lat, lng: lng };
+    
+    // Update destination marker
+    if (destinationMarker) {
+      destinationMarker.setMap(null);
+    }
+    
+    destinationMarker = new google.maps.Marker({
+      position: destination,
+      map: map,
+      title: selectedOption.dataset.label,
+      icon: {
+        url: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="%23F44336"%3E%3Cpath d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/%3E%3C/svg%3E',
+        scaledSize: new google.maps.Size(30, 30),
+        anchor: new google.maps.Point(15, 30)
+      }
+    });
+    
+    calculateRoute(destination);
+  } else {
+    // Clear route
+    directionsRenderer.setDirections({routes: []});
+    if (destinationMarker) {
+      destinationMarker.setMap(null);
+    }
+    document.getElementById('routeInfo').style.display = 'none';
+  }
+}
+
+function calculateRoute(destination) {
+  const warehouseLocation = { lat: 50.0755, lng: 14.4378 };
+  
+  const request = {
+    origin: warehouseLocation,
+    destination: destination,
+    travelMode: google.maps.TravelMode.DRIVING,
+    unitSystem: google.maps.UnitSystem.METRIC,
+    avoidHighways: false,
+    avoidTolls: false
+  };
+  
+  directionsService.route(request, (result, status) => {
+    if (status === 'OK') {
+      directionsRenderer.setDirections(result);
+      
+      const route = result.routes[0];
+      const leg = route.legs[0];
+      
+      document.getElementById('routeDistance').textContent = leg.distance.text;
+      document.getElementById('routeDuration').textContent = leg.duration.text;
+      
+      calculateETA();
+      document.getElementById('routeInfo').style.display = 'block';
+    } else {
+      console.error('Directions request failed due to ' + status);
+      document.getElementById('routeInfo').style.display = 'none';
+    }
+  });
+}
+
+function calculateETA() {
+  const startTimeInput = document.getElementById('start_time');
+  const durationElement = document.getElementById('routeDuration');
+  
+  if (startTimeInput.value && durationElement.textContent !== '-') {
+    const startTime = new Date();
+    const [hours, minutes] = startTimeInput.value.split(':');
+    startTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    
+    // Extract duration in minutes from text like "25 mins"
+    const durationText = durationElement.textContent;
+    const durationMatch = durationText.match(/(\d+)\s*(min|hour)/gi);
+    let totalMinutes = 0;
+    
+    if (durationMatch) {
+      durationMatch.forEach(match => {
+        const value = parseInt(match);
+        if (match.includes('hour')) {
+          totalMinutes += value * 60;
+        } else {
+          totalMinutes += value;
+        }
+      });
+    }
+    
+    const eta = new Date(startTime.getTime() + totalMinutes * 60000);
+    document.getElementById('routeETA').textContent = eta.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  }
+}
+
+function optimizeSchedule() {
+  const driverId = document.getElementById('driver_id').value;
+  const deliveryDate = document.getElementById('delivery_date').value;
+  
+  if (!driverId || !deliveryDate) {
+    alert('{{ _("Please select a driver and date first") }}');
+    return;
+  }
+  
+  const btn = event.target;
+  btn.classList.add('loading');
+  btn.disabled = true;
+  
+  fetch(`/employee/api/optimize-route/${driverId}?date=${deliveryDate}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(`{{ _("Error:") }} ${data.error}`);
+      } else {
+        alert(`{{ _("Route optimized!") }} ${data.length} {{ _("deliveries found for optimization.") }}`);
+      }
+    })
+    .catch(error => {
+      alert(`{{ _("Error optimizing route:") }} ${error}`);
+    })
+    .finally(() => {
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    });
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  
+  // Validate form
+  const form = event.target;
+  if (!form.checkValidity()) {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    return;
+  }
+  
+  // Submit form
+  setTimeout(() => {
+    form.submit();
+  }, 500);
+}
+
+// Load Google Maps API
+function loadGoogleMaps() {
+  const script = document.createElement('script');
+  script.src = 'https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places,directions,geometry&callback=initMap';
+  script.async = true;
+  script.defer = true;
+  document.head.appendChild(script);
+}
+
+// Initialize Google Maps when DOM is ready
+if (typeof google === 'undefined') {
+  loadGoogleMaps();
+}
 </script>
+
 {% endblock %}

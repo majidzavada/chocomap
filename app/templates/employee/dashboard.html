@@ -1,83 +1,679 @@
 {% extends 'base.html' %}
 {% block title %}{{ _('Employee Dashboard') }}{% endblock %}
-{% block content %}
-<div class="dashboard-box">
-  <h2>{{ _('Employee Dashboard') }}</h2>
 
-  <div class="stats">
-    <div class="stat-item">
-      <strong>{{ _('Today\'s Deliveries') }}</strong><br>
-      {{ today_count }}
+{% block content %}
+<div class="employee-dashboard">
+  <div class="dashboard-header">
+    <h1>{{ _('Employee Dashboard') }}</h1>
+    <p class="welcome-message">{{ _('Welcome back! Here\'s what\'s happening today.') }}</p>
+  </div>
+
+  <!-- Quick Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card today">
+      <div class="stat-icon">📅</div>
+      <div class="stat-content">
+        <h3>{{ today_count }}</h3>
+        <p>{{ _('Today\'s Deliveries') }}</p>
+      </div>
     </div>
-    <div class="stat-item">
-      <strong>{{ _('This Week') }}</strong><br>
-      {{ week_count }}
+    
+    <div class="stat-card week">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <h3>{{ week_count }}</h3>
+        <p>{{ _('This Week') }}</p>
+      </div>
     </div>
-    <div class="stat-item">
-      <strong>{{ _('Upcoming Delivery') }}</strong><br>
-      {% if next_delivery %}
-        {{ next_delivery.delivery_date }} — {{ next_delivery.label }}
-      {% else %}
-        {{ _('None') }}
-      {% endif %}
+    
+    <div class="stat-card month">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <h3>{{ month_count }}</h3>
+        <p>{{ _('This Month') }}</p>
+      </div>
+    </div>
+    
+    <div class="stat-card drivers">
+      <div class="stat-icon">🚛</div>
+      <div class="stat-content">
+        <h3>{{ active_drivers }}</h3>
+        <p>{{ _('Active Drivers') }}</p>
+      </div>
     </div>
   </div>
 
-  <div class="dashboard-links">
-    <a href="{{ url_for('employee.schedule') }}">{{ _('📅 Schedule a Delivery') }}</a>
-    <a href="{{ url_for('employee.addresses') }}">{{ _('🏠 Manage Addresses') }}</a>
-    <a href="{{ url_for('employee.calendar') }}">{{ _('📆 View Calendar') }}</a>
+  <!-- Main Content Grid -->
+  <div class="dashboard-grid">
+    
+    <!-- Next Delivery Card -->
+    <div class="dashboard-card next-delivery">
+      <h3>{{ _('Next Upcoming Delivery') }}</h3>
+      {% if next_delivery %}
+        <div class="next-delivery-info">
+          <div class="delivery-time">
+            <strong>{{ next_delivery.delivery_date }}</strong> at {{ next_delivery.start_time }}
+          </div>
+          <div class="delivery-details">
+            <p><strong>{{ _('Location:') }}</strong> {{ next_delivery.label }}</p>
+            <p><strong>{{ _('Driver:') }}</strong> {{ next_delivery.driver_name }}</p>
+          </div>
+          <a href="{{ url_for('employee.calendar') }}" class="btn btn-primary">{{ _('View Details') }}</a>
+        </div>
+      {% else %}
+        <div class="no-deliveries">
+          <p>{{ _('No upcoming deliveries scheduled') }}</p>
+          <a href="{{ url_for('employee.schedule') }}" class="btn btn-secondary">{{ _('Schedule New Delivery') }}</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Today's Status Breakdown -->
+    <div class="dashboard-card status-breakdown">
+      <h3>{{ _('Today\'s Delivery Status') }}</h3>
+      {% if status_breakdown %}
+        <div class="status-chart">
+          {% for status, count in status_breakdown.items() %}
+            <div class="status-item status-{{ status }}">
+              <span class="status-label">{{ _(status.title()) }}</span>
+              <span class="status-count">{{ count }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="no-data">{{ _('No deliveries scheduled for today') }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="dashboard-card recent-activity">
+      <h3>{{ _('Recent Deliveries') }}</h3>
+      {% if recent_deliveries %}
+        <div class="activity-list">
+          {% for delivery in recent_deliveries %}
+            <div class="activity-item">
+              <div class="activity-icon status-{{ delivery.status }}"></div>
+              <div class="activity-content">
+                <p class="activity-title">{{ delivery.address_label }}</p>
+                <p class="activity-meta">
+                  {{ delivery.driver_name }} • {{ delivery.delivery_date }}
+                  <span class="status-badge status-{{ delivery.status }}">{{ _(delivery.status.title()) }}</span>
+                </p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <a href="{{ url_for('employee.calendar') }}" class="view-all-link">{{ _('View All Deliveries') }}</a>
+      {% else %}
+        <p class="no-data">{{ _('No recent deliveries') }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="dashboard-card quick-actions">
+      <h3>{{ _('Quick Actions') }}</h3>
+      <div class="action-buttons">
+        <a href="{{ url_for('employee.schedule') }}" class="action-btn schedule">
+          <span class="action-icon">📅</span>
+          <span class="action-text">{{ _('Schedule Delivery') }}</span>
+        </a>
+        <a href="{{ url_for('employee.addresses') }}" class="action-btn addresses">
+          <span class="action-icon">🏠</span>
+          <span class="action-text">{{ _('Manage Addresses') }}</span>
+        </a>
+        <a href="{{ url_for('employee.calendar') }}" class="action-btn calendar">
+          <span class="action-icon">📆</span>
+          <span class="action-text">{{ _('View Calendar') }}</span>
+        </a>
+        <a href="#" class="action-btn reports" onclick="showReports()">
+          <span class="action-icon">📊</span>
+          <span class="action-text">{{ _('Generate Report') }}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Weekly Trend Chart -->
+    <div class="dashboard-card trend-chart">
+      <h3>{{ _('Weekly Delivery Trend') }}</h3>
+      <div class="chart-container">
+        <canvas id="weeklyTrendChart" width="400" height="200"></canvas>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeReports()">&times;</span>
+    <h3>{{ _('Generate Delivery Report') }}</h3>
+    <form id="reportForm">
+      <div class="form-group">
+        <label for="startDate">{{ _('Start Date:') }}</label>
+        <input type="date" id="startDate" name="start_date" required>
+      </div>
+      <div class="form-group">
+        <label for="endDate">{{ _('End Date:') }}</label>
+        <input type="date" id="endDate" name="end_date" required>
+      </div>
+      <button type="submit" class="btn btn-primary">{{ _('Generate Report') }}</button>
+    </form>
+    <div id="reportResults"></div>
   </div>
 </div>
 
 <style>
-  .dashboard-box {
-    max-width: 800px;
-    margin: auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    text-align: center;
-  }
+.employee-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-  .stats {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-  }
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
 
-  .stat-item {
-    background: #eee;
-    padding: 1rem;
-    border-radius: 8px;
-    width: 30%;
-    margin: 0.5rem;
-  }
+.dashboard-header h1 {
+  color: #333;
+  margin-bottom: 10px;
+}
 
-  .dashboard-links a {
-    display: inline-block;
-    margin: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background-color: #6a1b9a;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
-  }
+.welcome-message {
+  color: #666;
+  font-size: 16px;
+}
 
-  .dashboard-links a:hover {
-    background-color: #4a0e6b;
-  }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
 
-  @media (max-width: 600px) {
-    .stats {
-      flex-direction: column;
-    }
-    .stat-item {
-      width: 100%;
-    }
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+  font-size: 48px;
+  margin-right: 20px;
+}
+
+.stat-content h3 {
+  font-size: 32px;
+  margin: 0;
+  color: #333;
+}
+
+.stat-content p {
+  margin: 5px 0 0;
+  color: #666;
+  font-weight: 500;
+}
+
+.stat-card.today { border-left: 5px solid #4CAF50; }
+.stat-card.week { border-left: 5px solid #2196F3; }
+.stat-card.month { border-left: 5px solid #FF9800; }
+.stat-card.drivers { border-left: 5px solid #9C27B0; }
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.dashboard-card h3 {
+  margin: 0 0 20px;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 10px;
+}
+
+.next-delivery-info {
+  text-align: center;
+}
+
+.delivery-time {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #2196F3;
+}
+
+.delivery-details {
+  margin-bottom: 20px;
+}
+
+.delivery-details p {
+  margin: 8px 0;
+  color: #555;
+}
+
+.no-deliveries {
+  text-align: center;
+  color: #666;
+}
+
+.status-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.status-pending { background: #fff3cd; color: #856404; }
+.status-in_progress { background: #d1ecf1; color: #0c5460; }
+.status-completed { background: #d4edda; color: #155724; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+
+.activity-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-title {
+  font-weight: 600;
+  margin: 0 0 5px;
+  color: #333;
+}
+
+.activity-meta {
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.view-all-link {
+  display: block;
+  text-align: center;
+  margin-top: 15px;
+  color: #2196F3;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.view-all-link:hover {
+  text-decoration: underline;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.action-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.action-text {
+  font-weight: 500;
+  text-align: center;
+}
+
+.chart-container {
+  position: relative;
+  height: 200px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1976D2;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 30px;
+  border-radius: 12px;
+  width: 80%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.close:hover {
+  color: #000;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-buttons {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 5% auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .employee-dashboard {
+    padding: 10px;
+  }
+  
+  .stat-card {
+    padding: 15px;
+  }
+  
+  .stat-icon {
+    font-size: 36px;
+  }
+  
+  .stat-content h3 {
+    font-size: 24px;
+  }
+  
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+}
 </style>
+
+<script>
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+  initWeeklyTrendChart();
+  setDefaultDates();
+});
+
+function initWeeklyTrendChart() {
+  const canvas = document.getElementById('weeklyTrendChart');
+  if (!canvas) return;
+  
+  const ctx = canvas.getContext('2d');
+  const weeklyData = {{ weekly_trend | tojson | safe }};
+  
+  // Simple chart implementation
+  const labels = weeklyData.map(item => {
+    const date = new Date(item.delivery_date);
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  });
+  const data = weeklyData.map(item => item.count);
+  
+  drawSimpleChart(ctx, labels, data, canvas.width, canvas.height);
+}
+
+function drawSimpleChart(ctx, labels, data, width, height) {
+  const padding = 40;
+  const chartWidth = width - 2 * padding;
+  const chartHeight = height - 2 * padding;
+  
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+  
+  if (data.length === 0) {
+    ctx.fillStyle = '#666';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('No data available', width / 2, height / 2);
+    return;
+  }
+  
+  const maxValue = Math.max(...data, 1);
+  const stepX = chartWidth / (data.length - 1 || 1);
+  
+  // Draw axes
+  ctx.strokeStyle = '#ddd';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, height - padding);
+  ctx.lineTo(width - padding, height - padding);
+  ctx.stroke();
+  
+  // Draw data line
+  ctx.strokeStyle = '#2196F3';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  
+  data.forEach((value, index) => {
+    const x = padding + index * stepX;
+    const y = height - padding - (value / maxValue) * chartHeight;
+    
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+    
+    // Draw data points
+    ctx.fillStyle = '#2196F3';
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+  
+  ctx.stroke();
+  
+  // Draw labels
+  ctx.fillStyle = '#666';
+  ctx.font = '12px Arial';
+  ctx.textAlign = 'center';
+  
+  labels.forEach((label, index) => {
+    const x = padding + index * stepX;
+    ctx.fillText(label, x, height - 10);
+  });
+}
+
+function showReports() {
+  document.getElementById('reportModal').style.display = 'block';
+}
+
+function closeReports() {
+  document.getElementById('reportModal').style.display = 'none';
+}
+
+function setDefaultDates() {
+  const today = new Date();
+  const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+  
+  document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
+  document.getElementById('endDate').value = today.toISOString().split('T')[0];
+}
+
+// Handle report form submission
+document.getElementById('reportForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  
+  fetch(`/employee/api/delivery-stats?start_date=${startDate}&end_date=${endDate}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        document.getElementById('reportResults').innerHTML = 
+          `<div class="alert alert-danger">${data.error}</div>`;
+      } else {
+        document.getElementById('reportResults').innerHTML = `
+          <div class="report-results">
+            <h4>{{ _('Delivery Report') }}</h4>
+            <div class="report-stats">
+              <p><strong>{{ _('Total Deliveries:') }}</strong> ${data.total_deliveries || 0}</p>
+              <p><strong>{{ _('Completed:') }}</strong> ${data.completed_deliveries || 0}</p>
+              <p><strong>{{ _('Cancelled:') }}</strong> ${data.cancelled_deliveries || 0}</p>
+              <p><strong>{{ _('Average Processing Time:') }}</strong> ${Math.round(data.avg_processing_time || 0)} {{ _('minutes') }}</p>
+              <p><strong>{{ _('Average ETA:') }}</strong> ${Math.round(data.avg_eta || 0)} {{ _('minutes') }}</p>
+            </div>
+          </div>
+        `;
+      }
+    })
+    .catch(error => {
+      document.getElementById('reportResults').innerHTML = 
+        `<div class="alert alert-danger">{{ _('Error generating report') }}</div>`;
+    });
+});
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  const modal = document.getElementById('reportModal');
+  if (event.target === modal) {
+    modal.style.display = 'none';
+  }
+}
+
+// Auto-refresh data every 5 minutes
+setInterval(() => {
+  location.reload();
+}, 5 * 60 * 1000);
+</script>
+
 {% endblock %}

@@ -232,3 +232,138 @@ class DeliveryService:
             }
         finally:
             cursor.close()
+
+    @staticmethod
+    def get_all_deliveries_grouped(driver_filter=None, date_filter=None):
+        """Get all deliveries grouped by date and driver"""
+        cursor = mysql.connection.cursor()
+        try:
+            query = """
+                SELECT d.*, u.name AS driver_name, a.label, a.street_address, a.city
+                FROM deliveries d
+                JOIN users u ON d.driver_id = u.id
+                JOIN addresses a ON d.address_id = a.id
+            """
+            conditions = []
+            params = []
+
+            if driver_filter:
+                conditions.append("u.name LIKE %s")
+                params.append(f"%{driver_filter}%")
+            if date_filter:
+                conditions.append("d.delivery_date = %s")
+                params.append(date_filter)
+
+            if conditions:
+                query += " WHERE " + " AND ".join(conditions)
+
+            query += " ORDER BY d.delivery_date, d.start_time"
+            cursor.execute(query, tuple(params))
+            deliveries = cursor.fetchall()
+
+            # Format datetime fields
+            for delivery in deliveries:
+                delivery['created_at'] = format_datetime(delivery['created_at'])
+                delivery['updated_at'] = format_datetime(delivery['updated_at'])
+                delivery['delivery_date'] = format_datetime(delivery['delivery_date'])
+                if delivery['start_time']:
+                    delivery['start_time'] = format_datetime(delivery['start_time'])
+                if delivery['end_time']:
+                    delivery['end_time'] = format_datetime(delivery['end_time'])
+
+            # Group by date and driver
+            grouped = {}
+            for d in deliveries:
+                key = (d['delivery_date'], d['driver_name'])
+                if key not in grouped:
+                    grouped[key] = []
+                grouped[key].append(d)
+            
+            return grouped
+        except Exception as e:
+            logger.error(f"Error getting grouped deliveries: {str(e)}")
+            return {}
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def get_delivery_by_id(delivery_id: int) -> Optional[Dict[str, Any]]:
+        """Get a single delivery by ID"""
+        cursor = mysql.connection.cursor()
+        try:
+            cursor.execute("""
+                SELECT 
+                    d.*,
+                    a.label as address_label,
+                    a.street_address,
+                    a.city,
+                    a.latitude,
+                    a.longitude,
+                    u.name as driver_name
+                FROM deliveries d
+                JOIN addresses a ON d.address_id = a.id
+                JOIN users u ON d.driver_id = u.id
+                WHERE d.id = %s
+            """, (delivery_id,))
+            
+            delivery = cursor.fetchone()
+            if delivery:
+                # Format datetime fields
+                delivery['created_at'] = format_datetime(delivery['created_at'])
+                delivery['updated_at'] = format_datetime(delivery['updated_at'])
+                delivery['delivery_date'] = format_datetime(delivery['delivery_date'])
+                if delivery['start_time']:
+                    delivery['start_time'] = format_datetime(delivery['start_time'])
+                if delivery['end_time']:
+                    delivery['end_time'] = format_datetime(delivery['end_time'])
+            
+            return delivery
+        except Exception as e:
+            logger.error(f"Error getting delivery by ID: {str(e)}")
+            return None
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def update_delivery(
+        delivery_id: int,
+        driver_id: int,
+        address_id: int,
+        date: str,
+        start_time: str,
+        end_time: str,
+        notes: str
+    ) -> bool:
+        """Update an existing delivery"""
+        cursor = mysql.connection.cursor()
+        try:
+            cursor.execute("""
+                UPDATE deliveries 
+                SET driver_id = %s, address_id = %s, delivery_date = %s,
+                    start_time = %s, end_time = %s, notes = %s, updated_at = NOW()
+                WHERE id = %s
+            """, (driver_id, address_id, date, start_time, end_time, notes, delivery_id))
+            
+            mysql.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            mysql.connection.rollback()
+            logger.error(f"Error updating delivery: {str(e)}")
+            return False
+        finally:
+            cursor.close()
+
+    @staticmethod
+    def delete_delivery(delivery_id: int) -> bool:
+        """Delete a delivery"""
+        cursor = mysql.connection.cursor()
+        try:
+            cursor.execute("DELETE FROM deliveries WHERE id = %s", (delivery_id,))
+            mysql.connection.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            mysql.connection.rollback()
+            logger.error(f"Error deleting delivery: {str(e)}")
+            return False
+        finally:
+            cursor.close()

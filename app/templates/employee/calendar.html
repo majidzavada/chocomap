@@ -1,26 +1,597 @@
 {% extends 'base.html' %}
-{% block title %}{{ _('Weekly Delivery Calendar') }}{% endblock %}
+{% block title %}{{ _('Delivery Calendar') }}{% endblock %}
+
 {% block content %}
-<h2>{{ _('Delivery Calendar') }}</h2>
+<div class="calendar-container">
+  <div class="calendar-header">
+    <h1>{{ _('Delivery Calendar') }}</h1>
+    <div class="calendar-actions">
+      <button class="btn btn-primary" onclick="showScheduleModal()">
+        <i class="icon">➕</i> {{ _('Schedule New Delivery') }}
+      </button>
+      <button class="btn btn-secondary" onclick="exportCalendar()">
+        <i class="icon">📊</i> {{ _('Export') }}
+      </button>
+    </div>
+  </div>
 
-<form method="GET">
-  <input type="text" name="driver" placeholder="{{ _('Filter by driver') }}">
-  <input type="date" name="date" placeholder="{{ _('Filter by date') }}">
-  <button type="submit">{{ _('Apply Filters') }}</button>
-</form>
+  <!-- Advanced Filters -->
+  <div class="filters-section">
+    <form method="GET" class="filters-form">
+      <div class="filter-group">
+        <label for="driver">{{ _('Driver:') }}</label>
+        <select name="driver" id="driver" class="form-control">
+          <option value="">{{ _('All Drivers') }}</option>
+          {% for driver in drivers %}
+            <option value="{{ driver.name }}" {% if request.args.get('driver') == driver.name %}selected{% endif %}>
+              {{ driver.name }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="filter-group">
+        <label for="date">{{ _('Date:') }}</label>
+        <input type="date" name="date" id="date" class="form-control" 
+               value="{{ request.args.get('date', '') }}">
+      </div>
+      
+      <div class="filter-group">
+        <label for="status">{{ _('Status:') }}</label>
+        <select name="status" id="status" class="form-control">
+          <option value="">{{ _('All Statuses') }}</option>
+          <option value="pending" {% if request.args.get('status') == 'pending' %}selected{% endif %}>
+            {{ _('Pending') }}
+          </option>
+          <option value="in_progress" {% if request.args.get('status') == 'in_progress' %}selected{% endif %}>
+            {{ _('In Progress') }}
+          </option>
+          <option value="completed" {% if request.args.get('status') == 'completed' %}selected{% endif %}>
+            {{ _('Completed') }}
+          </option>
+          <option value="cancelled" {% if request.args.get('status') == 'cancelled' %}selected{% endif %}>
+            {{ _('Cancelled') }}
+          </option>
+        </select>
+      </div>
+      
+      <div class="filter-actions">
+        <button type="submit" class="btn btn-primary">{{ _('Apply Filters') }}</button>
+        <a href="{{ url_for('employee.calendar') }}" class="btn btn-secondary">{{ _('Clear') }}</a>
+      </div>
+    </form>
+  </div>
 
-{% for (date, driver), entries in schedule.items() %}
-  <h3>{{ date }} – {{ driver }}</h3>
-  <ul>
-    {% for d in entries %}
-      <li>
-        {{ d['start_time'] }} → {{ d['end_time'] }}:
-        {{ d['label'] }} – {{ d['street_address'] }}
-        [{{ d['status'] }}]
-        <a href="{{ url_for('employee.delete_delivery_route', delivery_id=d['id']) }}">🗑️</a>
-        <a href="{{ url_for('employee.edit_delivery', delivery_id=d['id']) }}">✏️</a>
-      </li>
-    {% endfor %}
-  </ul>
-{% endfor %}
+  <!-- Calendar Grid -->
+  <div class="calendar-grid">
+    {% if schedule %}
+      {% for (date, driver), entries in schedule.items() %}
+        <div class="calendar-day-group">
+          <div class="day-header">
+            <h3 class="day-title">
+              <span class="date">{{ date }}</span>
+              <span class="driver">{{ driver }}</span>
+            </h3>
+            <div class="day-stats">
+              <span class="delivery-count">{{ entries|length }} {{ _('deliveries') }}</span>
+            </div>
+          </div>
+          
+          <div class="deliveries-list">
+            {% for delivery in entries %}
+              <div class="delivery-card status-{{ delivery.status }}">
+                <div class="delivery-time">
+                  <span class="start-time">{{ delivery.start_time }}</span>
+                  <span class="separator">→</span>
+                  <span class="end-time">{{ delivery.end_time }}</span>
+                </div>
+                
+                <div class="delivery-info">
+                  <h4 class="address-label">{{ delivery.label }}</h4>
+                  <p class="address-details">{{ delivery.street_address }}</p>
+                  {% if delivery.city %}
+                    <p class="address-city">{{ delivery.city }}</p>
+                  {% endif %}
+                </div>
+                
+                <div class="delivery-status">
+                  <span class="status-badge status-{{ delivery.status }}">
+                    {{ _(delivery.status.title()) }}
+                  </span>
+                </div>
+                
+                <div class="delivery-actions">
+                  <button class="action-btn edit" onclick="editDelivery({{ delivery.id }})" title="{{ _('Edit') }}">
+                    ✏️
+                  </button>
+                  <button class="action-btn delete" onclick="confirmDelete({{ delivery.id }})" title="{{ _('Delete') }}">
+                    🗑️
+                  </button>
+                  <button class="action-btn optimize" onclick="optimizeRoute({{ delivery.driver_id }}, '{{ delivery.delivery_date }}')" title="{{ _('Optimize Route') }}">
+                    🗺️
+                  </button>
+                </div>
+                
+                {% if delivery.notes %}
+                  <div class="delivery-notes">
+                    <small>{{ _('Notes:') }} {{ delivery.notes }}</small>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-deliveries">
+        <div class="no-data-icon">📅</div>
+        <h3>{{ _('No deliveries found') }}</h3>
+        <p>{{ _('No deliveries match your current filters.') }}</p>
+        <a href="{{ url_for('employee.schedule') }}" class="btn btn-primary">
+          {{ _('Schedule First Delivery') }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Schedule Modal -->
+<div id="scheduleModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeScheduleModal()">&times;</span>
+    <h3>{{ _('Schedule New Delivery') }}</h3>
+    <iframe src="{{ url_for('employee.schedule') }}" width="100%" height="500px" frameborder="0"></iframe>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <span class="close" onclick="closeDeleteModal()">&times;</span>
+    <h3>{{ _('Confirm Deletion') }}</h3>
+    <p>{{ _('Are you sure you want to delete this delivery? This action cannot be undone.') }}</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="deleteDelivery()">{{ _('Yes, Delete') }}</button>
+      <button class="btn btn-secondary" onclick="closeDeleteModal()">{{ _('Cancel') }}</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.calendar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.calendar-header h1 {
+  color: #333;
+  margin: 0;
+}
+
+.calendar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.filters-section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  margin-bottom: 30px;
+}
+
+.filters-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  align-items: end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-control {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #2196F3;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.calendar-grid {
+  display: grid;
+  gap: 30px;
+}
+
+.calendar-day-group {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.day-header {
+  background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.day-title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.date {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.driver {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.delivery-count {
+  background: rgba(255,255,255,0.2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.deliveries-list {
+  padding: 20px;
+  display: grid;
+  gap: 15px;
+}
+
+.delivery-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.delivery-card:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.delivery-card.status-pending { border-left: 4px solid #ff9800; }
+.delivery-card.status-in_progress { border-left: 4px solid #2196f3; }
+.delivery-card.status-completed { border-left: 4px solid #4caf50; }
+.delivery-card.status-cancelled { border-left: 4px solid #f44336; }
+
+.delivery-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.separator {
+  color: #666;
+}
+
+.delivery-info h4 {
+  margin: 0 0 8px;
+  color: #333;
+  font-size: 16px;
+}
+
+.delivery-info p {
+  margin: 4px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.delivery-status {
+  margin: 15px 0;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge.status-pending { background: #fff3cd; color: #856404; }
+.status-badge.status-in_progress { background: #d1ecf1; color: #0c5460; }
+.status-badge.status-completed { background: #d4edda; color: #155724; }
+.status-badge.status-cancelled { background: #f8d7da; color: #721c24; }
+
+.delivery-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.action-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+.action-btn:hover {
+  background: #e9ecef;
+  transform: translateY(-1px);
+}
+
+.action-btn.edit:hover { background: #d1ecf1; }
+.action-btn.delete:hover { background: #f8d7da; }
+.action-btn.optimize:hover { background: #d4edda; }
+
+.delivery-notes {
+  margin-top: 10px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #2196F3;
+}
+
+.no-deliveries {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.no-data-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: #2196F3;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #1976D2;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #545b62;
+}
+
+.btn-danger {
+  background: #f44336;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #d32f2f;
+}
+
+.icon {
+  font-size: 16px;
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.close {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #aaa;
+}
+
+.close:hover {
+  color: #000;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .calendar-header {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .filters-form {
+    grid-template-columns: 1fr;
+  }
+  
+  .filter-actions {
+    justify-content: center;
+  }
+  
+  .day-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .delivery-actions {
+    justify-content: center;
+  }
+  
+  .modal-content {
+    width: 95%;
+    margin: 5% auto;
+    padding: 20px;
+  }
+}
+</style>
+
+<script>
+let deleteDeliveryId = null;
+
+function showScheduleModal() {
+  document.getElementById('scheduleModal').style.display = 'flex';
+}
+
+function closeScheduleModal() {
+  document.getElementById('scheduleModal').style.display = 'none';
+}
+
+function editDelivery(deliveryId) {
+  window.location.href = `/employee/delivery/${deliveryId}/edit`;
+}
+
+function confirmDelete(deliveryId) {
+  deleteDeliveryId = deliveryId;
+  document.getElementById('deleteModal').style.display = 'flex';
+}
+
+function closeDeleteModal() {
+  document.getElementById('deleteModal').style.display = 'none';
+  deleteDeliveryId = null;
+}
+
+function deleteDelivery() {
+  if (deleteDeliveryId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/employee/delivery/${deleteDeliveryId}/delete`;
+    document.body.appendChild(form);
+    form.submit();
+  }
+}
+
+function optimizeRoute(driverId, date) {
+  fetch(`/employee/api/optimize-route/${driverId}?date=${date}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert(`{{ _('Error:') }} ${data.error}`);
+      } else {
+        alert(`{{ _('Route optimized successfully!') }} ${data.length} {{ _('deliveries reordered.') }}`);
+        location.reload();
+      }
+    })
+    .catch(error => {
+      alert(`{{ _('Error optimizing route:') }} ${error}`);
+    });
+}
+
+function exportCalendar() {
+  const params = new URLSearchParams(window.location.search);
+  const startDate = params.get('date') || new Date().toISOString().split('T')[0];
+  const endDate = startDate; // For now, export single day
+  
+  window.location.href = `/employee/api/export-data?start_date=${startDate}&end_date=${endDate}&format=csv`;
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+  const scheduleModal = document.getElementById('scheduleModal');
+  const deleteModal = document.getElementById('deleteModal');
+  
+  if (event.target === scheduleModal) {
+    scheduleModal.style.display = 'none';
+  }
+  if (event.target === deleteModal) {
+    deleteModal.style.display = 'none';
+  }
+}
+
+// Auto-refresh data every 2 minutes
+setInterval(() => {
+  // Only refresh if no modals are open
+  const modals = document.querySelectorAll('.modal');
+  const anyModalOpen = Array.from(modals).some(modal => modal.style.display === 'flex');
+  
+  if (!anyModalOpen) {
+    location.reload();
+  }
+}, 2 * 60 * 1000);
+</script>
+
 {% endblock %}
