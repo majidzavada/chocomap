@@ -10,8 +10,45 @@ from flask import request, jsonify
 import jwt
 from app.config import Config
 import bcrypt
+import os
 
 logger = logging.getLogger(__name__)
+
+def load_api_keys() -> Dict[str, str]:
+    """Load API keys from configuration file."""
+    try:
+        api_keys_path = '/home/choco/chocomap/config/api_keys.json'
+        if os.path.exists(api_keys_path):
+            with open(api_keys_path, 'r') as f:
+                return json.load(f)
+    except Exception as e:
+        logger.error(f"Error loading API keys: {str(e)}")
+    return {}
+
+def get_google_maps_api_key() -> Optional[str]:
+    """Get Google Maps API key from environment or config file."""
+    # First try environment variable (this is where it should be)
+    api_key = os.environ.get('GOOGLE_MAPS_API_KEY')
+    if api_key and api_key != 'your-google-maps-api-key':
+        return api_key
+    
+    # Fallback to config file (for backward compatibility)
+    api_keys = load_api_keys()
+    api_key = api_keys.get('google_maps')
+    if api_key and api_key != 'your-google-maps-api-key':
+        return api_key
+    
+    return None
+
+def get_warehouse_location() -> Dict[str, float]:
+    """Get warehouse location from environment variables."""
+    try:
+        lat = float(os.environ.get('WAREHOUSE_LAT', 50.0755))
+        lng = float(os.environ.get('WAREHOUSE_LNG', 14.4378))
+        return {'lat': lat, 'lng': lng}
+    except (ValueError, TypeError):
+        # Default to Prague coordinates if parsing fails
+        return {'lat': 50.0755, 'lng': 14.4378}
 
 def sanitize_input(input_str: str) -> str:
     """Sanitize user input to prevent XSS attacks."""
@@ -267,4 +304,4 @@ def calculate_distance(lat1: float, lng1: float, lat2: float, lng2: float) -> fl
     c = 2 * atan2(sqrt(a), sqrt(1-a))
     distance = R * c
     
-    return distance 
+    return distance

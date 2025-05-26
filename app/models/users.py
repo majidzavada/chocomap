@@ -60,6 +60,7 @@ def get_all_drivers():
         cursor = mysql.connection.cursor()
         cursor.execute("SELECT id, name, email FROM users WHERE role = 'driver' AND active = TRUE ORDER BY name")
         drivers = cursor.fetchall()
+        logger.info(f"Found {len(drivers)} drivers: {drivers}")
         return drivers
     except Exception as e:
         logger.error(f"Error fetching drivers: {str(e)}")

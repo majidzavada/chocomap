@@ -8,7 +8,7 @@ from app.models.addresses import get_all_addresses, create_address, get_address_
 from app.models.users import get_all_drivers, get_user_by_id
 from app.services.delivery_service import DeliveryService
 from app.middleware import login_required, role_required, rate_limit_by_ip
-from app.utils import validate_email, sanitize_input, format_datetime
+from app.utils import validate_email, sanitize_input, format_datetime, get_google_maps_api_key, get_warehouse_location
 from app import mysql
 
 logger = logging.getLogger(__name__)
@@ -251,9 +251,16 @@ def schedule():
 
     drivers = get_all_drivers()
     addresses = get_all_addresses()
+    google_maps_api_key = get_google_maps_api_key()
+    warehouse_location = get_warehouse_location()
+    today = date.today().isoformat()
+    
     return render_template('employee/schedule.html',
                          drivers=drivers,
-                         addresses=addresses)
+                         addresses=addresses,
+                         google_maps_api_key=google_maps_api_key,
+                         warehouse_location=warehouse_location,
+                         today=today)
 
 @employee_bp.route('/calendar')
 @login_required
