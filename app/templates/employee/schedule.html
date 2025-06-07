@@ -40,7 +40,8 @@
                       data-street="{{ address.street_address }}"
                       data-city="{{ address.city }}"
                       data-lat="{{ address.latitude }}"
-                      data-lng="{{ address.longitude }}">
+                      data-lng="{{ address.longitude }}"
+                      {% if selected_address_id and selected_address_id|string == address.id|string %}selected{% endif %}>
                 {{ address.label }} - {{ address.street_address }}, {{ address.city }}
               </option>
             {% endfor %}
@@ -444,6 +445,16 @@ function initForm() {
   document.getElementById('address_id').addEventListener('change', updateRoutePreview);
   document.getElementById('start_time').addEventListener('change', calculateETA);
   document.getElementById('scheduleForm').addEventListener('submit', handleSubmit);
+  
+  // Check if address is pre-selected and trigger route preview
+  const addressSelect = document.getElementById('address_id');
+  if (addressSelect.value) {
+    // Small delay to ensure map is initialized
+    setTimeout(() => {
+      updateRoutePreview();
+      showToast('{{ _("Address selected from your address book") }}', 'success');
+    }, 1000);
+  }
 }
 
 function initMap() {

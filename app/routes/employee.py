@@ -4,7 +4,7 @@ from datetime import datetime, date, timedelta
 from typing import Dict, Any
 import logging
 
-from app.models.addresses import get_all_addresses, create_address, get_address_by_id
+from app.models.addresses import get_all_addresses, create_address, get_address_by_id, update_address
 from app.models.users import get_all_drivers, get_user_by_id
 from app.services.delivery_service import DeliveryService
 from app.middleware import login_required, role_required, rate_limit_by_ip
@@ -203,6 +203,58 @@ def addresses():
     addresses = get_all_addresses()
     return render_template('employee/addresses.html', addresses=addresses)
 
+@employee_bp.route('/address/<int:address_id>/edit', methods=['GET', 'POST'])
+@login_required
+@role_required('employee', 'manager')
+def edit_address(address_id):
+    """Edit an existing address."""
+    try:
+        if request.method == 'POST':
+            # Validate and sanitize input
+            label = sanitize_input(request.form.get('label', ''))
+            street = sanitize_input(request.form.get('street', ''))
+            city = sanitize_input(request.form.get('city', ''))
+            zip_code = sanitize_input(request.form.get('zip', ''))
+            
+            try:
+                lat = float(request.form.get('latitude', 0))
+                lon = float(request.form.get('longitude', 0))
+            except ValueError:
+                flash(_("Invalid coordinates"), "danger")
+                return redirect(url_for('employee.edit_address', address_id=address_id))
+
+            if not all([label, street, city, zip_code]):
+                flash(_("All fields are required"), "danger")
+                return redirect(url_for('employee.edit_address', address_id=address_id))
+
+            # Update address
+            if update_address(
+                address_id=address_id,
+                label=label,
+                street=street,
+                city=city,
+                zip_code=zip_code,
+                lat=lat,
+                lon=lon
+            ):
+                flash(_("Address updated successfully"), "success")
+                return redirect(url_for('employee.addresses'))
+            else:
+                flash(_("Error updating address"), "danger")
+                return redirect(url_for('employee.edit_address', address_id=address_id))
+
+        # GET request - show edit form
+        address = get_address_by_id(address_id)
+        if not address:
+            flash(_("Address not found"), "danger")
+            return redirect(url_for('employee.addresses'))
+
+        return render_template('employee/edit_address.html', address=address)
+    except Exception as e:
+        logger.error(f"Error editing address: {str(e)}", exc_info=True)
+        flash(_("Error processing address edit"), "danger")
+        return redirect(url_for('employee.addresses'))
+
 @employee_bp.route('/schedule', methods=['GET', 'POST'])
 @login_required
 @role_required('employee', 'manager')
@@ -254,13 +306,17 @@ def schedule():
     today = date.today().isoformat()
     warehouse_location = get_warehouse_location()
     google_maps_api_key = get_google_maps_api_key()
+    
+    # Handle pre-selected address from query parameters
+    selected_address_id = request.args.get('address_id')
 
     return render_template('employee/schedule.html',
                      drivers=drivers,
                      addresses=addresses,
                      today=today,
                      warehouse_location=warehouse_location,
-                     google_maps_api_key=google_maps_api_key)
+                     google_maps_api_key=google_maps_api_key,
+                     selected_address_id=selected_address_id)
 
 @employee_bp.route('/calendar')
 @login_required

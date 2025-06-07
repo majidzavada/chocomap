@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% block title %}{{ _('Edit Address') }}{% endblock %}
+{% block content %}
+<div class="address-form-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card address-form-card shadow-lg">
+          <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0"><i class="fas fa-edit me-2"></i>{{ _('Edit Address') }}</h4>
+          </div>
+          <div class="card-body p-4">
+            <form method="POST" id="address-form">
+              <!-- Address Label -->
+              <div class="mb-4">
+                <label for="label" class="form-label fw-bold">{{ _('Address Label') }}</label>
+                <input type="text" 
+                       class="form-control form-control-lg" 
+                       name="label" 
+                       id="label"
+                       value="{{ address.label }}"
+                       placeholder="{{ _('e.g., Home, Office, Customer Location') }}" 
+                       required>
+                <div class="form-text">{{ _('Give this address a memorable name') }}</div>
+              </div>
+
+              <!-- Google Maps Address Search -->
+              <div class="mb-4">
+                <label for="autocomplete" class="form-label fw-bold">{{ _('Search Address') }}</label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-warning text-dark">
+                    <i class="fas fa-search"></i>
+                  </span>
+                  <input id="autocomplete" 
+                         type="text" 
+                         class="form-control address-search-input" 
+                         placeholder="{{ _('Start typing an address...') }}" 
+                         autocomplete="off">
+                </div>
+                <div class="form-text">{{ _('Search and select your address from Google Maps') }}</div>
+              </div>
+
+              <!-- Map Display -->
+              <div class="mb-4">
+                <div id="map" class="map-container" style="height: 400px; width: 100%;"></div>
+                <div class="form-text mt-2">
+                  <i class="fas fa-info-circle me-1 text-info"></i>
+                  {{ _('You can drag the marker to fine-tune the location') }}
+                </div>
+              </div>
+
+              <!-- Address Details (Auto-filled) -->
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="mb-3">
+                    <label for="street" class="form-label fw-semibold">{{ _('Street Address') }}</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="street" 
+                           id="street" 
+                           value="{{ address.street_address }}"
+                           placeholder="{{ _('Street Address') }}" 
+                           required>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="zip" class="form-label fw-semibold">{{ _('ZIP Code') }}</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="zip" 
+                           id="zip" 
+                           value="{{ address.zip_code }}"
+                           placeholder="{{ _('ZIP Code') }}" 
+                           required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="city" class="form-label fw-semibold">{{ _('City') }}</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="city" 
+                           id="city" 
+                           value="{{ address.city }}"
+                           placeholder="{{ _('City') }}" 
+                           required>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label for="latitude" class="form-label fw-semibold">{{ _('Latitude') }}</label>
+                    <input type="text" 
+                           class="form-control coordinates-display" 
+                           name="latitude" 
+                           id="latitude" 
+                           value="{{ address.latitude }}"
+                           readonly>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label for="longitude" class="form-label fw-semibold">{{ _('Longitude') }}</label>
+                    <input type="text" 
+                           class="form-control coordinates-display" 
+                           name="longitude" 
+                           id="longitude" 
+                           value="{{ address.longitude }}"
+                           readonly>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-warning btn-lg submit-btn-modern" id="submit-btn">
+                  <i class="fas fa-save me-2"></i>{{ _('Update Address') }}
+                </button>
+              </div>
+            </form>
+
+            <!-- Action buttons -->
+            <div class="d-flex gap-2 mt-3">
+              <a href="{{ url_for('employee.addresses') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>{{ _('Cancel') }}
+              </a>
+              <a href="{{ url_for('employee.schedule') }}?address_id={{ address.id }}" class="btn btn-success">
+                <i class="fas fa-calendar me-2"></i>{{ _('Use for Scheduling') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .address-form-container {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+  }
+
+  .address-form-card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+  }
+
+  .address-search-input {
+    border: none;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+  }
+
+  .address-search-input:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+  }
+
+  .map-container {
+    border: 3px solid #ffc107;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .coordinates-display {
+    background-color: #f8f9fa;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .submit-btn-modern {
+    border-radius: 10px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .submit-btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
+  }
+</style>
+
+<script>
+  let map, marker, autocomplete;
+  let selectedPlace = null;
+
+  function initMap() {
+    // Use existing address coordinates or default location (Prague)
+    const currentLat = parseFloat(document.getElementById('latitude').value) || 50.0755;
+    const currentLng = parseFloat(document.getElementById('longitude').value) || 14.4378;
+    const currentLocation = { lat: currentLat, lng: currentLng };
+    
+    // Initialize map
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: currentLocation,
+      zoom: 16,
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }]
+        }
+      ]
+    });
+
+    // Initialize marker
+    marker = new google.maps.Marker({
+      position: currentLocation,
+      map: map,
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      title: "{{ _('Drag to adjust location') }}"
+    });
+
+    // Handle marker drag
+    google.maps.event.addListener(marker, 'dragend', function() {
+      const position = marker.getPosition();
+      updateCoordinates(position.lat(), position.lng());
+      reverseGeocode(position);
+    });
+
+    // Initialize autocomplete
+    autocomplete = new google.maps.places.Autocomplete(
+      document.getElementById('autocomplete'),
+      { 
+        types: ['geocode'],
+        componentRestrictions: { country: ['cz', 'sk'] } // Restrict to Czech Republic and Slovakia
+      }
+    );
+
+    // Handle place selection
+    autocomplete.addListener('place_changed', function() {
+      const place = autocomplete.getPlace();
+      
+      if (!place.geometry) {
+        showAlert('{{ _("Please select a valid address from the dropdown") }}', 'warning');
+        return;
+      }
+
+      selectedPlace = place;
+      processPlaceData(place);
+    });
+
+    // Handle map clicks
+    google.maps.event.addListener(map, 'click', function(event) {
+      const position = event.latLng;
+      marker.setPosition(position);
+      map.panTo(position);
+      updateCoordinates(position.lat(), position.lng());
+      reverseGeocode(position);
+    });
+  }
+
+  function processPlaceData(place) {
+    // Center map and position marker
+    map.setCenter(place.geometry.location);
+    map.setZoom(16);
+    marker.setPosition(place.geometry.location);
+    
+    // Update coordinates
+    updateCoordinates(
+      place.geometry.location.lat(), 
+      place.geometry.location.lng()
+    );
+
+    // Parse address components
+    let addressData = {
+      street: '',
+      city: '',
+      zip: '',
+      country: ''
+    };
+
+    for (const component of place.address_components) {
+      const types = component.types;
+      
+      if (types.includes('street_number')) {
+        addressData.street = component.long_name + ' ';
+      }
+      if (types.includes('route')) {
+        addressData.street += component.long_name;
+      }
+      if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+        addressData.city = component.long_name;
+      }
+      if (types.includes('postal_code')) {
+        addressData.zip = component.long_name;
+      }
+      if (types.includes('country')) {
+        addressData.country = component.long_name;
+      }
+    }
+
+    // Update form fields
+    document.getElementById('street').value = addressData.street.trim();
+    document.getElementById('city').value = addressData.city;
+    document.getElementById('zip').value = addressData.zip;
+
+    // Show success feedback
+    showAlert('{{ _("Address updated successfully!") }}', 'success');
+  }
+
+  function reverseGeocode(position) {
+    const geocoder = new google.maps.Geocoder();
+    
+    geocoder.geocode({ location: position }, function(results, status) {
+      if (status === 'OK' && results[0]) {
+        // Find the most specific result
+        const result = results.find(r => 
+          r.types.includes('street_address') || 
+          r.types.includes('premise') ||
+          r.types.includes('route')
+        ) || results[0];
+        
+        document.getElementById('autocomplete').value = result.formatted_address;
+        processPlaceData(result);
+      }
+    });
+  }
+
+  function updateCoordinates(lat, lng) {
+    document.getElementById('latitude').value = lat.toFixed(6);
+    document.getElementById('longitude').value = lng.toFixed(6);
+  }
+
+  function showAlert(message, type) {
+    // Create bootstrap alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-2`;
+    alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Insert after the search input
+    const searchGroup = document.getElementById('autocomplete').closest('.mb-4');
+    searchGroup.appendChild(alertDiv);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      if (alertDiv.parentNode) {
+        alertDiv.remove();
+      }
+    }, 3000);
+  }
+
+  // Form submission handler
+  document.getElementById('address-form').addEventListener('submit', function(e) {
+    const street = document.getElementById('street').value;
+    const city = document.getElementById('city').value;
+    const label = document.getElementById('label').value;
+    
+    if (!street || !city || !label) {
+      e.preventDefault();
+      showAlert('{{ _("Please fill in all required fields") }}', 'danger');
+      return false;
+    }
+  });
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ get_google_maps_api_key() }}&libraries=places&callback=initMap" async defer></script>
+{% endblock %}
