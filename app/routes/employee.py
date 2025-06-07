@@ -252,11 +252,15 @@ def schedule():
     drivers = get_all_drivers()
     addresses = get_all_addresses()
     today = date.today().isoformat()
-    
+    warehouse_location = get_warehouse_location()
+    google_maps_api_key = get_google_maps_api_key()
+
     return render_template('employee/schedule.html',
-                         drivers=drivers,
-                         addresses=addresses,
-                         today=today)
+                     drivers=drivers,
+                     addresses=addresses,
+                     today=today,
+                     warehouse_location=warehouse_location,
+                     google_maps_api_key=google_maps_api_key)
 
 @employee_bp.route('/calendar')
 @login_required
