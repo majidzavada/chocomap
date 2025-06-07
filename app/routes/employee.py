@@ -200,8 +200,9 @@ def addresses():
             flash(_("Error processing address"), "danger")
         return redirect(url_for('employee.addresses'))
 
+    from app.utils import get_google_maps_api_key
     addresses = get_all_addresses()
-    return render_template('employee/addresses.html', addresses=addresses)
+    return render_template('employee/addresses.html', addresses=addresses, get_google_maps_api_key=get_google_maps_api_key)
 
 @employee_bp.route('/schedule', methods=['GET', 'POST'])
 @login_required

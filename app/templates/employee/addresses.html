@@ -3,13 +3,15 @@
 {% block content %}
 <h2>{{ _('Address Book') }}</h2>
 
-<form method="POST">
+<form method="POST" id="address-form">
   <input type="text" name="label" placeholder="{{ _('Label') }}" required><br>
-  <input type="text" name="street" placeholder="{{ _('Street Address') }}" required><br>
-  <input type="text" name="city" placeholder="{{ _('City') }}" required><br>
-  <input type="text" name="zip" placeholder="{{ _('ZIP Code') }}" required><br>
-  <input type="text" name="latitude" placeholder="{{ _('Latitude') }}" required><br>
-  <input type="text" name="longitude" placeholder="{{ _('Longitude') }}" required><br>
+  <input id="autocomplete" type="text" placeholder="{{ _('Search Address') }}" autocomplete="off"><br>
+  <input type="text" name="street" id="street" placeholder="{{ _('Street Address') }}" required><br>
+  <input type="text" name="city" id="city" placeholder="{{ _('City') }}" required><br>
+  <input type="text" name="zip" id="zip" placeholder="{{ _('ZIP Code') }}" required><br>
+  <input type="text" name="latitude" id="latitude" placeholder="{{ _('Latitude') }}" required readonly><br>
+  <input type="text" name="longitude" id="longitude" placeholder="{{ _('Longitude') }}" required readonly><br>
+  <div id="map" style="height: 300px; width: 100%; margin-bottom: 10px;"></div>
   <button type="submit">{{ _('Add Address') }}</button>
 </form>
 
@@ -19,4 +21,47 @@
     <li><strong>{{ a.label }}</strong>: {{ a.street_address }}, {{ a.city }} {{ a.zip_code }}</li>
   {% endfor %}
 </ul>
+
+<script>
+  let map, marker, autocomplete;
+  function initMap() {
+    const defaultLocation = { lat: 50.0755, lng: 14.4378 };
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: defaultLocation,
+      zoom: 13
+    });
+    marker = new google.maps.Marker({
+      position: defaultLocation,
+      map: map,
+      draggable: true
+    });
+    google.maps.event.addListener(marker, 'dragend', function() {
+      document.getElementById('latitude').value = marker.getPosition().lat();
+      document.getElementById('longitude').value = marker.getPosition().lng();
+    });
+    autocomplete = new google.maps.places.Autocomplete(
+      document.getElementById('autocomplete'),
+      { types: ['geocode'] }
+    );
+    autocomplete.addListener('place_changed', function() {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) return;
+      map.setCenter(place.geometry.location);
+      marker.setPosition(place.geometry.location);
+      document.getElementById('latitude').value = place.geometry.location.lat();
+      document.getElementById('longitude').value = place.geometry.location.lng();
+      // Fill address fields if available
+      let street = '', city = '', zip = '';
+      for (const comp of place.address_components) {
+        if (comp.types.includes('route')) street = comp.long_name;
+        if (comp.types.includes('locality')) city = comp.long_name;
+        if (comp.types.includes('postal_code')) zip = comp.long_name;
+      }
+      document.getElementById('street').value = street;
+      document.getElementById('city').value = city;
+      document.getElementById('zip').value = zip;
+    });
+  }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key={{ get_google_maps_api_key() }}&libraries=places&callback=initMap" async defer></script>
 {% endblock %}

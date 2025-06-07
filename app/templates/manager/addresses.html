@@ -1,35 +1,236 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ _('Addresses') }}{% endblock %}
+{% block title %}{{ _('Addresses Management') }}{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    <h1>{{ _('Addresses') }}</h1>
-    {% if addresses %}
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>{{ _('Label') }}</th>
-                    <th>{{ _('Street Address') }}</th>
-                    <th>{{ _('City') }}</th>
-                    <th>{{ _('ZIP Code') }}</th>
-                    <th>{{ _('Created By') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for address in addresses %}
-                <tr>
-                    <td>{{ address.label }}</td>
-                    <td>{{ address.street_address }}</td>
-                    <td>{{ address.city }}</td>
-                    <td>{{ address.zip_code }}</td>
-                    <td>{{ address.created_by_name or '' }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>{{ _('No addresses found.') }}</p>
-    {% endif %}
+    <h1>{{ _('Addresses Management') }}</h1>
+    
+    <!-- Add New Address Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>{{ _('Add New Address') }}</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" id="address-form">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="label" class="form-label">{{ _('Label') }}</label>
+                        <input type="text" class="form-control" name="label" id="label" placeholder="{{ _('Label') }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="autocomplete" class="form-label">{{ _('Search Address') }}</label>
+                        <input id="autocomplete" type="text" class="form-control" placeholder="{{ _('Search Address') }}" autocomplete="off">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="street" class="form-label">{{ _('Street Address') }}</label>
+                        <input type="text" class="form-control" name="street" id="street" placeholder="{{ _('Street Address') }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="city" class="form-label">{{ _('City') }}</label>
+                        <input type="text" class="form-control" name="city" id="city" placeholder="{{ _('City') }}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="zip" class="form-label">{{ _('ZIP Code') }}</label>
+                        <input type="text" class="form-control" name="zip" id="zip" placeholder="{{ _('ZIP Code') }}" required>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="latitude" class="form-label">{{ _('Latitude') }}</label>
+                        <input type="text" class="form-control" name="latitude" id="latitude" placeholder="{{ _('Latitude') }}" required readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="longitude" class="form-label">{{ _('Longitude') }}</label>
+                        <input type="text" class="form-control" name="longitude" id="longitude" placeholder="{{ _('Longitude') }}" required readonly>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ _('Location on Map') }}</label>
+                    <div id="map" style="height: 400px; width: 100%; border: 1px solid #ddd; border-radius: 5px;"></div>
+                </div>
+                <button type="submit" class="btn btn-primary">{{ _('Add Address') }}</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Existing Addresses -->
+    <div class="card">
+        <div class="card-header">
+            <h3>{{ _('Existing Addresses') }}</h3>
+        </div>
+        <div class="card-body">
+            {% if addresses %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>{{ _('Label') }}</th>
+                                <th>{{ _('Street Address') }}</th>
+                                <th>{{ _('City') }}</th>
+                                <th>{{ _('ZIP Code') }}</th>
+                                <th>{{ _('Coordinates') }}</th>
+                                <th>{{ _('Created By') }}</th>
+                                <th>{{ _('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for address in addresses %}
+                            <tr>
+                                <td><strong>{{ address.label }}</strong></td>
+                                <td>{{ address.street_address }}</td>
+                                <td>{{ address.city }}</td>
+                                <td>{{ address.zip_code }}</td>
+                                <td>
+                                    {% if address.lat and address.lon %}
+                                        <small>{{ "%.6f"|format(address.lat) }}, {{ "%.6f"|format(address.lon) }}</small>
+                                        <br>
+                                        <button class="btn btn-sm btn-outline-info" onclick="showOnMap({{ address.lat }}, {{ address.lon }}, '{{ address.label }}')">
+                                            {{ _('Show on Map') }}
+                                        </button>
+                                    {% else %}
+                                        <span class="text-muted">{{ _('No coordinates') }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ address.created_by_name or _('Unknown') }}</td>
+                                <td>
+                                    <a href="{{ url_for('manager.edit_address', address_id=address.id) }}" class="btn btn-sm btn-warning">
+                                        {{ _('Edit') }}
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    {{ _('No addresses found. Add your first address using the form above.') }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<script>
+  let map, marker, autocomplete;
+  
+  function initMap() {
+    const defaultLocation = { lat: 50.0755, lng: 14.4378 }; // Prague coordinates
+    
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: defaultLocation,
+      zoom: 13,
+      mapTypeControl: true,
+      streetViewControl: true,
+      fullscreenControl: true
+    });
+    
+    marker = new google.maps.Marker({
+      position: defaultLocation,
+      map: map,
+      draggable: true,
+      title: '{{ _("Drag to set location") }}'
+    });
+    
+    // Update coordinates when marker is dragged
+    google.maps.event.addListener(marker, 'dragend', function() {
+      updateCoordinates(marker.getPosition().lat(), marker.getPosition().lng());
+    });
+    
+    // Click on map to set marker
+    google.maps.event.addListener(map, 'click', function(event) {
+      marker.setPosition(event.latLng);
+      updateCoordinates(event.latLng.lat(), event.latLng.lng());
+    });
+    
+    // Setup autocomplete
+    autocomplete = new google.maps.places.Autocomplete(
+      document.getElementById('autocomplete'),
+      { 
+        types: ['geocode'],
+        componentRestrictions: { country: 'cz' } // Restrict to Czech Republic, change as needed
+      }
+    );
+    
+    autocomplete.addListener('place_changed', function() {
+      const place = autocomplete.getPlace();
+      if (!place.geometry) {
+        alert('{{ _("No details available for input: ") }}' + place.name);
+        return;
+      }
+      
+      // Center map on selected place
+      map.setCenter(place.geometry.location);
+      map.setZoom(17);
+      marker.setPosition(place.geometry.location);
+      
+      updateCoordinates(place.geometry.location.lat(), place.geometry.location.lng());
+      
+      // Fill address fields if available
+      fillAddressFields(place.address_components);
+    });
+  }
+  
+  function updateCoordinates(lat, lng) {
+    document.getElementById('latitude').value = lat.toFixed(6);
+    document.getElementById('longitude').value = lng.toFixed(6);
+  }
+  
+  function fillAddressFields(addressComponents) {
+    let street = '', city = '', zip = '';
+    
+    for (const component of addressComponents) {
+      const types = component.types;
+      
+      if (types.includes('route')) {
+        street = component.long_name;
+      } else if (types.includes('street_number')) {
+        street = component.long_name + ' ' + street;
+      } else if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+        city = component.long_name;
+      } else if (types.includes('postal_code')) {
+        zip = component.long_name;
+      }
+    }
+    
+    if (street) document.getElementById('street').value = street.trim();
+    if (city) document.getElementById('city').value = city;
+    if (zip) document.getElementById('zip').value = zip;
+  }
+  
+  function showOnMap(lat, lng, label) {
+    map.setCenter({ lat: lat, lng: lng });
+    map.setZoom(17);
+    
+    // Create a temporary marker for the address
+    const tempMarker = new google.maps.Marker({
+      position: { lat: lat, lng: lng },
+      map: map,
+      title: label,
+      icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+    });
+    
+    const infoWindow = new google.maps.InfoWindow({
+      content: '<strong>' + label + '</strong><br>Lat: ' + lat.toFixed(6) + '<br>Lng: ' + lng.toFixed(6)
+    });
+    
+    tempMarker.addListener('click', function() {
+      infoWindow.open(map, tempMarker);
+    });
+    
+    // Auto-open info window
+    infoWindow.open(map, tempMarker);
+    
+    // Remove temporary marker after 10 seconds
+    setTimeout(function() {
+      tempMarker.setMap(null);
+    }, 10000);
+  }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key={{ get_google_maps_api_key() }}&libraries=places&callback=initMap" async defer></script>
 {% endblock %}

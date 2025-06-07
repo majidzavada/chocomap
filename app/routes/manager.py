@@ -83,17 +83,60 @@ def driver_stats(driver_id):
         flash(_("Error loading driver statistics"), "danger")
         return redirect(url_for('manager.drivers'))
 
-@manager_bp.route('/addresses')
+@manager_bp.route('/addresses', methods=['GET', 'POST'])
 @login_required
 @role_required('manager')
 def addresses():
+    if request.method == 'POST':
+        try:
+            from app.utils import sanitize_input
+            from app.models.addresses import create_address
+            
+            # Validate and sanitize input
+            label = sanitize_input(request.form.get('label', ''))
+            street = sanitize_input(request.form.get('street', ''))
+            city = sanitize_input(request.form.get('city', ''))
+            zip_code = sanitize_input(request.form.get('zip', ''))
+            
+            try:
+                lat = float(request.form.get('latitude', 0))
+                lon = float(request.form.get('longitude', 0))
+            except ValueError:
+                flash(_("Invalid coordinates"), "danger")
+                return redirect(url_for('manager.addresses'))
+
+            if not all([label, street, city, zip_code]):
+                flash(_("All fields are required"), "danger")
+                return redirect(url_for('manager.addresses'))
+
+            # Create address
+            address_id = create_address(
+                label=label,
+                street=street,
+                city=city,
+                zip_code=zip_code,
+                lat=lat,
+                lon=lon,
+                user_id=session['user_id']
+            )
+
+            if address_id:
+                flash(_("Address added successfully"), "success")
+            else:
+                flash(_("Error adding address"), "danger")
+        except Exception as e:
+            logger.error(f"Error creating address: {str(e)}")
+            flash(_("Error processing address"), "danger")
+        return redirect(url_for('manager.addresses'))
+    
     try:
+        from app.utils import get_google_maps_api_key
         addresses = AddressService.get_all_addresses()
-        return render_template('manager/addresses.html', addresses=addresses)
+        return render_template('manager/addresses.html', addresses=addresses, get_google_maps_api_key=get_google_maps_api_key)
     except Exception as e:
         logger.error(f"Error loading addresses: {str(e)}")
         flash(_("Error loading addresses"), "danger")
-        return render_template('manager/addresses.html')
+        return render_template('manager/addresses.html', get_google_maps_api_key=get_google_maps_api_key)
 
 @manager_bp.route('/address/<int:address_id>/edit', methods=['GET', 'POST'])
 @login_required
