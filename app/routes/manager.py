@@ -130,13 +130,12 @@ def addresses():
         return redirect(url_for('manager.addresses'))
     
     try:
-        from app.utils import get_google_maps_api_key
         addresses = AddressService.get_all_addresses()
-        return render_template('manager/addresses.html', addresses=addresses, get_google_maps_api_key=get_google_maps_api_key)
+        return render_template('manager/addresses.html', addresses=addresses)
     except Exception as e:
         logger.error(f"Error loading addresses: {str(e)}")
         flash(_("Error loading addresses"), "danger")
-        return render_template('manager/addresses.html', get_google_maps_api_key=get_google_maps_api_key)
+        return render_template('manager/addresses.html')
 
 @manager_bp.route('/address/<int:address_id>/edit', methods=['GET', 'POST'])
 @login_required

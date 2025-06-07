@@ -1,67 +1,377 @@
 {% extends 'base.html' %}
 {% block title %}{{ _('Address Book') }}{% endblock %}
 {% block content %}
-<h2>{{ _('Address Book') }}</h2>
+<div class="address-form-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card address-form-card shadow-lg">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>{{ _('Add New Address') }}</h4>
+          </div>
+          <div class="card-body p-4">
+            <form method="POST" id="address-form">
+              <!-- Address Label -->
+              <div class="mb-4">
+                <label for="label" class="form-label fw-bold">{{ _('Address Label') }}</label>
+                <input type="text" 
+                       class="form-control form-control-lg" 
+                       name="label" 
+                       id="label"
+                       placeholder="{{ _('e.g., Home, Office, Customer Location') }}" 
+                       required>
+                <div class="form-text">{{ _('Give this address a memorable name') }}</div>
+              </div>
 
-<form method="POST" id="address-form">
-  <input type="text" name="label" placeholder="{{ _('Label') }}" required><br>
-  <input id="autocomplete" type="text" placeholder="{{ _('Search Address') }}" autocomplete="off"><br>
-  <input type="text" name="street" id="street" placeholder="{{ _('Street Address') }}" required><br>
-  <input type="text" name="city" id="city" placeholder="{{ _('City') }}" required><br>
-  <input type="text" name="zip" id="zip" placeholder="{{ _('ZIP Code') }}" required><br>
-  <input type="text" name="latitude" id="latitude" placeholder="{{ _('Latitude') }}" required readonly><br>
-  <input type="text" name="longitude" id="longitude" placeholder="{{ _('Longitude') }}" required readonly><br>
-  <div id="map" style="height: 300px; width: 100%; margin-bottom: 10px;"></div>
-  <button type="submit">{{ _('Add Address') }}</button>
-</form>
+              <!-- Google Maps Address Search -->
+              <div class="mb-4">
+                <label for="autocomplete" class="form-label fw-bold">{{ _('Search Address') }}</label>
+                <div class="input-group input-group-lg">
+                  <span class="input-group-text bg-primary text-white">
+                    <i class="fas fa-search"></i>
+                  </span>
+                  <input id="autocomplete" 
+                         type="text" 
+                         class="form-control address-search-input" 
+                         placeholder="{{ _('Start typing an address...') }}" 
+                         autocomplete="off">
+                </div>
+                <div class="form-text">{{ _('Search and select your address from Google Maps') }}</div>
+              </div>
 
-<h3>{{ _('Saved Addresses') }}</h3>
-<ul>
-  {% for a in addresses %}
-    <li><strong>{{ a.label }}</strong>: {{ a.street_address }}, {{ a.city }} {{ a.zip_code }}</li>
-  {% endfor %}
-</ul>
+              <!-- Map Display -->
+              <div class="mb-4">
+                <div id="map" class="map-container" style="height: 400px; width: 100%;"></div>
+                <div class="form-text mt-2">
+                  <i class="fas fa-info-circle me-1 text-info"></i>
+                  {{ _('You can drag the marker to fine-tune the location') }}
+                </div>
+              </div>
+
+              <!-- Address Details (Auto-filled) -->
+              <div class="row">
+                <div class="col-md-8">
+                  <div class="mb-3">
+                    <label for="street" class="form-label fw-semibold">{{ _('Street Address') }}</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="street" 
+                           id="street" 
+                           placeholder="{{ _('Street Address') }}" 
+                           required readonly>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label for="zip" class="form-label fw-semibold">{{ _('ZIP Code') }}</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="zip" 
+                           id="zip" 
+                           placeholder="{{ _('ZIP Code') }}" 
+                           required readonly>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label for="city" class="form-label fw-semibold">{{ _('City') }}</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="city" 
+                           id="city" 
+                           placeholder="{{ _('City') }}" 
+                           required readonly>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label for="latitude" class="form-label fw-semibold">{{ _('Latitude') }}</label>
+                    <input type="text" 
+                           class="form-control coordinates-display" 
+                           name="latitude" 
+                           id="latitude" 
+                           readonly>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="mb-3">
+                    <label for="longitude" class="form-label fw-semibold">{{ _('Longitude') }}</label>
+                    <input type="text" 
+                           class="form-control coordinates-display" 
+                           name="longitude" 
+                           id="longitude" 
+                           readonly>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg submit-btn-modern" id="submit-btn" disabled>
+                  <i class="fas fa-plus me-2"></i>{{ _('Add Address') }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Saved Addresses Sidebar -->
+      <div class="col-lg-4 mt-4 mt-lg-0">
+        <div class="card shadow-lg">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="fas fa-bookmark me-2"></i>{{ _('Saved Addresses') }}</h5>
+          </div>
+          <div class="card-body">
+            {% if addresses %}
+              <div class="list-group list-group-flush">
+                {% for a in addresses %}
+                  <div class="list-group-item address-item px-3 py-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                      <div class="flex-grow-1">
+                        <h6 class="mb-1 text-primary fw-bold">
+                          <i class="fas fa-map-pin me-2"></i>{{ a.label }}
+                        </h6>
+                        <p class="mb-1 text-muted">{{ a.street_address }}</p>
+                        <small class="text-muted">
+                          <i class="fas fa-city me-1"></i>{{ a.city }} {{ a.zip_code }}
+                        </small>
+                      </div>
+                      <button class="btn btn-outline-primary btn-sm ms-2" 
+                              data-lat="{{ a.latitude }}" 
+                              data-lng="{{ a.longitude }}" 
+                              data-label="{{ a.label }}"
+                              onclick="showAddressOnMap(this.dataset.lat, this.dataset.lng, this.dataset.label)"
+                              title="{{ _('Show on map') }}">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="text-center text-muted py-5">
+                <i class="fas fa-map-marker-alt fa-3x mb-3 opacity-25"></i>
+                <h6 class="mb-2">{{ _('No addresses saved yet') }}</h6>
+                <small>{{ _('Add your first address using the form') }}</small>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   let map, marker, autocomplete;
+  let selectedPlace = null;
+
   function initMap() {
+    // Default location (Prague)
     const defaultLocation = { lat: 50.0755, lng: 14.4378 };
+    
+    // Initialize map
     map = new google.maps.Map(document.getElementById('map'), {
       center: defaultLocation,
-      zoom: 13
+      zoom: 13,
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }]
+        }
+      ]
     });
+
+    // Initialize marker
     marker = new google.maps.Marker({
       position: defaultLocation,
       map: map,
-      draggable: true
+      draggable: true,
+      animation: google.maps.Animation.DROP,
+      title: "{{ _('Drag to adjust location') }}"
     });
+
+    // Handle marker drag
     google.maps.event.addListener(marker, 'dragend', function() {
-      document.getElementById('latitude').value = marker.getPosition().lat();
-      document.getElementById('longitude').value = marker.getPosition().lng();
+      const position = marker.getPosition();
+      updateCoordinates(position.lat(), position.lng());
+      reverseGeocode(position);
     });
+
+    // Initialize autocomplete
     autocomplete = new google.maps.places.Autocomplete(
       document.getElementById('autocomplete'),
-      { types: ['geocode'] }
+      { 
+        types: ['geocode'],
+        componentRestrictions: { country: ['cz', 'sk'] } // Restrict to Czech Republic and Slovakia
+      }
     );
+
+    // Handle place selection
     autocomplete.addListener('place_changed', function() {
       const place = autocomplete.getPlace();
-      if (!place.geometry) return;
-      map.setCenter(place.geometry.location);
-      marker.setPosition(place.geometry.location);
-      document.getElementById('latitude').value = place.geometry.location.lat();
-      document.getElementById('longitude').value = place.geometry.location.lng();
-      // Fill address fields if available
-      let street = '', city = '', zip = '';
-      for (const comp of place.address_components) {
-        if (comp.types.includes('route')) street = comp.long_name;
-        if (comp.types.includes('locality')) city = comp.long_name;
-        if (comp.types.includes('postal_code')) zip = comp.long_name;
+      
+      if (!place.geometry) {
+        showAlert('{{ _("Please select a valid address from the dropdown") }}', 'warning');
+        return;
       }
-      document.getElementById('street').value = street;
-      document.getElementById('city').value = city;
-      document.getElementById('zip').value = zip;
+
+      selectedPlace = place;
+      processPlaceData(place);
+      enableSubmitButton();
+    });
+
+    // Handle map clicks
+    google.maps.event.addListener(map, 'click', function(event) {
+      const position = event.latLng;
+      marker.setPosition(position);
+      map.panTo(position);
+      updateCoordinates(position.lat(), position.lng());
+      reverseGeocode(position);
     });
   }
+
+  function processPlaceData(place) {
+    // Center map and position marker
+    map.setCenter(place.geometry.location);
+    map.setZoom(16);
+    marker.setPosition(place.geometry.location);
+    
+    // Update coordinates
+    updateCoordinates(
+      place.geometry.location.lat(), 
+      place.geometry.location.lng()
+    );
+
+    // Parse address components
+    let addressData = {
+      street: '',
+      city: '',
+      zip: '',
+      country: ''
+    };
+
+    for (const component of place.address_components) {
+      const types = component.types;
+      
+      if (types.includes('street_number')) {
+        addressData.street = component.long_name + ' ';
+      }
+      if (types.includes('route')) {
+        addressData.street += component.long_name;
+      }
+      if (types.includes('locality') || types.includes('administrative_area_level_2')) {
+        addressData.city = component.long_name;
+      }
+      if (types.includes('postal_code')) {
+        addressData.zip = component.long_name;
+      }
+      if (types.includes('country')) {
+        addressData.country = component.long_name;
+      }
+    }
+
+    // Update form fields
+    document.getElementById('street').value = addressData.street.trim();
+    document.getElementById('city').value = addressData.city;
+    document.getElementById('zip').value = addressData.zip;
+
+    // Show success feedback
+    showAlert('{{ _("Address selected successfully!") }}', 'success');
+  }
+
+  function reverseGeocode(position) {
+    const geocoder = new google.maps.Geocoder();
+    
+    geocoder.geocode({ location: position }, function(results, status) {
+      if (status === 'OK' && results[0]) {
+        // Find the most specific result
+        const result = results.find(r => 
+          r.types.includes('street_address') || 
+          r.types.includes('premise') ||
+          r.types.includes('route')
+        ) || results[0];
+        
+        document.getElementById('autocomplete').value = result.formatted_address;
+        processPlaceData(result);
+      }
+    });
+  }
+
+  function updateCoordinates(lat, lng) {
+    document.getElementById('latitude').value = lat.toFixed(6);
+    document.getElementById('longitude').value = lng.toFixed(6);
+  }
+
+  function enableSubmitButton() {
+    const submitBtn = document.getElementById('submit-btn');
+    const street = document.getElementById('street').value;
+    const city = document.getElementById('city').value;
+    const label = document.getElementById('label').value;
+    
+    if (street && city && label) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('btn-secondary');
+      submitBtn.classList.add('btn-primary');
+    }
+  }
+
+  function showAddressOnMap(lat, lng, label) {
+    const position = { lat: parseFloat(lat), lng: parseFloat(lng) };
+    map.setCenter(position);
+    map.setZoom(16);
+    marker.setPosition(position);
+    
+    // Add info window
+    const infoWindow = new google.maps.InfoWindow({
+      content: `<div class="p-2"><strong>${label}</strong></div>`
+    });
+    infoWindow.open(map, marker);
+    
+    setTimeout(() => infoWindow.close(), 3000);
+  }
+
+  function showAlert(message, type) {
+    // Create bootstrap alert
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-2`;
+    alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Insert after the search input
+    const searchGroup = document.getElementById('autocomplete').closest('.mb-3');
+    searchGroup.appendChild(alertDiv);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      if (alertDiv.parentNode) {
+        alertDiv.remove();
+      }
+    }, 3000);
+  }
+
+  // Enable submit button when label is filled
+  document.getElementById('label').addEventListener('input', enableSubmitButton);
+
+  // Form submission handler
+  document.getElementById('address-form').addEventListener('submit', function(e) {
+    const street = document.getElementById('street').value;
+    const city = document.getElementById('city').value;
+    const label = document.getElementById('label').value;
+    
+    if (!street || !city || !label) {
+      e.preventDefault();
+      showAlert('{{ _("Please search and select an address first") }}', 'danger');
+      return false;
+    }
+  });
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key={{ get_google_maps_api_key() }}&libraries=places&callback=initMap" async defer></script>
 {% endblock %}

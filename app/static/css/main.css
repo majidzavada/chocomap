@@ -100,6 +100,103 @@
     padding: 1rem;
 }
 
+/* Address Form Specific Styles */
+.address-form-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+.address-form-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.address-search-input {
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.address-search-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.25rem rgba(0,123,255,0.15);
+    transform: translateY(-2px);
+}
+
+.map-container {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.map-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 49%, rgba(0,123,255,0.1) 50%, transparent 51%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.address-item {
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid #007bff;
+}
+
+.address-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.coordinates-display {
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.submit-btn-modern {
+    border-radius: 2rem;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+}
+
+.submit-btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+}
+
+.submit-btn-modern:disabled {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Pulse animation for search input */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0,123,255,0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(0,123,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,123,255,0); }
+}
+
+.search-active {
+    animation: pulse 2s infinite;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
     .container {
@@ -113,23 +210,16 @@
     #map {
         height: 300px;
     }
+    
+    .address-form-container {
+        padding: 1rem;
+    }
+    
+    .address-form-card {
+        margin: 0;
+    }
+    
+    #map {
+        height: 250px !important;
+    }
 }
-
-/* Animation Styles */
-.fade-enter {
-    opacity: 0;
-}
-
-.fade-enter-active {
-    opacity: 1;
-    transition: opacity 300ms ease-in;
-}
-
-.fade-exit {
-    opacity: 1;
-}
-
-.fade-exit-active {
-    opacity: 0;
-    transition: opacity 300ms ease-in;
-} 

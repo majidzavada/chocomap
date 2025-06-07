@@ -200,9 +200,8 @@ def addresses():
             flash(_("Error processing address"), "danger")
         return redirect(url_for('employee.addresses'))
 
-    from app.utils import get_google_maps_api_key
     addresses = get_all_addresses()
-    return render_template('employee/addresses.html', addresses=addresses, get_google_maps_api_key=get_google_maps_api_key)
+    return render_template('employee/addresses.html', addresses=addresses)
 
 @employee_bp.route('/schedule', methods=['GET', 'POST'])
 @login_required
@@ -252,15 +251,11 @@ def schedule():
 
     drivers = get_all_drivers()
     addresses = get_all_addresses()
-    google_maps_api_key = get_google_maps_api_key()
-    warehouse_location = get_warehouse_location()
     today = date.today().isoformat()
     
     return render_template('employee/schedule.html',
                          drivers=drivers,
                          addresses=addresses,
-                         google_maps_api_key=google_maps_api_key,
-                         warehouse_location=warehouse_location,
                          today=today)
 
 @employee_bp.route('/calendar')

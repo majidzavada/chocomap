@@ -84,6 +84,13 @@ def create_app(config_class=Config):
     # Make get_locale available in templates
     app.jinja_env.globals.update(get_locale=get_locale)
     
+    # Make utility functions available in templates
+    from app.utils import get_google_maps_api_key, get_warehouse_location
+    app.jinja_env.globals.update(
+        get_google_maps_api_key=get_google_maps_api_key,
+        get_warehouse_location=get_warehouse_location
+    )
+    
     # Add custom Jinja filters
     @app.template_filter('date')
     def date_filter(value, format='%Y-%m-%d'):
@@ -124,6 +131,11 @@ def create_app(config_class=Config):
     from app.routes.driver import driver_bp
     from app.routes.manager import manager_bp
     from app.routes.admin import admin_bp
+    
+    # Add favicon route
+    @app.route('/favicon.ico')
+    def favicon():
+        return app.send_static_file('favicon.ico')
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(employee_bp)
