@@ -126,26 +126,30 @@
             <h5 class="mb-0"><i class="fas fa-bookmark me-2"></i>{{ _('Saved Addresses') }}</h5>
           </div>
           <div class="card-body">
+            <!-- Add Back to Schedule button -->
+            <div class="mb-3">
+              <a href="{{ url_for('employee.schedule') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Schedule') }}
+              </a>
+            </div>
+
             {% if addresses %}
               <div class="list-group list-group-flush">
                 {% for a in addresses %}
-                  <div class="list-group-item address-item px-3 py-3">
-                    <div class="d-flex justify-content-between align-items-start">
-                      <div class="flex-grow-1">
-                        <h6 class="mb-1 text-primary fw-bold">
-                          <i class="fas fa-map-pin me-2"></i>{{ a.label }}
-                        </h6>
-                        <p class="mb-1 text-muted">{{ a.street_address }}</p>
-                        <small class="text-muted">
-                          <i class="fas fa-city me-1"></i>{{ a.city }} {{ a.zip_code }}
-                        </small>
-                      </div>
-                      <button class="btn btn-outline-primary btn-sm ms-2" 
-                              data-lat="{{ a.latitude }}" 
-                              data-lng="{{ a.longitude }}" 
-                              data-label="{{ a.label }}"
-                              onclick="showAddressOnMap(this.dataset.lat, this.dataset.lng, this.dataset.label)"
-                              title="{{ _('Show on map') }}">
+                  <div class="list-group-item address-item px-3 py-3 d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                      <h6 class="mb-1 text-primary fw-bold">
+                        <i class="fas fa-map-pin me-2"></i>{{ a.label }}
+                      </h6>
+                      <p class="mb-1 text-muted">{{ a.street_address }}</p>
+                      <small class="text-muted">
+                        <i class="fas fa-city me-1"></i>{{ a.city }} {{ a.zip_code }}
+                      </small>
+                    </div>
+                    <div class="d-flex flex-column gap-2 ms-2">
+                      <a href="{{ url_for('employee.edit_address', address_id=a.id) }}" class="btn btn-sm btn-warning mb-1">{{ _('Edit') }}</a>
+                      <button class="btn btn-sm btn-success mb-1" onclick="selectAddress('{{ a.id }}')">{{ _('Select') }}</button>
+                      <button class="btn btn-outline-primary btn-sm" data-lat="{{ a.latitude }}" data-lng="{{ a.longitude }}" data-label="{{ a.label }}" onclick="showAddressOnMap(this.dataset.lat, this.dataset.lng, this.dataset.label)" title="{{ _('Show on map') }}">
                         <i class="fas fa-eye"></i>
                       </button>
                     </div>
@@ -355,6 +359,11 @@
         alertDiv.remove();
       }
     }, 3000);
+  }
+
+  function selectAddress(addressId) {
+    // Redirect to schedule page with address pre-selected
+    window.location.href = `{{ url_for('employee.schedule') }}?address_id=${addressId}`;
   }
 
   // Enable submit button when label is filled
