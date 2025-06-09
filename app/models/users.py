@@ -6,6 +6,7 @@ import time
 from datetime import datetime
 import bcrypt
 import logging
+import MySQLdb.cursors
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def cache_with_timeout(timeout=300):  # 5 minutes default
 def get_user_by_email(email):
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
         return user
@@ -42,7 +43,7 @@ def get_user_by_email(email):
 def get_user_by_id(user_id):
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))
         user = cursor.fetchone()
         return user
@@ -57,7 +58,7 @@ def get_user_by_id(user_id):
 def get_all_drivers():
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT id, name, email FROM users WHERE role = 'driver' AND active = TRUE ORDER BY name")
         drivers = cursor.fetchall()
         logger.info(f"Found {len(drivers)} drivers: {drivers}")
@@ -72,7 +73,7 @@ def get_all_drivers():
 def create_user(name, email, password, role='employee', preferred_lang='cs'):
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         cursor.execute("""
             INSERT INTO users (name, email, password_hash, role, preferred_lang, active)
@@ -97,7 +98,7 @@ def update_user(user_id, **kwargs):
     
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         query = "UPDATE users SET " + ", ".join(f"{k} = %s" for k in update_fields.keys())
         query += " WHERE id = %s"
         values = list(update_fields.values()) + [user_id]
@@ -116,7 +117,7 @@ def update_user(user_id, **kwargs):
 def change_password(user_id, new_password):
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         password_hash = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt()).decode()
         cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s",
                       (password_hash, user_id))
@@ -133,7 +134,7 @@ def change_password(user_id, new_password):
 def verify_password(user_id, password):
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
         result = cursor.fetchone()
         if result:
@@ -149,7 +150,7 @@ def verify_password(user_id, password):
 def deactivate_user(user_id):
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("UPDATE users SET active = FALSE WHERE id = %s", (user_id,))
         mysql.connection.commit()
         return cursor.rowcount > 0
@@ -164,7 +165,7 @@ def deactivate_user(user_id):
 def get_user_stats(user_id):
     cursor = None
     try:
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("""
             SELECT 
                 COUNT(DISTINCT d.id) as total_deliveries,
@@ -196,7 +197,7 @@ class User:
     def get_by_id(user_id):
         cursor = None
         try:
-            cursor = mysql.connection.cursor()
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE id = %s', (user_id,))
             user_tuple = cursor.fetchone()
             
@@ -223,7 +224,7 @@ class User:
 
     @staticmethod
     def get_by_email(email):
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE email = %s', (email,))
         user_tuple = cursor.fetchone()
         cursor.close()
@@ -247,7 +248,7 @@ class User:
     def get_all_pending():
         cursor = None
         try:
-            cursor = mysql.connection.cursor()
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE approval_status = %s', ('pending',))
             users_tuples = cursor.fetchall()
             
@@ -275,7 +276,7 @@ class User:
     def get_all():
         cursor = None
         try:
-            cursor = mysql.connection.cursor()
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users')
             users_tuples = cursor.fetchall()
             
@@ -310,7 +311,7 @@ class User:
         values = list(updates.values())
         values.append(self.id)
         
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute(f'UPDATE users SET {set_clause} WHERE id = %s', values)
         mysql.connection.commit()
         cursor.close()
@@ -321,7 +322,7 @@ class User:
         return True
 
     def delete(self):
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('DELETE FROM users WHERE id = %s', (self.id,))
         mysql.connection.commit()
         cursor.close()
