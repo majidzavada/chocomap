@@ -199,20 +199,20 @@ class User:
         try:
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE id = %s', (user_id,))
-            user_tuple = cursor.fetchone()
+            user_dict = cursor.fetchone()
             
-            if not user_tuple:
+            if not user_dict:
                 return None
                 
-            # Convert tuple to kwargs for User constructor
+            # Use dictionary keys to access data from DictCursor
             user_data = {
-                'id': user_tuple[0],
-                'name': user_tuple[1],
-                'email': user_tuple[2],
-                'role': user_tuple[3],
-                'preferred_lang': user_tuple[4],
-                'approval_status': user_tuple[5],
-                'created_at': user_tuple[6]
+                'id': user_dict['id'],
+                'name': user_dict['name'],
+                'email': user_dict['email'],
+                'role': user_dict['role'],
+                'preferred_lang': user_dict['preferred_lang'],
+                'approval_status': user_dict['approval_status'],
+                'created_at': user_dict['created_at']
             }
             return User(**user_data)
         except Exception as e:
@@ -226,21 +226,21 @@ class User:
     def get_by_email(email):
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE email = %s', (email,))
-        user_tuple = cursor.fetchone()
+        user_dict = cursor.fetchone()
         cursor.close()
         
-        if not user_tuple:
+        if not user_dict:
             return None
             
-        # Convert tuple to kwargs for User constructor
+        # Use dictionary keys to access data from DictCursor
         user_data = {
-            'id': user_tuple[0],
-            'name': user_tuple[1],
-            'email': user_tuple[2],
-            'role': user_tuple[3],
-            'preferred_lang': user_tuple[4],
-            'approval_status': user_tuple[5],
-            'created_at': user_tuple[6]
+            'id': user_dict['id'],
+            'name': user_dict['name'],
+            'email': user_dict['email'],
+            'role': user_dict['role'],
+            'preferred_lang': user_dict['preferred_lang'],
+            'approval_status': user_dict['approval_status'],
+            'created_at': user_dict['created_at']
         }
         return User(**user_data)
 
@@ -250,18 +250,18 @@ class User:
         try:
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users WHERE approval_status = %s', ('pending',))
-            users_tuples = cursor.fetchall()
+            users_dicts = cursor.fetchall()
             
             users = []
-            for user_tuple in users_tuples:
+            for user_dict in users_dicts:
                 user_data = {
-                    'id': user_tuple[0],
-                    'name': user_tuple[1],
-                    'email': user_tuple[2],
-                    'role': user_tuple[3],
-                    'preferred_lang': user_tuple[4],
-                    'approval_status': user_tuple[5],
-                    'created_at': user_tuple[6]
+                    'id': user_dict['id'],
+                    'name': user_dict['name'],
+                    'email': user_dict['email'],
+                    'role': user_dict['role'],
+                    'preferred_lang': user_dict['preferred_lang'],
+                    'approval_status': user_dict['approval_status'],
+                    'created_at': user_dict['created_at']
                 }
                 users.append(User(**user_data))
             return users
@@ -278,18 +278,18 @@ class User:
         try:
             cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
             cursor.execute('SELECT id, name, email, role, preferred_lang, approval_status, created_at FROM users')
-            users_tuples = cursor.fetchall()
+            users_dicts = cursor.fetchall()
             
             users = []
-            for user_tuple in users_tuples:
+            for user_dict in users_dicts:
                 user_data = {
-                    'id': user_tuple[0],
-                    'name': user_tuple[1],
-                    'email': user_tuple[2],
-                    'role': user_tuple[3],
-                    'preferred_lang': user_tuple[4],
-                    'approval_status': user_tuple[5],
-                    'created_at': user_tuple[6]
+                    'id': user_dict['id'],
+                    'name': user_dict['name'],
+                    'email': user_dict['email'],
+                    'role': user_dict['role'],
+                    'preferred_lang': user_dict['preferred_lang'],
+                    'approval_status': user_dict['approval_status'],
+                    'created_at': user_dict['created_at']
                 }
                 users.append(User(**user_data))
             return users

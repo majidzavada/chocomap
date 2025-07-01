@@ -3,6 +3,7 @@ from typing import Optional, Dict, Any, List, Tuple
 from app import mysql
 from app.utils import hash_password, is_valid_password, verify_password
 import logging
+import MySQLdb
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ class UserService:
         role: str
     ) -> Optional[int]:
         """Create a new user with validation"""
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         try:
             # Validate password
             is_valid, message = is_valid_password(password)
@@ -56,7 +57,7 @@ class UserService:
         approval_status: Optional[str] = None
     ) -> bool:
         """Update user information"""
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         try:
             updates = []
             params = []
@@ -111,7 +112,7 @@ class UserService:
     @staticmethod
     def get_user_stats() -> Dict[str, Any]:
         """Get user statistics"""
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         try:
             cursor.execute("""
                 SELECT 
@@ -143,7 +144,7 @@ class UserService:
     @staticmethod
     def get_user_activity(user_id: int, days: int = 30) -> List[Dict[str, Any]]:
         """Get user activity for the last N days"""
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         try:
             cursor.execute("""
                 SELECT 
@@ -171,7 +172,7 @@ class UserService:
     @staticmethod
     def track_user_activity(user_id: int, action: str, details: Optional[Dict] = None) -> bool:
         """Track user activity"""
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         try:
             cursor.execute("""
                 INSERT INTO user_activity (
@@ -190,7 +191,7 @@ class UserService:
     @staticmethod
     def authenticate_user(login_input: str, password: str) -> Optional[Dict[str, Any]]:
         """Authenticate a user with email or username and password"""
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         try:
             logger.info(f"Attempting to authenticate user: {login_input}")
             
@@ -199,24 +200,12 @@ class UserService:
                 FROM users 
                 WHERE email = %s OR username = %s
             """, (login_input, login_input))
-            user_tuple = cursor.fetchone()
+            user = cursor.fetchone()
             
-            if not user_tuple:
+            if not user:
                 logger.warning(f"No user found with email/username: {login_input}")
                 return None
             
-            # Convert tuple to dictionary
-            user = {
-                'id': user_tuple[0],
-                'name': user_tuple[1],
-                'email': user_tuple[2],
-                'username': user_tuple[3],
-                'password_hash': user_tuple[4],
-                'role': user_tuple[5],
-                'active': user_tuple[6],
-                'approval_status': user_tuple[7]
-            }
-                
             if not user['active']:
                 logger.warning(f"Inactive user attempted login: {login_input}")
                 return None
@@ -245,7 +234,7 @@ class UserService:
     @staticmethod
     def change_password(user_id: int, current_password: str, new_password: str) -> bool:
         """Change user's password after verifying current password"""
-        cursor = mysql.connection.cursor()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         try:
             cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
             result = cursor.fetchone()

@@ -466,7 +466,7 @@ function initMap() {
       return;
     }
 
-    const warehouseLocation = {{ warehouse_location | tojson }};
+    const warehouseLocation = {{ warehouse_location | tojson | safe }};
     
     map = new google.maps.Map(document.getElementById('map'), {
       center: warehouseLocation,
