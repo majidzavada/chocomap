@@ -1,0 +1,111 @@
+---
+- name: Create system user for the application
+  user:
+    name: "{{ app_user }}"
+    system: yes
+    home: "{{ app_root }}"
+    create_home: no
+    shell: /bin/bash
+
+- name: Ensure app root directory exists
+  file:
+    path: "{{ app_root }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+- name: Clone or update repository
+  git:
+    repo: "{{ repo_url }}"
+    dest: "{{ app_root }}"
+    version: main
+    update: yes
+    force: yes
+  become_user: "{{ app_user }}"
+
+- name: Create Python virtual environment
+  command: python3 -m venv venv
+  args:
+    chdir: "{{ app_root }}"
+    creates: "{{ app_root }}/venv/bin/activate"
+  become_user: "{{ app_user }}"
+
+- name: Install Python requirements
+  pip:
+    requirements: "{{ app_root }}/requirements.txt"
+    virtualenv: "{{ app_root }}/venv"
+    virtualenv_command: python3 -m venv
+  become_user: "{{ app_user }}"
+  when: ansible_check_mode == false
+
+- name: Install gunicorn in virtual environment
+  pip:
+    name: gunicorn
+    virtualenv: "{{ app_root }}/venv"
+  become_user: "{{ app_user }}"
+
+- name: Create logs directory
+  file:
+    path: "{{ app_root }}/logs"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+- name: Create uploads directory
+  file:
+    path: "{{ app_root }}/{{ upload_folder }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+- name: Create config directory
+  file:
+    path: "{{ app_root }}/config"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+- name: Template config files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ app_root }}/config/{{ item.dest }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0644'
+    backup: yes
+  loop:
+    - { src: 'app_settings.json.j2', dest: 'app_settings.json' }
+    - { src: 'api_keys.json.j2', dest: 'api_keys.json' }
+    - { src: 'email_settings.json.j2', dest: 'email_settings.json' }
+
+- name: Template .env file
+  template:
+    src: env.j2
+    dest: "{{ app_root }}/.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0600'
+    backup: yes
+
+- name: Upgrade pip, setuptools, and wheel
+  command: "{{ app_root }}/venv/bin/pip install --upgrade pip setuptools wheel"
+  args:
+    chdir: "{{ app_root }}"
+  become_user: "{{ app_user }}"
+
+- name: Run database migrations
+  command: "{{ app_root }}/venv/bin/flask db upgrade"
+  args:
+    chdir: "{{ app_root }}"
+  become_user: "{{ app_user }}"
+
+- name: Compile Babel translations
+  command: "{{ app_root }}/venv/bin/pybabel compile -d app/translations"
+  args:
+    chdir: "{{ app_root }}"
+  become_user: "{{ app_user }}"
+  when: translation_compile | default(true)

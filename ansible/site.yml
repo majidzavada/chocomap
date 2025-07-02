@@ -1,0 +1,15 @@
+---
+- name: Deploy ChocoMap Application
+  hosts: web
+  become: yes
+  vars_files:
+    - group_vars/web.yml
+    - group_vars/vault.yml
+
+  roles:
+    - base
+    - database
+    - redis
+    - app
+    - gunicorn
+    - webserver

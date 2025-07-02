@@ -1,0 +1,81 @@
+# Flask Configuration
+flask_app: "wsgi.py"
+flask_env: "development"
+flask_debug: true
+
+# Security Keys
+secret_key: "e69f3f976dc851de1978c308b56d495ee0b16b6f0918d0583a3d981fe6404bad"
+jwt_secret_key: "e69f3f976dc851de1978c308b56d495ee0b16b6f0918d0583a3d981fe6404bad"
+
+# Database Configuration
+mysql_host: "localhost"
+mysql_user: "root"
+mysql_password: "3070"
+mysql_db: "chocomap"
+mysql_port: 3306
+
+# Redis Configuration
+redis_url: "redis://localhost:6379/0"
+
+# Email Configuration
+mail_server: "smtp.forpsi.com"
+mail_port: 587
+mail_use_tls: true
+mail_username: "majid@steinerkovarik.com"
+mail_password: "Capturenx2!"
+mail_default_sender: "majid@steinerkovarik.com"
+
+# Google Maps API
+google_maps_api_key: "AIzaSyB4ydX5yuWubeVcRF6BwY0AgH1SmFQV3Mw"
+
+# Warehouse Location
+warehouse_lat: 50.059134
+warehouse_lng: 14.33596
+
+# Application Settings
+app_name: "Chocomap"
+app_version: "1.0.0"
+timezone: "UTC"
+default_language: "en"
+
+# Feature Flags
+enable_analytics: true
+enable_notifications: true
+enable_file_upload: true
+
+# Security Settings
+session_cookie_secure: true
+session_cookie_httponly: true
+session_cookie_samesite: "Lax"
+strict_transport_security: true
+
+# CORS Settings
+cors_origins: "http://localhost:5000,http://localhost:8000"
+
+# Logging Configuration
+log_level: "INFO"
+log_file: "logs/chocomap.log"
+
+# Rate Limiting
+ratelimit_default: "200 per day"
+ratelimit_storage_url: "redis://localhost:6379/0"
+ratelimit_strategy: "fixed-window"
+
+# Cache Settings
+cache_type: "redis"
+cache_redis_url: "redis://localhost:6379/0"
+cache_default_timeout: 300
+
+# File Upload Settings
+upload_folder: "app/static/uploads"
+max_content_length: 16777216
+allowed_extensions: "png,jpg,jpeg,gif,pdf"
+
+# JWT Settings
+jwt_access_token_expires: 3600
+jwt_refresh_token_expires: 2592000
+jwt_algorithm: "HS256"
+
+# Session Settings
+session_type: "filesystem"
+permanent_session_lifetime: 86400

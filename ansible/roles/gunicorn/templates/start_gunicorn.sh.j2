@@ -1,0 +1,23 @@
+#!/bin/bash
+set -e
+
+# Activate virtual environment
+source {{ app_root }}/venv/bin/activate
+
+# Change to application directory
+cd {{ app_root }}
+
+# Start Gunicorn
+exec gunicorn \
+    --bind 127.0.0.1:8000 \
+    --workers 3 \
+    --worker-class sync \
+    --worker-connections 1000 \
+    --max-requests 1000 \
+    --max-requests-jitter 100 \
+    --timeout 30 \
+    --keep-alive 2 \
+    --access-logfile - \
+    --error-logfile - \
+    --log-level info \
+    wsgi:app

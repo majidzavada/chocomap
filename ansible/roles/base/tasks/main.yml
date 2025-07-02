@@ -1,0 +1,23 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install base packages
+  apt:
+    name:
+      - git
+      - python3-venv
+      - python3-pip
+      - python3-dev
+      - build-essential
+    state: present
+
+- name: Install additional system packages
+  apt:
+    name:
+      - default-libmysqlclient-dev
+      - build-essential
+      - python3-dev
+    state: present

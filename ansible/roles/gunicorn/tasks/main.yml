@@ -1,0 +1,27 @@
+---
+- name: Template Gunicorn start script
+  template:
+    src: start_gunicorn.sh.j2
+    dest: "{{ app_root }}/start_gunicorn.sh"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: '0755'
+
+- name: Template systemd service file
+  template:
+    src: chocomap.service.j2
+    dest: /etc/systemd/system/chocomap.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload systemd
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start ChocoMap service
+  systemd:
+    name: chocomap
+    enabled: yes
+    state: started

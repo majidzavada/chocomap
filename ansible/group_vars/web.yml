@@ -1,0 +1,58 @@
+---
+# Web host group variables
+app_user: chocomap
+app_root: "{{ playbook_dir }}/.."
+repo_url: "https://github.com/steinerkovarik/chocomap.git"
+domain_name: chocomap.local
+upload_folder: uploads
+translation_compile: false
+
+# Database connection (mapped from vault vars)
+db_host: "{{ mysql_host }}"
+db_user: "{{ mysql_user }}"
+db_password: "{{ mysql_password }}"
+db_name: "{{ mysql_db }}"
+db_port: {{ mysql_port }}
+
+# Flask settings
+flask_env: production
+flask_debug: false
+secret_key: "{{ vault_secret_key | default('your-secret-key-here') }}"
+jwt_secret_key: "{{ vault_jwt_secret_key | default('your-jwt-secret-key-here') }}"
+
+# Redis settings
+redis_url: "redis://localhost:6379/0"
+
+# Email settings
+mail_server: "{{ vault_mail_server | default('localhost') }}"
+mail_port: "{{ vault_mail_port | default(587) }}"
+mail_use_tls: "{{ vault_mail_use_tls | default(true) }}"
+mail_username: "{{ vault_mail_username | default('') }}"
+mail_password: "{{ vault_mail_password | default('') }}"
+mail_default_sender: "{{ vault_mail_default_sender | default('noreply@chocomap.local') }}"
+
+# API keys
+google_maps_api_key: "{{ vault_google_maps_api_key | default('your-google-maps-api-key') }}"
+
+# Application settings
+app_name: "ChocoMap"
+app_version: "1.0.0"
+timezone: "UTC"
+default_language: "en"
+warehouse_lat: "50.0755"
+warehouse_lng: "14.4378"
+
+# Feature flags
+enable_analytics: true
+enable_notifications: true
+enable_file_upload: true
+
+# Security settings
+session_cookie_secure: false
+session_cookie_httponly: true
+session_cookie_samesite: "Lax"
+strict_transport_security: false
+
+# Template variables for config files
+debug: false
+page_size: 20

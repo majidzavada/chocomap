@@ -1,0 +1,9 @@
+skip_list:
+  - fqcn[action-core]
+  - fqcn[action]
+  - yaml[truthy]
+  - literal-compare
+  - yaml[trailing-spaces]
+  - name[casing]
+  - no-changed-when
+  - execution-error

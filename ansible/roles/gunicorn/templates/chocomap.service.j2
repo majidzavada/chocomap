@@ -1,0 +1,20 @@
+[Unit]
+Description=Gunicorn instance to serve ChocoMap
+After=network.target mysql.service redis-server.service
+Wants=mysql.service redis-server.service
+
+[Service]
+Type=exec
+User={{ app_user }}
+Group={{ app_user }}
+WorkingDirectory={{ app_root }}
+Environment="PATH={{ app_root }}/venv/bin"
+ExecStart={{ app_root }}/start_gunicorn.sh
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

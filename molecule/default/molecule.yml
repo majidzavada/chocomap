@@ -1,0 +1,16 @@
+---
+driver:
+  name: docker
+
+platforms:
+  - name: instance
+    image: ubuntu:latest
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  playbooks:
+    converge: ../../site.yml
+
+verifier:
+  name: testinfra
