@@ -12,7 +12,7 @@ db_host: "{{ mysql_host }}"
 db_user: "{{ mysql_user }}"
 db_password: "{{ mysql_password }}"
 db_name: "{{ mysql_db }}"
-db_port: {{ mysql_port }}
+db_port: "{{ mysql_port }}"
 
 # Flask settings
 flask_env: production
